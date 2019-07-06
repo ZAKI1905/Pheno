@@ -5,7 +5,6 @@ PYTHIA-8:
   - T. Sjöstrand, S. Mrenna and P. Skands, JHEP05 (2006) 026, Comput. Phys. Comm. 178 (2008) 852.
   
 FastJet: 
-  - M. Cacciari, G.P. Salam and G. Soyez, Eur.Phys.J. C72 (2012) 1896 [arXiv:1111.6097] and, optionally, 
-  - M. Cacciari and G.P. Salam, Phys. Lett. B 641 (2006) 57 [hep-ph/0512210]. 
+  - M. Cacciari, G.P. Salam and G. Soyez, Eur.Phys.J. C72 (2012) 1896 [arXiv:1111.6097].
 
 
