@@ -8,10 +8,10 @@
 #include <iostream>
 #include <vector>
 #include "Pythia8/Pythia.h"
-#include "../include/EV.h"
-#include "../include/M4Cut.h"
-#include "../include/Basics.h"
-#include "../include/Cut.h"
+#include "../inc/EV.h"
+#include "../inc/M4Cut.h"
+#include "../inc/Basics.h"
+#include "../inc/Cut.h"
 
 using namespace Pythia8 ;
 
@@ -46,12 +46,61 @@ void M4Cut::input(std::string property)
 void M4Cut::cut_cond(vector<ExParticle>& in_parlst)
 {
 
+  //************************************************************
+  //           Special Colinear Approximation 
+  //************************************************************
+
+//   if (in_parlst.size() != 4)  return;
+
+//   vector<ExParticle> sel_emu ;
+//   vector<ExParticle> sel_taumu ;
+//   int tau_sign;
+
+//   for (size_t i=0 ; i<in_parlst.size() ; ++i)
+//   {
+//     if ( in_parlst[i].idAbs() == ID_TAU)
+//     {
+//       tau_sign = (in_parlst[i].id() / in_parlst[i].idAbs()) ;
+//       sel_taumu.push_back(in_parlst[i]) ;
+//     }
+//     if ( in_parlst[i].idAbs() == ID_ELECTRON)
+//       sel_emu.push_back(in_parlst[i]) ;
+    
+//   }
+
+//  for (size_t i=0 ; i<in_parlst.size() ; ++i)
+//   {
+//     if ( in_parlst[i].idAbs() == ID_MUON ) 
+//       {
+//         if( (in_parlst[i].id() / in_parlst[i].idAbs()) == tau_sign )
+//           sel_emu.push_back(in_parlst[i]) ;
+//         else
+//           sel_taumu.push_back(in_parlst[i]) ;
+//       }
+//   }
+
+//   if (sel_emu.size() != 2 || sel_taumu.size() != 2)  return ;
+
+//   double tauMuInv = invM(sel_taumu) ;
+//   double eMuInv = invM(sel_emu) ;
+//   double momProd = (sel_emu[0].mom()*sel_emu[1].mom());
+
+//   double eps = ( pow(tauMuInv, 2) - pow(eMuInv, 2) ) / (2*momProd) ;
+
+//   Vec4 tmp_vec4 =  (1+eps)*sel_emu[0].mom() + sel_emu[1].mom() ;
+//   Vec4 tmp_total_vec4 = tmp_vec4 + sel_taumu[0].mom() +  sel_taumu[1].mom() ;
+
+//   double tmp_m = tmp_total_vec4.mCalc() ;
+
+  //************************************************************
+  //************************************************************
+
   // Calculate the invariant mass of the 
   // 4 leptons
   double tmp_m = invM(in_parlst) ;
 
-  // For now we get rid of the events with size > 4.
-  if ( in_parlst.size() > 4 ||  tmp_m < M4_cut_min || tmp_m > M4_cut_max )
+  // For now we get rid of the events with size != 4.
+  if ( in_parlst.size() != 4 ||  tmp_m < M4_cut_min || tmp_m > M4_cut_max )
   {
     for(size_t i=0 ; i < in_parlst.size() ; ++i )
     {

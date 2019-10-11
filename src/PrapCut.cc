@@ -8,10 +8,10 @@
 #include <iostream>
 #include <vector>
 #include "Pythia8/Pythia.h"
-#include "../include/EV.h"
-#include "../include/PrapCut.h"
-#include "../include/Basics.h"
-#include "../include/Cut.h"
+#include "../inc/EV.h"
+#include "../inc/PrapCut.h"
+#include "../inc/Basics.h"
+#include "../inc/Cut.h"
 
 using namespace Pythia8 ;
 

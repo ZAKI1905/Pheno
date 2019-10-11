@@ -11,9 +11,9 @@
 #include "Pythia8/Pythia.h"
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/Selector.hh"
-#include "../include/EV.h"
-#include "../include/Basics.h"
-
+#include "../inc/EV.h"
+#include "../inc/Basics.h"
+#include "../inc/GenJet.h"
 
 using std::vector ;
 using namespace Pythia8 ;
@@ -26,16 +26,20 @@ using namespace Pythia8 ;
 EV::EV(int set_ev_num, Event& event):event_number(set_ev_num)
 {
 
-  for(size_t i=0 ; i < event.size() ; ++i)
+  for(int i=0 ; i < event.size() ; ++i)
   {
       ExParticle pt(event[i]) ;
-
       // sets the event pointer for pt
       setEVPtr(pt) ;
 
       // Saving the event into a particle vector
       Full_Event.push_back(pt) ;
 
+      /*
+        // Filling the pseudojet list with particles.
+        Note (May-12-2019): This doesn't have to be this early,
+         but might save time by removing a loop.
+      */
       gen_psjts(event[i]) ;
 
   }
@@ -62,9 +66,7 @@ void EV::addCutPtr(std::shared_ptr<Cut>cutPtrIn)
 //--------------------------------------------------------------
 // Member function to set the GenJet pointer.
 void EV::addGenJetPtr(GenJet* genjetPtrIn) 
-{ 
-  GenJetPtr = genjetPtrIn ;
-}
+{ GenJetPtr = genjetPtrIn ; }
 
 //--------------------------------------------------------------
 // Saves pseudojet lists for fastjet
@@ -79,7 +81,8 @@ void EV::gen_psjts(ExParticle p)
     else
     {
       fastjet::PseudoJet particle(p.px(),p.py(),p.pz(),p.e()) ;
-      particle.set_user_index(p.id()) ;
+      particle.set_user_index(p.chargeType()) ;
+      // particle.set_user_index(-50) ;
       ps_jts.push_back(particle) ;
     }
   }
@@ -202,6 +205,7 @@ vector<ExParticle>& EV::Full_Ev()
 
 //--------------------------------------------------------------
 // Returns the size of the event
+
 size_t EV::size() const
 {
   return Full_Event.size() ;
@@ -233,6 +237,7 @@ bool EV::had_dec(ExParticle& p)
 
 //--------------------------------------------------------------
 // Returns the hadronically decaying taus.
+
 vector<ExParticle>& EV::htau()
 {
   return h_taus ;
@@ -243,14 +248,14 @@ Vec4 EV::vis_p(ExParticle& p)
 // Returns the visible momentum of a particle
 {
 
-  if ( p.isVisible() ) return p.mom() ;
+  if ( p.isFinal() ) return p.mom() ;
 
   Vec4              four_mom(0) ;
   vector<ExParticle>  Temp_Parts ;
   Temp_Parts.push_back(p) ;
 
 
-  for(int j=0 ; j<Temp_Parts.size() ; j++)
+  for(size_t j=0 ; j<Temp_Parts.size() ; j++)
   {
     //Either the particle has a range of decay products or 
     // a "carbon copy" as its sole daughter.
@@ -260,7 +265,7 @@ Vec4 EV::vis_p(ExParticle& p)
 
         for(int i= Temp_Parts[j].daughter1() ; i<= Temp_Parts[j].daughter2() ; ++i )
         {
-            // If the daughters are not visible, then their daughters
+            // If the daughters are not final, then their daughters
             // will be checked and so on.
             if(Full_Event[i].isFinal())
             {
@@ -385,7 +390,8 @@ void EV::update_ps_jets()
       ExParticle p = lep_jts[i] ;
       fastjet::PseudoJet particle(p.mom().px(),p.mom().py(),
       p.mom().pz(),p.mom().e()) ;
-      particle.set_user_index(p.id()) ;
+      particle.set_user_index(p.chargeType()) ;
+      // particle.set_user_index(-50) ;
       ps_jts.push_back(particle) ;
     }
   }

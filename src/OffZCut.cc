@@ -1,7 +1,7 @@
 /*
-  M2Cut class
+  OffZCut class
 
-  Last Updated by Zaki on July 6, 2019
+  Last Updated by Zaki on August 2, 2019
 
 */
 
@@ -9,9 +9,10 @@
 #include <vector>
 #include "Pythia8/Pythia.h"
 #include "../inc/EV.h"
-#include "../inc/M2Cut.h"
+#include "../inc/OffZCut.h"
 #include "../inc/Basics.h"
 #include "../inc/Cut.h"
+#include "../inc/GenJet.h"
 
 using namespace Pythia8 ;
 
@@ -19,58 +20,62 @@ using namespace Pythia8 ;
 
 //--------------------------------------------------------------
 // Constructor
-M2Cut::M2Cut(EV& ev) : Cut(ev) {}
+OffZCut::OffZCut(EV& ev) : Cut(ev) {  }
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void M2Cut::input(std::string property)
+void OffZCut::input(std::string property)
 {
   // Parsing the command
   std::vector<std::string> inp = pars(property, "=") ;
   
-  if(inp[0] == "M2_Cut_Value")
+  if(inp[0] == "OffZ_Cut_Min")
   {
-    M2_Cut_Value = std::stof (inp[1]) ;
+    OffZ_cut_min = std::stof (inp[1]) ;
+  }
+  else if(inp[0] == "OffZ_Cut_Max")
+  {
+    OffZ_cut_max = std::stof (inp[1]) ;
   }
   else
-  { std::cerr<<endl<<inp[0]<<" is invalid option for M2 cut!"<<std::flush ;
+  { std::cerr<<endl<<inp[0]<<" is invalid option for OffZ cut!"<<std::flush ;
   } 
 }
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void M2Cut::cut_cond(vector<ExParticle>& in_parlst)
+void OffZCut::cut_cond(vector<ExParticle>& in_parlst)
 {
   char special_message_char[100] ;
   bool special_message_on = false ;
 
-    for(size_t i=0 ; i < in_parlst.size() ; ++i )
+  for(size_t i=0 ; i < in_parlst.size() ; ++i )
+  {
+    for(size_t j=i ; j < in_parlst.size() ; ++j)
     {
-      for(size_t j=i ; j < in_parlst.size() ; ++j)
-      {
-        vector<ExParticle> tmp_lst = {in_parlst[i],in_parlst[j]} ;
+      vector<ExParticle> tmp_lst = {in_parlst[i],in_parlst[j]} ;
 
-          if(in_parlst[i].id()==-in_parlst[j].id() && 
-             invM(tmp_lst) < M2_Cut_Value)
+        if(in_parlst[i].id()==-in_parlst[j].id() && 
+            OffZ_cut_min < invM(tmp_lst) && invM(tmp_lst) < OffZ_cut_max)
+        {
+          add_elem(rm_list, (int) i) ;
+          add_elem(rm_list, (int) j) ;
+
+          if(report_cut)
           {
-            add_elem(rm_list, (int) i) ;
-            add_elem(rm_list, (int) j) ;
+            sprintf(special_message_char,
+            "\n | -(%2d,%2d) pair with invariant mass %2.3f fail this cut.  |",
+            (int)i+1, (int)j+1, invM(tmp_lst)) ;
 
-            if(report_cut)
-            {
-              sprintf(special_message_char,
-              "\n | -(%2d,%2d) pair with invariant mass %2.3f fail this cut.  |",
-              (int)i+1, (int)j+1, invM(tmp_lst)) ;
-
-              string somestring(special_message_char) ;
-              special_message += somestring           ;
-              special_message_on = true               ;
-            }
+            string somestring(special_message_char) ;
+            special_message += somestring           ;
+            special_message_on = true               ;
           }
-      }
-    
-
+        }
     }
+  
+
+  }
     
   if(special_message_on)
   {

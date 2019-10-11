@@ -5,6 +5,9 @@
 
 */
 
+#define PBSTR "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+#define PBWIDTH 60
+
 extern const int  ID_ELECTRON  = 11 ;
 extern const int  ID_MUON      = 13 ;
 extern const int  ID_TAU       = 15 ;
@@ -17,9 +20,9 @@ extern const int  ID_TAU       = 15 ;
 #include "Pythia8/Pythia.h"
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/Selector.hh"
-#include "../include/Basics.h"
+#include "../inc/Basics.h"
 
-using namespace Pythia8 ;
+using    namespace Pythia8 ;
 
 extern const std::vector<int> lept_id_list { ID_ELECTRON, -ID_ELECTRON,
                                 ID_MUON, -ID_MUON, ID_TAU, -ID_TAU } ;
@@ -32,7 +35,29 @@ double rand01()
 }
 
 //==============================================================
+bool endswith (std::string const &fullString, std::string const &ending) 
+{
+  if (fullString.length() >= ending.length())
+    return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending)); 
+  else
+    return false;
+}
 
+//==============================================================
+// Function to remove occurences of a certain char
+// ( e.g. spaces ) from a given string 
+std::string strip(string str, char c) 
+{ 
+  std::string out_str ;
+  
+  for (size_t i = 0; i<str.size(); i++) 
+    if (str[i] != c) 
+      out_str.push_back(str[i]); 
+
+  return out_str;
+} 
+
+//==============================================================
 template <class T> 
 bool contains( std::vector<T>& Vec, T Element ) 
 {
@@ -67,7 +92,6 @@ bool contains<ExParticle>( std::vector<ExParticle>& Vec, ExParticle p )
 int count( vector<ExParticle>& Vec, vector<int> id_list ) 
 {
   
-
   int counter = 0 ;
 
   for ( size_t i=0 ; i < id_list.size() ; ++i )
@@ -216,6 +240,34 @@ void stolst(vector<float>& out_lst, std::string in_lst_str, std::string delim)
 }
 
 //==============================================================
+// Event range input parser for inputs like:
+//  (...=1-10,50-75,300,401)
+std::vector<int> ev_range_pars(std::string input)
+{
+    std::vector<std::string> pars_pr_ev_set = pars(input, ",", -1) ;
+    std::vector<int> ev_set ;
+
+    for (size_t i=0 ; i<pars_pr_ev_set.size() ; ++i)
+    {
+      std::vector<std::string> tmp_set = pars(pars_pr_ev_set[i], "-");
+
+      int min_ev = std::stoi(tmp_set[0]);
+      int max_ev = std::stoi(tmp_set[1]);
+
+      // For inputs that are a range of event, i.e. '...,20-50,...'
+      if (min_ev != max_ev)
+      {
+        for(int j=min_ev ; j<=max_ev; ++j)
+          ev_set.push_back(j) ;
+      }
+      // For inputs that are single event, i.e. '...,50,...' 
+      else
+        ev_set.push_back(min_ev);
+    }
+
+  return ev_set;
+}
+//==============================================================
 // Returns the invariant mass of a list of particles
 double invM(vector<ExParticle>& prt_lst) 
 {
@@ -279,14 +331,34 @@ int OSOF(vector<ExParticle>& ev)
 // Returns the distance between two particles
 double R(ExParticle& p1, ExParticle& p2)
 {
-    return pow((pow((p1.visMom().eta() - p2.visMom().eta()), 2) 
-           + pow((p1.visMom().phi() - p2.visMom().phi()),2)),0.5) ;
+  return pow((pow((p1.visMom().eta() - p2.visMom().eta()), 2) 
+          + pow((p1.visMom().phi() - p2.visMom().phi()),2)),0.5) ;
 }
 
 //==============================================================
 // Records the input quantity (int, float or double) and saves in
 // multiple (# of threads) text files.
-void saveVec(vector<int> list, std::string out_file_str)
+
+//-------------------------------------------------------
+template <class T> 
+void saveVec(vector<T> list, std::string out_file_str)
+{
+  if (list.size() ==0 ) return ;
+  out_file_str = out_file_str + ".dat" ;
+
+  std::FILE * out_file ;
+  out_file = fopen(out_file_str.c_str(), "a") ;
+
+  for(size_t i=0 ; i < list.size() ; ++i)
+    { fprintf(out_file,"%f\n", list[i]) ; }
+
+  fclose(out_file) ;
+}
+
+//-------------------------------------------------------
+// Specialization for int instances
+template <> 
+void saveVec<int>(vector<int> list, std::string out_file_str)
 {
   if (list.size() ==0 ) return ;
 
@@ -302,7 +374,24 @@ void saveVec(vector<int> list, std::string out_file_str)
 }
 
 //-------------------------------------------------------
-void saveVec(vector<float> list, std::string out_file_str)
+// void saveVec(vector<double> list, std::string out_file_str)
+// {
+//   if (list.size() ==0 ) return ;
+//   out_file_str = out_file_str + ".dat" ;
+
+//   std::FILE * out_file ;
+//   out_file = fopen(out_file_str.c_str(), "a") ;
+
+//   for(size_t i=0 ; i < list.size() ; ++i)
+//     { fprintf(out_file,"%f\n", list[i]) ; }
+
+//   fclose(out_file) ;
+// }
+
+//-------------------------------------------------------
+// Specialization for string instances
+template <> 
+void saveVec<std::string>(vector<std::string> list, std::string out_file_str)
 {
   if (list.size() ==0 ) return ;
   out_file_str = out_file_str + ".dat" ;
@@ -311,28 +400,15 @@ void saveVec(vector<float> list, std::string out_file_str)
   out_file = fopen(out_file_str.c_str(), "a") ;
 
   for(size_t i=0 ; i < list.size() ; ++i)
-    { fprintf(out_file,"%f\n", list[i]) ; }
+    { fprintf(out_file,"%s\n", list[i].c_str()) ; }
 
   fclose(out_file) ;
 }
 
 //-------------------------------------------------------
-void saveVec(vector<double> list, std::string out_file_str)
-{
-  if (list.size() ==0 ) return ;
-  out_file_str = out_file_str + ".dat" ;
-
-  std::FILE * out_file ;
-  out_file = fopen(out_file_str.c_str(), "a") ;
-
-  for(size_t i=0 ; i < list.size() ; ++i)
-    { fprintf(out_file,"%f\n", list[i]) ; }
-
-  fclose(out_file) ;
-}
-
-//-------------------------------------------------------
-void saveVec(vector<rec_var> list)
+// Overloading saveVec for rec_var<T> inputs
+template <class T>
+void saveVec(vector<rec_var<T> > list)
 {
   if (list.size() ==0 ) return ;
   string out_file_str = list[0].name + ".dat" ;
@@ -341,11 +417,54 @@ void saveVec(vector<rec_var> list)
   out_file = fopen(out_file_str.c_str(), "a") ;
 
   for(size_t i=0 ; i < list.size() ; ++i)
-    { fprintf(out_file,"%f\n", list[i].val) ; }
+    { 
+      fprintf(out_file,"%f\n", list[i].val) ;
+    }
 
   fclose(out_file) ;
 }
 
+//-------------------------------------------------------
+// Specialization for double vector instances
+template <> 
+void saveVec<vector<double> >(vector<rec_var<vector<double> > > list)
+{
+  if (list.size() ==0 ) return ;
+
+  string out_file_str = list[0].name + ".dat" ;
+
+  std::FILE * out_file ;
+  out_file = fopen(out_file_str.c_str(), "a") ;
+
+  for(size_t i=0; i < list.size(); ++i)
+  { 
+    for(size_t j=0; j < list[i].val.size(); ++j)
+      fprintf(out_file,"%f ", list[i].val[j]) ; 
+    
+    fprintf(out_file,"\n");
+  }
+
+  fclose(out_file) ;
+}
+
+//-------------------------------------------------------
+// Specialization for int instances
+template <>
+void saveVec<int>(vector<rec_var<int> > list)
+{
+  if (list.size() ==0 ) return ;
+  string out_file_str = list[0].name + ".dat" ;
+
+  std::FILE * out_file ;
+  out_file = fopen(out_file_str.c_str(), "a") ;
+
+  for(size_t i=0 ; i < list.size() ; ++i)
+    { 
+      fprintf(out_file,"%d\n", list[i].val) ;
+    }
+
+  fclose(out_file) ;
+}
 //==============================================================
 
 //==============================================================
@@ -369,5 +488,16 @@ template void rm_elem<ExParticle>(vector<ExParticle>&, vector<int>) ;
 template void rm_elem<fastjet::PseudoJet>(vector<fastjet::PseudoJet>&,
  vector<int>) ;
 //--------------------------------
+
+// SaveVec
+template void saveVec<int>(vector<int>, std::string) ;
+template void saveVec<float>(vector<float>, std::string) ;
+template void saveVec<double>(vector<double>, std::string) ;
+template void saveVec<std::string>(vector<std::string>, std::string) ;
+
+template void saveVec<double>(vector<rec_var<double> >) ;
+template void saveVec<vector<double> >(vector<rec_var<vector<double> > >) ;
+template void saveVec<int>(vector<rec_var<int> >) ;
+template void saveVec<float>(vector<rec_var<float> >) ;
 
 //==============================================================

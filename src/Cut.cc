@@ -1,17 +1,17 @@
-/* 
+/*
   Cut class
 
   Last Updated by Zaki on July 6, 2019
 
-*/ 
+*/
 
 // "algorithm" for "remove" and "remove_if"
-#include <algorithm>     
+#include <algorithm>
 #include <iostream>
 #include <vector>
-#include "../include/Basics.h"
-#include "../include/EV.h"
-#include "../include/Cut.h"
+#include "../inc/Basics.h"
+#include "../inc/EV.h"
+#include "../inc/Cut.h"
 
 using std::vector ;
 
@@ -21,7 +21,10 @@ using std::vector ;
 // Constructor
 // Constructor takes a reference to an event.
 
-Cut::Cut(EV& ev):ev_ref(ev) { }
+Cut::Cut(EV& ev):ev_ref(ev) {
+  // // Adding the pointer to this cut to the event
+  //   ev.addCutPtr(this);
+   }
 
 //--------------------------------------------------------------
 // Virtual destructor
@@ -50,11 +53,11 @@ void Cut::report()
     if( same_iEv != ev_ref.i() )
     {
       same_iEv = ev_ref.i() ;
-      fprintf(pCUT_REPORT_FILE,"\n %s Event %5d begins %s\n", pr(50,'*').c_str(),
+      fprintf(pCUT_REPORT_FILE,"\n %s Event %5d %s\n", pr(50,'*').c_str(),
        same_iEv, pr(50,'*').c_str()) ;
 
     }
-    
+
 
   // --------------------------------------
   // List of particles prior to the Cut
@@ -96,7 +99,7 @@ void Cut::report()
       fprintf(pCUT_REPORT_FILE,"\n No particle passed this cut.") ;
   // If all passed
     else
-      fprintf(pCUT_REPORT_FILE,"\n All of the particles passed this cut.") ; 
+      fprintf(pCUT_REPORT_FILE,"\n All of the particles passed this cut.") ;
   }
 
   // --------------------------------------
@@ -135,19 +138,22 @@ void Cut::apply(vector<ExParticle>& in_parlst)
 
   // Copying in_parlst for report()
     in_parts_cpy = in_parlst ;
- 
+
   // Adds those not passing cuts to rm_list
     cut_cond(in_parlst) ;
-  
+
   // Removes the elements in in_parlst based on rm_list
     rm_elem(in_parlst, rm_list) ;
+
+  // Adding the pointer to this cut to the event
+    // ev_ref.addCutPtr(this) ;
 
   // Copying in_parlst for report()
     out_parts_cpy = in_parlst ;
 
   // Reports cut
     if(report_cut) report() ;
-  
+
 }
 
 //--------------------------------------------------------------

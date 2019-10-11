@@ -13,9 +13,9 @@
 #include "Pythia8/Pythia.h"
 #include "fastjet/ClusterSequence.hh"
 #include "fastjet/Selector.hh"
-#include "../include/ExParticle.h"
-#include "../include/Basics.h"
-#include "../include/EV.h"
+#include "../inc/ExParticle.h"
+#include "../inc/Basics.h"
+#include "../inc/EV.h"
 
 using std::vector ;
 using namespace Pythia8 ;
@@ -51,6 +51,8 @@ void ExParticle::setEVPtr(EV* evPtrIn) { EVPtr = evPtrIn ;}
 // and muons
 void ExParticle::setMom()
 {
+  // If visible, returns the true momentum, otherwise '0'.
+  // ptMom = (this->isVisible()) ? this->p() : 0;
 
   ptMom = this->p() ;
   float pt_res ;
@@ -72,6 +74,7 @@ void ExParticle::setMom()
 
   ptMom = this->p()*( 1 + distribution(generator) ) ;
 
+  // cout<<"\n"<<"- Random number is: "<<distribution(generator)<<endl ;
 }
 
 //--------------------------------------------------------------

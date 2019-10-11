@@ -8,10 +8,10 @@
 #include <iostream>
 #include <vector>
 #include "Pythia8/Pythia.h"
-#include "../include/EV.h"
-#include "../include/PtCut.h"
-#include "../include/Basics.h"
-#include "../include/Cut.h"
+#include "../inc/EV.h"
+#include "../inc/PtCut.h"
+#include "../inc/Basics.h"
+#include "../inc/Cut.h"
 
 using namespace Pythia8 ;
 
@@ -64,7 +64,7 @@ void PtCut::cut_cond(vector<ExParticle>& in_parlst)
   for(size_t i=0 ; i < in_parlst.size() ; ++i )
   { 
     // If pT is less than the cut
-    if( in_parlst[i].mom().pT() < pt_cut_val(i+1, in_parlst[i]) )
+    if( in_parlst[i].visMom().pT() < pt_cut_val(i+1, in_parlst[i]) )
     {
       /* It's possible that it's a tau that first fails
        the cut (unlikely), but still no problem. */
@@ -81,7 +81,7 @@ void PtCut::cut_cond(vector<ExParticle>& in_parlst)
       // Check the pT condition this time for taus
       while (i < in_parlst.size())
       {
-        if( in_parlst[i].pT() < pt_cut_val(i+1, in_parlst[i]) )
+        if( in_parlst[i].visMom().pT() < pt_cut_val(i+1, in_parlst[i]) )
         {
           tau_fail_idx = i ;
           break ;

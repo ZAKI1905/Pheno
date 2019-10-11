@@ -8,9 +8,9 @@
 #include <iostream>
 #include <vector>
 #include "Pythia8/Pythia.h"
-#include "../include/EV.h"
-#include "../include/Binner.h"
-#include "../include/Basics.h"
+#include "../inc/EV.h"
+#include "../inc/Binner.h"
+#include "../inc/Basics.h"
 
 using namespace Pythia8 ;
 
@@ -22,6 +22,9 @@ Binner::Binner() {}
 //--------------------------------------------------------------
 // Virtual destructor
 Binner::~Binner() { }
+
+//--------------------------------------------------------------
+// void Binner::input(std::string property) {}
 
 
 //==============================================================

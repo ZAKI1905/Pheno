@@ -1,18 +1,18 @@
 /*
   STBinner class
 
-  Last Updated by Zaki on July 6, 2019
+  Last Updated by Zaki on Sep 3, 2019
 
 */
 
 #include <iostream>
 #include <vector>
 #include "Pythia8/Pythia.h"
-#include "../include/EV.h"
-#include "../include/STBinner.h"
-#include "../include/Binner.h"
-#include "../include/GenJet.h"
-#include "../include/Basics.h"
+#include "../inc/EV.h"
+#include "../inc/STBinner.h"
+#include "../inc/Binner.h"
+#include "../inc/GenJet.h"
+#include "../inc/Basics.h"
 
 using namespace Pythia8 ;
 
@@ -26,17 +26,25 @@ void STBinner::input(EV& evIn)
 {
   // Saving the event reference
   evp = &evIn ;
-
+ 
   // The leptons that passed the cuts (by definition charged)
    charged_lept = evp->pass_lepts() ;
-
+  
   // Setting unit event counter from the event weight
    one_event  = evp->weight() ;
 
   // Saving the inclusive jets after the cuts
-   jet_set = evp->GenJetPtr->inc_jets_after ;
+   jet_set = evp->GenJetPtr->inclusive_after() ;
+
 
 }
+
+//--------------------------------------------------------------
+// // Should be used after the genjet method
+// void STBinner::input(vector<fastjet::PseudoJet> in_jet_set)
+// {
+//   jet_set = in_jet_set ;
+// }
 
 //--------------------------------------------------------------
 // Overloading the input method.
@@ -341,6 +349,27 @@ void STBinner::report(std::string File_LHE)
         content += tmp ;
 
       }
+
+      // fprintf(FINAL_REPORT," | %s |\n",pr(35+dash_count,'-').c_str()) ;
+
+
+      // print out the details for each bin
+      // if(j!=8 && j!=9)
+      // {
+      //   for (size_t i = 0 ; i < 5 ; ++i) {
+      //     fprintf(FINAL_REPORT," | %6u    |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i]) ;
+      //     fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i],  bin_set[j-1][2][i]) ;
+      //   }
+      //   fprintf(FINAL_REPORT,"  %s \n\n",pr(37,'-').c_str()) ;
+      // }
+      // else
+      // {
+      //   for (size_t i = 0 ; i < 5 ; ++i) {
+      //     fprintf(FINAL_REPORT," | %6u    |%9.2f   |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
+      //     fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
+      //   }
+      //   fprintf(FINAL_REPORT,"  %s \n\n",pr(50,'-').c_str()) ;
+      // }
     }
     fprintf(FINAL_REPORT, "%s", content.c_str()) ;
 
