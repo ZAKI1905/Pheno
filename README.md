@@ -1,5 +1,5 @@
 # Pheno
-This is the program used for the collider analysis in "Exotic Lepton-Flavor Violating Higgs Decays". 
+This is the program used for the collider analysis in "Exotic Lepton-Flavor Violating Higgs Decays" project. 
 
 -Last updated October 11, 2019
 
