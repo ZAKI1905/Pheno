@@ -1,67 +1,102 @@
-PYTFASFLAG = $(shell pythia8-config --fastjet3 --libs --cxxflags ) -lCGAL -lgmp
+# The main c++ file ( should have main() function )
+MAINOBJ_0	:= cms_8TeV
+MAINOBJ_1 	:= search_LFV_1
+MAINOBJ_2_1 := search_LFV_2_1
+MAINOBJ_2_2 := search_LFV_2_2
+MAINOBJ_3 	:= search_LFV_3
+MAINOBJ_4 := search_LFV_4
+MAINOBJ_5 	:= faketaus
 
-objects = Basics.o ExParticle.o EV.o Cut.o GenJet.o Isolation.o IdEff.o M2Cut.o M4Cut.o PtCut.o PrapCut.o Binner.o STBinner.o test.o Pheno.o
+# MAINOBJ := $(MAINOBJ_1) $(MAINOBJ_2) $(MAINOBJ_3) $(MAINOBJ_4)
 
-CC = g++
-CCFLAGS  = -std=c++11 -fopenmp -Wall -Wextra -pedantic -g
-EXE = run
+MAINOBJ 	:= $(MAINOBJ_5)
 
-#------------------------------------objects----------------------------------------
-$(EXE) : $(objects)
-	$(CC) $(CCFLAGS) -o $(EXE) $(objects) $(PYTFASFLAG)
-	echo "Build Date = `date` " >_compile.txt
-	-rm $(objects)
+# The Target Binary Program 
+# This could be anything, but this way you can make
+# all the binaries by switching the 'MAINOBJ' above,
+# without changing anything else.
+TARGET      :=  $(MAINOBJ)
 
-test.o : Basics.o EV.o IdEff.o
-	$(CC) -std=c++11 -c test.cc 
 
-Basics.o : src/Basics.cc include/Basics.h
-	$(info Compiling...) 
-	$(CC) -std=c++11 -c src/Basics.cc 
+# The Directories, Source, Includes, Objects, Binary and Resources
+SRCDIR      := src
+INCDIR      := inc
+BUILDDIR    := obj
+TARGETDIR   := bin
+# RESDIR      := res
+MAINDIR     := main
+SRCEXT      := cc
+DEPEXT      := d
+OBJEXT      := o
 
-ExParticle.o : Basics.o src/ExParticle.cc include/ExParticle.h
-	$(CC) -std=c++11 -c src/ExParticle.cc 
+# Compiler and Linker
+CC          := g++
 
-EV.o : ExParticle.o Basics.o src/EV.cc include/EV.h
-	$(CC) -std=c++11 -c src/EV.cc 
 
-GenJet.o : EV.o Basics.o src/GenJet.cc include/GenJet.h
-	$(CC) -std=c++11 -c src/GenJet.cc 
+# Flags, Libraries and Includes
+CFLAGS      := -std=c++11 -fopenmp -Wall -Wextra -pedantic -g
+# CFLAGS      := -std=c++11 -fopenmp -Wall -Wextra -pedantic -g -lCGAL -lgmp
+PYTFASFLAG 	:= $(shell pythia8-config --fastjet3 --libs --cxxflags ) 
+LDFLAGS 	:= 
+INC         := -I$(INCDIR) -I/usr/local/include $(PYTFASFLAG) $(LDFLAGS)
+# INC         := -I$(INCDIR) $(PYTFASFLAG) $(LDFLAGS) 
+INCDEP      := -I$(INCDIR) $(PYTFASFLAG) $(LDFLAGS) 
 
-Cut.o : EV.o Basics.o src/Cut.cc include/Cut.h
-	$(CC) -std=c++11 -c src/Cut.cc 
+#---------------------------------------------------------------------------------
+# DO NOT EDIT BELOW THIS LINE
+#---------------------------------------------------------------------------------
+SOURCES     := $(shell find $(SRCDIR) -type f -name '*.$(SRCEXT)')
+OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
 
-Isolation.o : Basics.o EV.o Cut.o src/Isolation.cc include/Isolation.h
-	$(CC) -std=c++11 -c src/Isolation.cc 
+# # Making special target
+# special: directories $(TARGET)
 
-IdEff.o : Basics.o EV.o Cut.o src/IdEff.cc include/IdEff.h
-	$(CC) -std=c++11 -c src/IdEff.cc 
+# Making all targets
+all: directories $(TARGET)
 
-M2Cut.o : Basics.o EV.o Cut.o src/M2Cut.cc include/M2Cut.h
-	$(CC) -std=c++11 -c src/M2Cut.cc 
+# Remake
+remake: cleaner all
 
-M4Cut.o : Basics.o EV.o Cut.o src/M4Cut.cc include/M4Cut.h
-	$(CC) -std=c++11 -c src/M4Cut.cc 
+# #Copy Resources from Resources Directory to Target Directory
+# resources: directories
+# 	@cp $(RESDIR)/* $(TARGETDIR)/
 
-PtCut.o : Basics.o EV.o Cut.o src/PtCut.cc include/PtCut.h
-	$(CC) -std=c++11 -c src/PtCut.cc 
+# Make the Directories
+directories:
+	@mkdir -p $(TARGETDIR)
+	@mkdir -p $(BUILDDIR)
 
-PrapCut.o : Basics.o EV.o Cut.o src/PrapCut.cc include/PrapCut.h
-	$(CC) -std=c++11 -c src/PrapCut.cc 
+# Clean only Objecst
+clean:
+	@echo "Cleaning objects..."
+	@$(RM) -rf $(BUILDDIR)
 
-Binner.o : EV.o Basics.o src/Binner.cc include/Binner.h
-	$(CC) -std=c++11 -c src/Binner.cc 
+# Full Clean, Objects and Binaries
+cleaner: clean
+	@echo "Cleaning up..."
+	@$(RM) -rf $(TARGETDIR)
 
-STBinner.o : EV.o Basics.o Binner.o src/STBinner.cc include/STBinner.h
-	$(CC) -std=c++11 -c src/STBinner.cc 
+# Pull in dependency info for *existing* .o files
+-include $(OBJECTS:.$(OBJEXT)=.$(DEPEXT))
 
-Pheno.o : Basics.o src/Pheno.cc include/Pheno.h
-	$(CC) $(CCFLAGS) -std=c++11 -c src/Pheno.cc
+# Link
+$(TARGET): $(OBJECTS) $(MAINOBJ).$(OBJEXT)
+	$(CC)  $(CFLAGS) -o $(TARGETDIR)/$(TARGET) $^ $(PYTFASFLAG) $(LDFLAGS)
 
-#-------------------------------------------------------------------------------
+# Compile
+$(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(INC) -c -o $@ $<  
+	@$(CC) $(CFLAGS) $(INCDEP) -MM $(SRCDIR)/$*.$(SRCEXT) > $(BUILDDIR)/$*.$(DEPEXT) 
+	@cp -f $(BUILDDIR)/$*.$(DEPEXT) $(BUILDDIR)/$*.$(DEPEXT).tmp
+	@sed -e 's|.*:|$(BUILDDIR)/$*.$(OBJEXT):|' < $(BUILDDIR)/$*.$(DEPEXT).tmp > $(BUILDDIR)/$*.$(DEPEXT)
+	@sed -e 's/.*://' -e 's/\\$$//' < $(BUILDDIR)/$*.$(DEPEXT).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(BUILDDIR)/$*.$(DEPEXT)
+	@rm -f $(BUILDDIR)/$*.$(DEPEXT).tmp
+	@echo "Build Date = `date` " >_compile.txt
 
-.PHONY : clean
+$(MAINOBJ).$(OBJEXT): $(MAINDIR)/$(MAINOBJ).$(SRCEXT)
+	$(CC) -c $(MAINDIR)/$(MAINOBJ).$(SRCEXT)
 
-clean :
-	$(info Cleaning...)
-	-rm $(EXE) $(objects)
+# Non-File Targets
+.PHONY: all remake clean cleaner resources
+
