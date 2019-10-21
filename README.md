@@ -2,23 +2,21 @@
 This is the program used for the collider analysis in "[Exotic Lepton-Flavor Violating Higgs Decays](http://arxiv.org/abs/arXiv:1910.07533)" project.
 
 ## Info 
+```
   *Exotic Lepton-Flavor Violating Higgs Decays*
-  
   Jared A. Evans, Philip Tanedo, and Mohammadreza Zakeri
-  
   http://arxiv.org/abs/arXiv:1910.07533
+```
 
 If you use this package please cite:
-
-  Mohammadreza Zakeri. (2019, October 11).
-  
+```
+  Mohammadreza Zakeri. (2019, October 11).  
   ZAKI1905/Pheno: Beta-Release (Version v1.0.0-beta). Zenodo.
-  
   http://doi.org/10.5281/zenodo.3482349
-
+```
 
 For BibTeX style citation use:
-'''
+```
   @software{mohammadreza_zakeri_2019_3482349,
     author       = {Mohammadreza Zakeri},
     title        = {ZAKI1905/Pheno: Beta-Release},
@@ -29,7 +27,7 @@ For BibTeX style citation use:
     doi          = {10.5281/zenodo.3482349},
     url          = {https://doi.org/10.5281/zenodo.3482349}
   }
-'''
+```
 
 -Last updated October 11, 2019
 
