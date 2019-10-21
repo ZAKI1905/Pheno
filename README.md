@@ -4,8 +4,8 @@ Info:
 
 This is the program used for the collider analysis in "Exotic Lepton-Flavor Violating Higgs Decays" project:
 
-  Exotic Lepton-Flavor Violating Higgs Decays
-  Jared A. Evans, Philip Tanedo, and Mohammadreza Zakeri
+  Exotic Lepton-Flavor Violating Higgs Decays,
+  Jared A. Evans, Philip Tanedo, and Mohammadreza Zakeri,
   http://arxiv.org/abs/arXiv:1910.07533
 
 If you use this package please cite:
