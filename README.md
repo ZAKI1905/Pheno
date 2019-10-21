@@ -31,20 +31,20 @@ For BibTeX style citation use:
 
 ## Compiling
 To make the binary files:
-  -1) Edit the make file ("~/Makefile") in the main directory, by adding the path to pythia, fastjet, etc. 
-  -2) Choose the main c++ file (which is inside "~/main") to be compiled, by typing it in front of "MAINOBJ" in the make file. 
-  -3) Run "make"
+  1. Edit the make file ("~/Makefile") in the main directory, by adding the path to pythia, fastjet, etc. 
+  2. Choose the main c++ file (which is inside "~/main") to be compiled, by typing it in front of "MAINOBJ" in the make file. 
+  3. Run "make"
 
 ## Running
 To run the binaries:
-  -1) Put the LHE file(s) in the desired directory, with the following naming scheme:
+  1. Put the LHE file(s) in the desired directory, with the following naming scheme:
   {"XYZ_0.lhe", "XYZ_1.lhe", "XYZ_2.lhe", ...}
   where all "XYZ.lhe" files are from the same process, but chopped for parallel computing by OMP.
   Note: If there is only one LHE file, still add "_0.lhe" to its name.
 
   Step 2 depends on the main c++ file format, for the ones inside "~/main" do
 
-  -2) run `./bin/[BINARY] [LHE_FILE] [NUM_EVENTS] [OMP_THREADS] [REPORT_BOOL]`
+  2. run `./bin/[BINARY] [LHE_FILE] [NUM_EVENTS] [OMP_THREADS] [REPORT_BOOL]`
   where:
 
     "BINARY" stands for the name of the binary file (inside ~/bin)
@@ -60,11 +60,11 @@ To run the binaries:
     {my_model_0.lhe, my_model_1.lhe}
 
 To add your own main c++ file:
-  -1) write a c++ file with a main() function and put it inside "~/main".
-  -2) Add the name of the main file in the make file for compiling.
-  -3) Compile using "make" command
-  -4) A binary with the same name will be created inside "~/bin"
-  -5) Run as explained above.
+  1. write a c++ file with a main() function and put it inside "~/main".
+  2. Add the name of the main file in the make file for compiling.
+  3. Compile using "make" command
+  4. A binary with the same name will be created inside "~/bin"
+  5. Run as explained above.
 
 ## References
 This package uses PYTHIA-8 and FastJet.
