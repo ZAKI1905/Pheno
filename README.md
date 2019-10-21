@@ -1,9 +1,37 @@
 # Pheno
-This is the program used for the collider analysis in "Exotic Lepton-Flavor Violating Higgs Decays" project. 
+
+Info: 
+
+This is the program used for the collider analysis in "Exotic Lepton-Flavor Violating Higgs Decays" project:
+
+  Exotic Lepton-Flavor Violating Higgs Decays
+  Jared A. Evans, Philip Tanedo, and Mohammadreza Zakeri
+  http://arxiv.org/abs/arXiv:1910.07533
+
+If you use this package please cite:
+
+  Mohammadreza Zakeri. (2019, October 11).
+  ZAKI1905/Pheno: Beta-Release (Version v1.0.0-beta). Zenodo.
+  http://doi.org/10.5281/zenodo.3482349
+
+
+For BibTeX style citation use:
+
+  @software{mohammadreza_zakeri_2019_3482349,
+    author       = {Mohammadreza Zakeri},
+    title        = {ZAKI1905/Pheno: Beta-Release},
+    month        = oct,
+    year         = 2019,
+    publisher    = {Zenodo},
+    version      = {v1.0.0-beta},
+    doi          = {10.5281/zenodo.3482349},
+    url          = {https://doi.org/10.5281/zenodo.3482349}
+  }
+
 
 -Last updated October 11, 2019
 
-
+_________________________________________________________________________
 To make the binary files:
   1) Edit the make file ("~/Makefile") in the main directory, by adding the path to pythia, fastjet, etc. 
   2) Choose the main c++ file (which is inside "~/main") to be compiled, by typing it in front of "MAINOBJ" in the make file. 
