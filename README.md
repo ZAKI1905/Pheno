@@ -1,8 +1,8 @@
 # Pheno
 
-Info: 
-
-This is the program used for the collider analysis in "Exotic Lepton-Flavor Violating Higgs Decays" project:
+## Info 
+_________________________________________________________________________
+This is the program used for the collider analysis in "[Exotic Lepton-Flavor Violating Higgs Decays](http://arxiv.org/abs/arXiv:1910.07533)" project:
 
   Exotic Lepton-Flavor Violating Higgs Decays,\n
   Jared A. Evans, Philip Tanedo, and Mohammadreza Zakeri,\n
@@ -31,13 +31,15 @@ For BibTeX style citation use:
 
 -Last updated October 11, 2019
 
+## Compiling
 _________________________________________________________________________
 To make the binary files:
   1) Edit the make file ("~/Makefile") in the main directory, by adding the path to pythia, fastjet, etc. 
   2) Choose the main c++ file (which is inside "~/main") to be compiled, by typing it in front of "MAINOBJ" in the make file. 
   3) Run "make"
 
-
+## Running
+_________________________________________________________________________
 To run the binaries:
   1) Put the LHE file(s) in the desired directory, with the following naming scheme:
   {"XYZ_0.lhe", "XYZ_1.lhe", "XYZ_2.lhe", ...}
@@ -46,7 +48,7 @@ To run the binaries:
 
   Step 2 depends on the main c++ file format, for the ones inside "~/main" do
 
-  2) run "./bin/[BINARY] [LHE_FILE] [NUM_EVENTS] [OMP_THREADS] [REPORT_BOOL]"
+  2) run `./bin/[BINARY] [LHE_FILE] [NUM_EVENTS] [OMP_THREADS] [REPORT_BOOL]`
   where:
 
     "BINARY" stands for the name of the binary file (inside ~/bin)
@@ -57,7 +59,7 @@ To run the binaries:
     "OMP_THREADS" is the number of threads to be requested from OMP
     "REPORT_BOOL" can be '0' (no cut, etc. reporting) or '1' (reports cuts, etc. in .txt files)
 
-  Example: run "./bin/cms_8TeV lhe_dir/my_model.lhe 1000 2 0" in terminal, 
+  Example: run `./bin/cms_8TeV lhe_dir/my_model.lhe 1000 2 0` in terminal, 
   where the lhe_dir contains 2 lhe files each having 500 events named as:
     {my_model_0.lhe, my_model_1.lhe}
 
@@ -68,7 +70,8 @@ To add your own main c++ file:
   4) A binary with the same name will be created inside "~/bin"
   5) Run as explained above.
 
--------------------------------------------
+## References
+_________________________________________________________________________
 This package uses PYTHIA-8 and FastJet.
 
 PYTHIA-8: 
