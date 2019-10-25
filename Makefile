@@ -9,7 +9,7 @@ MAINOBJ_5 	:= faketaus
 
 # MAINOBJ := $(MAINOBJ_1) $(MAINOBJ_2) $(MAINOBJ_3) $(MAINOBJ_4)
 
-MAINOBJ 	:= $(MAINOBJ_5)
+MAINOBJ 	:= $(MAINOBJ_0)
 
 # The Target Binary Program 
 # This could be anything, but this way you can make
@@ -34,10 +34,10 @@ CC          := g++
 
 
 # Flags, Libraries and Includes
-CFLAGS      := -std=c++11 -fopenmp -Wall -Wextra -pedantic -g
+CFLAGS      := -std=c++11 -fopenmp -Wall -Wextra -pedantic -g -fPIC
 # CFLAGS      := -std=c++11 -fopenmp -Wall -Wextra -pedantic -g -lCGAL -lgmp
 PYTFASFLAG 	:= $(shell pythia8-config --fastjet3 --libs --cxxflags ) 
-LDFLAGS 	:= 
+LDFLAGS 	:= -lCGAL -lgmp
 INC         := -I$(INCDIR) -I/usr/local/include $(PYTFASFLAG) $(LDFLAGS)
 # INC         := -I$(INCDIR) $(PYTFASFLAG) $(LDFLAGS) 
 INCDEP      := -I$(INCDIR) $(PYTFASFLAG) $(LDFLAGS) 
@@ -95,7 +95,7 @@ $(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
 	@echo "Build Date = `date` " >_compile.txt
 
 $(MAINOBJ).$(OBJEXT): $(MAINDIR)/$(MAINOBJ).$(SRCEXT)
-	$(CC) -c $(MAINDIR)/$(MAINOBJ).$(SRCEXT)
+	$(CC) $(INC) -c $(MAINDIR)/$(MAINOBJ).$(SRCEXT)
 
 # Non-File Targets
 .PHONY: all remake clean cleaner resources
