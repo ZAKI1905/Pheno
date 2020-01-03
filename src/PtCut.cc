@@ -5,13 +5,13 @@
 
 */
 
-#include <iostream>
-#include <vector>
-#include "Pythia8/Pythia.h"
-#include "../inc/EV.h"
-#include "../inc/PtCut.h"
-#include "../inc/Basics.h"
-#include "../inc/Cut.h"
+// #include <iostream>
+// #include <vector>
+// #include "Pythia8/Pythia.h"
+// #include "../inc/EV.h"
+#include "../include/PtCut.h"
+// #include "../inc/Basics.h"
+// #include "../inc/Cut.h"
 
 using namespace Pythia8 ;
 
@@ -19,7 +19,7 @@ using namespace Pythia8 ;
 
 //--------------------------------------------------------------
 // Constructor
-PtCut::PtCut(EV& ev) : Cut(ev) {}
+PtCut::PtCut(EV& ev) : Cut(ev) {logger.SetUnit("PtCut");}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".

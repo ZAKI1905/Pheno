@@ -6,15 +6,17 @@
 */ 
 
 #include <iostream>
-#include <vector>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/Basics.h"
-#include "../inc/EV.h"
-#include "../inc/GenJet.h"
+// #include <vector>
 
-using std::vector ;
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
+
+#include "../include/Basics.h"
+#include "../include/EV.h"
+#include "../include/GenJet.h"
+
+// using std::vector ;
 
 //==============================================================
 /*
@@ -31,7 +33,7 @@ using std::vector ;
 
 //--------------------------------------------------------------
 // Basic  Constructor
-GenJet::GenJet(EV& ev):ev_ref(ev){ ev.addGenJetPtr(this) ; }
+GenJet::GenJet(EV& ev):ev_ref(ev){ ev.addGenJetPtr(this); logger.SetUnit("GenJet"); }
 
 //--------------------------------------------------------------
 // Takes a pointer to pseudo jets in the event
@@ -92,7 +94,7 @@ void GenJet::gen()
 
 //--------------------------------------------------------------
 // input method that takes jet options
-void GenJet::input(vector<std::string> option)
+void GenJet::input(std::vector<std::string> option)
 {
 
   std::string main_option = option[0] ;
@@ -119,21 +121,21 @@ void GenJet::input(vector<std::string> option)
 }
 //--------------------------------------------------------------
 // Sets jet definition options
-void GenJet::setSelector(vector<std::string> selector_set)
+void GenJet::setSelector(std::vector<std::string> selector_set)
 {
 
   // Start i from "1", since the first element is "Selector".
   for (size_t i =1 ; i< selector_set.size(); ++i)
   {
-    vector<std::string> tmp_sel = pars(selector_set[i],"=");
+    std::vector<std::string> tmp_sel = pars(selector_set[i],"=");
 
     // ......Cases with 4 inputs..........
     if (tmp_sel[0] == "RapPhiRange")
     {
-      vector<std::string> tmp_sel_range = pars(tmp_sel[1],"-", -1) ;
+      std::vector<std::string> tmp_sel_range = pars(tmp_sel[1],"-", -1) ;
 
       if ( tmp_sel_range.size() !=4 ) 
-      { cout<<"\n ==>>> Error: The range must be four numbers --> ignoring this selector.\n"; continue; }
+      { LOG_ERROR("The range must be four numbers --> ignoring this selector.") ; continue; }
       
       double rap_min =  std::stod(tmp_sel_range[0]);
       double rap_max =  std::stod(tmp_sel_range[1]);
@@ -149,10 +151,10 @@ void GenJet::setSelector(vector<std::string> selector_set)
     else if ( endswith(tmp_sel[0], "Range") )
     {
 
-      vector<std::string> tmp_sel_range = pars(tmp_sel[1],"-", -1) ;
+      std::vector<std::string> tmp_sel_range = pars(tmp_sel[1],"-", -1) ;
 
       if ( tmp_sel_range.size() !=2 ) 
-      { cout<<"\n ==>>> Error: The range must be two numbers --> ignoring this selector.\n"; continue; }
+      { LOG_ERROR("The range must be two numbers --> ignoring this selector."); continue; }
 
       double min = std::stod(tmp_sel_range[0]);
       double max =  std::stod(tmp_sel_range[1]);
@@ -229,12 +231,12 @@ void GenJet::setSelector(vector<std::string> selector_set)
 
 //--------------------------------------------------------------
 // Sets jet definition options
-void GenJet::setJetDef(vector<std::string> jet_def_set)
+void GenJet::setJetDef(std::vector<std::string> jet_def_set)
 {
   // Start i from "1", since the first element is "Def".
   for (size_t i =1 ; i< jet_def_set.size(); ++i)
     {
-      vector<std::string> tmp_def = pars(jet_def_set[i],"=");
+      std::vector<std::string> tmp_def = pars(jet_def_set[i],"=");
 
       if (tmp_def[0] == "Algorithm")
         setJetAlg(tmp_def[1]) ;
@@ -276,7 +278,7 @@ void GenJet::setJetAlg(std::string jet_alg_str)
 
   else
   {
-    cout<<"==> WARNING: The algorithm is not found, please add it to GenJet::setJetAlg options.\n"<<std::flush; 
+    LOG_WARNING("The algorithm is not found, please add it to GenJet::setJetAlg options."); 
   }
   
 }
@@ -301,7 +303,7 @@ void GenJet::setRecScheme(std::string rec_scheme)
     recomb_scheme = fastjet::BIpt2_scheme ;
   else
   {
-    cout<<"==> WARNING: The recombination scheme is not found, please add it to GenJet::setRecScheme options.\n"<<std::flush; 
+    std::cout<<"==> WARNING: The recombination scheme is not found, please add it to GenJet::setRecScheme options.\n"<<std::flush; 
   }
 
 }
@@ -324,7 +326,7 @@ void GenJet::setStrategy(std::string strat)
     strategy = fastjet::NlnNCam ;
   else
   {
-    cout<<"==> WARNING: The strategy is not found, please add it to GenJet::setStrategy options.\n"<<std::flush; 
+    std::cout<<"==> WARNING: The strategy is not found, please add it to GenJet::setStrategy options.\n"<<std::flush; 
   }
 }
 
@@ -332,7 +334,7 @@ void GenJet::setStrategy(std::string strat)
 // Isolation condition assuming jets are faking taus
 void GenJet::fake_isolate()
 {
-  vector<int> remove_jet ;
+  std::vector<int> remove_jet ;
   char isolate_message_char[200] ;
 
   for(size_t i=0 ; i < inc_jets_after.size() ; ++i )
@@ -373,7 +375,7 @@ void GenJet::fake_isolate()
           "\n - Jet with (phi, prap)= (%4.2f, %4.2f) failed the tau_h isolation condition.\n",
           jet_i.phi(), jet_i.pseudorapidity()) ;
 
-        string somestring(isolate_message_char) ;
+        std::string somestring(isolate_message_char) ;
         isolate_message += somestring ;
       }
     }
@@ -386,7 +388,7 @@ void GenJet::fake_isolate()
 //--------------------------------------------------------------
 void GenJet::isolate()
 {
-  vector<int> remove_jet ;
+  std::vector<int> remove_jet ;
   double  d ;
   char isolate_message_char[200] ;
 
@@ -409,7 +411,7 @@ void GenJet::isolate()
             p.visMom().phi(), p.visMom().eta(), d, inc_jets_after[j].phi(),
              inc_jets_after[j].pseudorapidity()) ;
 
-        string somestring(isolate_message_char) ;
+        std::string somestring(isolate_message_char) ;
         isolate_message += somestring ;
         }
         remove_jet.push_back(j) ;
@@ -472,7 +474,7 @@ void GenJet::report()
   Printing the jet report
 */
 template <class T> void GenJet::print_jettable(std::FILE * file,
- vector<T> list, char* File_Description,  const char* Table_Title, int iEv)
+ std::vector<T> list, char* File_Description,  const char* Table_Title, int iEv)
 {
 
   thread_local static int Table_Num   = 0  ;
@@ -490,7 +492,7 @@ template <class T> void GenJet::print_jettable(std::FILE * file,
      pr(29,'-').c_str() , iEv, pr(29,'-').c_str() ) ;
                                 Same_iEvent = iEv ;  }
 
-    string Title_Dash((int) strlen(Table_Title)+8 ,'_') ;
+    std::string Title_Dash((int) strlen(Table_Title)+8 ,'_') ;
     fprintf(file,"  %s\n |  %*s  |",Title_Dash.c_str(),
      (int) strlen(Table_Title)+4  , Table_Title) ;
 
@@ -503,7 +505,7 @@ template <class T> void GenJet::print_jettable(std::FILE * file,
     for (unsigned int i = 0 ; i < list.size() ; ++i) {
       
       // get the constituents of the jet
-      vector<fastjet::PseudoJet> constituents = list[i].constituents() ;
+      std::vector<fastjet::PseudoJet> constituents = list[i].constituents() ;
 
       // The total charge of each jet
       float charge = ( list[i].user_index() / 3. )  ;

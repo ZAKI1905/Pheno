@@ -1,102 +1,100 @@
-# The main c++ file ( should have main() function )
-MAINOBJ_0	:= cms_8TeV
-MAINOBJ_1 	:= search_LFV_1
-MAINOBJ_2_1 := search_LFV_2_1
-MAINOBJ_2_2 := search_LFV_2_2
-MAINOBJ_3 	:= search_LFV_3
-MAINOBJ_4 := search_LFV_4
-MAINOBJ_5 	:= faketaus
+# ----------------------------------
+# Targets
 
-# MAINOBJ := $(MAINOBJ_1) $(MAINOBJ_2) $(MAINOBJ_3) $(MAINOBJ_4)
+LINK_TARGET	:= cms_8TeV
+MAIN 	:= cms_8TeV
 
-MAINOBJ 	:= $(MAINOBJ_0)
-
-# The Target Binary Program 
-# This could be anything, but this way you can make
-# all the binaries by switching the 'MAINOBJ' above,
-# without changing anything else.
-TARGET      :=  $(MAINOBJ)
-
-
-# The Directories, Source, Includes, Objects, Binary and Resources
-SRCDIR      := src
-INCDIR      := inc
-BUILDDIR    := obj
-TARGETDIR   := bin
-# RESDIR      := res
-MAINDIR     := main
-SRCEXT      := cc
-DEPEXT      := d
-OBJEXT      := o
-
+# ----------------------------------
 # Compiler and Linker
-CC          := g++
+CC          := clang++-mp-9.0
 
+# Extensions
+SRC_EXT      := cc
+OBJ_EXT		 := o
+
+# Directories
+SRC_DIR		:= src
+MAIN_DIR	:= main
+OBJ_DIR		:= obj
+BIN_DIR		:= bin
+INC_DIR		:= include
 
 # Flags, Libraries and Includes
-CFLAGS      := -std=c++11 -fopenmp -Wall -Wextra -pedantic -g -fPIC
-# CFLAGS      := -std=c++11 -fopenmp -Wall -Wextra -pedantic -g -lCGAL -lgmp
-PYTFASFLAG 	:= $(shell pythia8-config --fastjet3 --libs --cxxflags ) 
-LDFLAGS 	:= -lCGAL -lgmp
-INC         := -I$(INCDIR) -I/usr/local/include $(PYTFASFLAG) $(LDFLAGS)
-# INC         := -I$(INCDIR) $(PYTFASFLAG) $(LDFLAGS) 
-INCDEP      := -I$(INCDIR) $(PYTFASFLAG) $(LDFLAGS) 
+DEP_INC		:= -Idependencies/include 
+DEP_LIB_DIR	:= -Ldependencies/lib
 
-#---------------------------------------------------------------------------------
-# DO NOT EDIT BELOW THIS LINE
-#---------------------------------------------------------------------------------
-SOURCES     := $(shell find $(SRCDIR) -type f -name '*.$(SRCEXT)')
-OBJECTS     := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))
+PYTH8_FLAG		:= $(DEP_LIB_DIR) -lpythia8 -lboost_iostreams -lz
+FASTJ_FLAG 		:=  -lfastjet
+CCFLAGS			:=  -std=c++11 -Wall -g -fopenmp -fPIC
 
-# # Making special target
-# special: directories $(TARGET)
+# Making library
+OUT_LIB		:= Pheno
+OUT_LIB_DIR	:= lib
 
-# Making all targets
-all: directories $(TARGET)
+# Compile command
+COMPILE		:= $(CC) $(CCFLAGS) $(DEP_INC) -I$(INC_DIR) 
+COMPILE_FLAG:= $(PYTH8_FLAG) $(FASTJ_FLAG)
+# ================================================================================
 
-# Remake
-remake: cleaner all
+SOURCES     := $(shell find $(SRC_DIR) -type f -name '*.$(SRC_EXT)')
+OBJECTS     := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%,$(SOURCES:.$(SRC_EXT)=.$(OBJ_EXT)))
 
-# #Copy Resources from Resources Directory to Target Directory
-# resources: directories
-# 	@cp $(RESDIR)/* $(TARGETDIR)/
+# .......................................................................
 
-# Make the Directories
-directories:
-	@mkdir -p $(TARGETDIR)
-	@mkdir -p $(BUILDDIR)
+all: directories $(BIN_DIR)/$(LINK_TARGET)
 
-# Clean only Objecst
+directories :
+	@echo "Creating the directories..." 
+	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(BIN_DIR)
+
+$(BIN_DIR)/$(LINK_TARGET):	$(OBJECTS)  $(OBJ_DIR)/$(MAIN).$(OBJ_EXT)
+	@echo "Linking the objects..."
+	$(COMPILE) $(COMPILE_FLAG) $^ -o $@
+
+$(OBJ_DIR)/%.$(OBJ_EXT) : $(SRC_DIR)/%.$(SRC_EXT) $(INC_DIR)/%.h
+	@echo "Compiling the dependencies..."
+	$(COMPILE) -c -o $@ $<
+
+$(OBJ_DIR)/$(MAIN).$(OBJ_EXT) : $(MAIN_DIR)/$(MAIN).$(SRC_EXT)
+	@echo "Compiling the Main file..."
+	$(COMPILE) -c -o $@ $<
+
+# in case only header file changes
+$(INC_DIR)/%.h : 
+	$(COMPILE) -c -o $(OBJ_DIR)/%.$(OBJ_EXT) $(SRC_DIR)/%.$(SRC_EXT)
+# .......................................................................
+
+genlib: mk_lib_dirs complib
+
+complib: $(OBJECTS)
+	@echo "Creating static library..."
+	ar -cvq $(OUT_LIB_DIR)/lib$(OUT_LIB).a $^
+	# gcc -shared  $^ -o $(OUT_LIB_DIR)/lib$(OUT_LIB).so
+
+mk_lib_dirs: 
+	@echo "Creating directories..."
+	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(OUT_LIB_DIR)
+
+# .......................................................................
+
+# Clean only Objects
 clean:
 	@echo "Cleaning objects..."
-	@$(RM) -rf $(BUILDDIR)
+	@$(RM) -rf $(OBJ_DIR)
+
+# .......................................................................
 
 # Full Clean, Objects and Binaries
 cleaner: clean
-	@echo "Cleaning up..."
-	@$(RM) -rf $(TARGETDIR)
+	@echo "Cleaning up objects and binaries..."
+	@$(RM) -rf $(BIN_DIR)
+	# @$(RM) -rf $(OUT_LIB_DIR)
 
-# Pull in dependency info for *existing* .o files
--include $(OBJECTS:.$(OBJEXT)=.$(DEPEXT))
-
-# Link
-$(TARGET): $(OBJECTS) $(MAINOBJ).$(OBJEXT)
-	$(CC)  $(CFLAGS) -o $(TARGETDIR)/$(TARGET) $^ $(PYTFASFLAG) $(LDFLAGS)
-
-# Compile
-$(BUILDDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(INC) -c -o $@ $<  
-	@$(CC) $(CFLAGS) $(INCDEP) -MM $(SRCDIR)/$*.$(SRCEXT) > $(BUILDDIR)/$*.$(DEPEXT) 
-	@cp -f $(BUILDDIR)/$*.$(DEPEXT) $(BUILDDIR)/$*.$(DEPEXT).tmp
-	@sed -e 's|.*:|$(BUILDDIR)/$*.$(OBJEXT):|' < $(BUILDDIR)/$*.$(DEPEXT).tmp > $(BUILDDIR)/$*.$(DEPEXT)
-	@sed -e 's/.*://' -e 's/\\$$//' < $(BUILDDIR)/$*.$(DEPEXT).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(BUILDDIR)/$*.$(DEPEXT)
-	@rm -f $(BUILDDIR)/$*.$(DEPEXT).tmp
-	@echo "Build Date = `date` " >_compile.txt
-
-$(MAINOBJ).$(OBJEXT): $(MAINDIR)/$(MAINOBJ).$(SRCEXT)
-	$(CC) $(INC) -c $(MAINDIR)/$(MAINOBJ).$(SRCEXT)
+# .......................................................................
 
 # Non-File Targets
-.PHONY: all remake clean cleaner resources
+.PHONY: all clean cleaner directories genlib mk_lib_dirs complib
 
+# .......................................................................

@@ -29,7 +29,7 @@ For BibTeX style citation use:
   }
 ```
 
--Last updated October 25, 2019
+-Last updated January 3, 2020
 
 ## Python Modules
 You can setup the python program following these steps:
@@ -48,9 +48,8 @@ You can then run the program by running "python  ~/python/pheno.py"
 
 ## Compiling the C++ files
 To make the binary files:
-  1. Edit the make file ("~/Makefile") in the main directory, by adding the path to pythia, fastjet, etc. 
-  2. Choose the main c++ file (which is inside "~/main") to be compiled, by typing it in front of "MAINOBJ" in the make file. 
-  3. Run "make"
+  1. Choose the main c++ file (which is inside "~/main") to be compiled, by typing it in front of "MAIN" & "LINK_TARGET" in the make file. 
+  2. Run "make"
 
 ## Running the C++ binaries (stand-alone)
 You can also run the C++ binaries by themselves, if you already have lhe files and want to run pythia and fastjet.

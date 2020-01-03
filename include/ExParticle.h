@@ -1,22 +1,23 @@
 #ifndef ExParticle_H
 #define ExParticle_H
 
-#include <vector>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
+// #include <vector>
+#include <Pythia8/Pythia.h>
+#include <fastjet/ClusterSequence.hh>
+#include <fastjet/Selector.hh>
 
-using std::vector ;
-using namespace Pythia8 ;
+// using std::vector ;
+// using namespace Pythia8 ;
 
 //==============================================================
 // Forward declaration
 class EV ;
 
-class ExParticle : public Particle
+class ExParticle : public Pythia8::Particle
 {
 
   friend class EV ;
+  // friend class pheno ;  // For debugging, remove it later!
   //--------------------------------------------------------------
 
   public:
@@ -24,19 +25,23 @@ class ExParticle : public Particle
     ExParticle() ; 
     ExParticle(const Particle&) ; 
 
-    ExParticle& operator=(const ExParticle& pt) {if (this != &pt) {
-    idSave = pt.idSave; statusSave = pt.statusSave;
-    mother1Save = pt.mother1Save; mother2Save = pt.mother2Save;
-    daughter1Save = pt.daughter1Save; daughter2Save = pt.daughter2Save;
-    colSave = pt.colSave; acolSave = pt.acolSave; pSave = pt.pSave;
-    mSave = pt.mSave; scaleSave = pt.scaleSave; polSave = pt.polSave;
-    hasVertexSave = pt.hasVertexSave; vProdSave = pt.vProdSave;
-    tauSave = pt.tauSave; pdePtr = pt.pdePtr; evtPtr = pt.evtPtr; 
-    
-    DecaysToHad = pt.DecaysToHad; HadDecisSet = pt.HadDecisSet;
-    visibleMom =pt.visibleMom; visMomisSet = pt.visMomisSet;
-    ptMom = pt.ptMom; EVPtr = pt.EVPtr;}
-    return *this; }
+    ExParticle& operator=(const ExParticle& pt) {
+      if (this != &pt) 
+      {
+        idSave = pt.idSave; statusSave = pt.statusSave;
+        mother1Save = pt.mother1Save; mother2Save = pt.mother2Save;
+        daughter1Save = pt.daughter1Save; daughter2Save = pt.daughter2Save;
+        colSave = pt.colSave; acolSave = pt.acolSave; pSave = pt.pSave;
+        mSave = pt.mSave; scaleSave = pt.scaleSave; polSave = pt.polSave;
+        hasVertexSave = pt.hasVertexSave; vProdSave = pt.vProdSave;
+        tauSave = pt.tauSave; pdePtr = pt.pdePtr; evtPtr = pt.evtPtr; 
+        
+        DecaysToHad = pt.DecaysToHad; HadDecisSet = pt.HadDecisSet;
+        visibleMom =pt.visibleMom; visMomisSet = pt.visMomisSet;
+        ptMom = pt.ptMom; EVPtr = pt.EVPtr; 
+      }
+
+      return *this; }
 
     bool operator==(const ExParticle& right) ;
 
@@ -44,14 +49,16 @@ class ExParticle : public Particle
     double idEff() ;
 
     // returns Mom
-    Vec4 mom() ;                  
+    Pythia8::Vec4 mom() ;                  
 
     // returns DecaysToHad
     bool isHadDec() ;
 
     // returns visible momentum ("visibleMom")
-    Vec4 visMom() ;   
+    Pythia8::Vec4 visMom() ;   
 
+    // Pointer to the EV to which the particle belongs 
+    EV* EVPtr=NULL ;
   //--------------------------------------------------------------
 
   private:
@@ -64,9 +71,6 @@ class ExParticle : public Particle
 
     // The idEff value
     double id_eff_val = 1 ;
-
-    // Pointer to the EV to which the particle belongs 
-    EV* EVPtr=NULL ;
 
     // Member function to set the Event pointer.
     void setEVPtr(EV*) ;
@@ -85,13 +89,13 @@ class ExParticle : public Particle
     void setVisMom() ;
 
     // Visible momentum
-    Vec4 visibleMom ;
+    Pythia8::Vec4 visibleMom ;
 
     // Checks if visibleMom is set
     bool visMomisSet = false ; 
 
     // The measured 4-mom by detectors
-    Vec4 ptMom ; 
+    Pythia8::Vec4 ptMom ; 
 
     // Muon mom resolution
     float muonMomRes() ; 

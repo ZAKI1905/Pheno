@@ -10,31 +10,31 @@
 #include <cmath>
 #include <ctime>
 #include <fstream>
-#include <vector>
+// #include <vector>
 #include <chrono>
 #include <ctime>
 #include <omp.h>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/EV.h"
-#include "../inc/Basics.h"
-#include "../inc/Pheno.h"
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
+// #include "../inc/EV.h"
+// #include "../inc/Basics.h"
+#include "../include/Pheno.h"
 
-using namespace Pythia8 ;
+// using namespace Pythia8 ;
 
 
-vector<double> scaleTauE(vector<ExParticle>&);
+std::vector<double> scaleTauE(std::vector<ExParticle>&);
 
 ///////////////////////////////////////////////////
 ///////////////      main()     ///////////////////
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  string filename           = "" ;
-  string Tot_Num_Events_str = "" ;
-  string NUM_THREADS_str    = "" ;
-  string report_input_str   = "" ;
+  std::string filename           = "" ;
+  std::string Tot_Num_Events_str = "" ;
+  std::string NUM_THREADS_str    = "" ;
+  std::string report_input_str   = "" ;
 
   filename.assign(argv[1]) ;
   Tot_Num_Events_str.assign(argv[2]) ;
@@ -177,12 +177,12 @@ int main(int argc,char *argv[])
 
 //==============================================================
 // Electron & tau momentum scaling ( for LFV_3_1 )
-vector<double> scaleTauE(vector<ExParticle>& parts)
+std::vector<double> scaleTauE(std::vector<ExParticle>& parts)
 {
   if (parts.size() != 4)  return {-1, -1, -1, -1, -1, -1, -1} ;
 
-  vector<ExParticle> sel_emu ;
-  vector<ExParticle> sel_taumu ;
+  std::vector<ExParticle> sel_emu ;
+  std::vector<ExParticle> sel_taumu ;
   int tau_sign;
 
   // Adding tau and electron
@@ -212,9 +212,9 @@ vector<double> scaleTauE(vector<ExParticle>& parts)
 
   if (sel_emu.size() != 2 || sel_taumu.size() != 2)  return {-2, -2, -2, -2, -2, -2, -2} ;
 
-  Vec4 p_ta = sel_taumu[0].visMom();
-  Vec4 p_e = sel_emu[0].visMom();
-  Vec4 p_mu_sum = sel_taumu[1].visMom() + sel_emu[1].visMom();
+  Pythia8::Vec4 p_ta = sel_taumu[0].visMom();
+  Pythia8::Vec4 p_e = sel_emu[0].visMom();
+  Pythia8::Vec4 p_mu_sum = sel_taumu[1].visMom() + sel_emu[1].visMom();
 
   double m_ta = 1.777 ; // GeV
   double m_H  = 125   ; // GeV
@@ -241,8 +241,8 @@ vector<double> scaleTauE(vector<ExParticle>& parts)
 
   if(alpha_ta < 1 || alpha_e < 1) { alpha_e = 1; alpha_ta = 1; }
 
-  Vec4 scaled_p_ta = alpha_ta*p_ta ;
-  Vec4 scaled_p_e = alpha_e*p_e ;
+  Pythia8::Vec4 scaled_p_ta = alpha_ta*p_ta ;
+  Pythia8::Vec4 scaled_p_e = alpha_e*p_e ;
   // ..........................................
 
 
@@ -251,7 +251,7 @@ vector<double> scaleTauE(vector<ExParticle>& parts)
 
   double M4_scaled = (scaled_p_ta + sel_taumu[1].visMom() + scaled_p_e + sel_emu[1].visMom() ).mCalc() ;
 
-  vector<double> out = {tauMuInv, eMuInv, M4, mfi_sq_p, 
+  std::vector<double> out = {tauMuInv, eMuInv, M4, mfi_sq_p, 
                         tauMuInv_scaled, eMuInv_scaled, M4_scaled} ;
 
 

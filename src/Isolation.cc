@@ -5,16 +5,17 @@
 
 */
 
-#include <iostream>
-#include <vector>
-#include "Pythia8/Pythia.h"
-#include "../inc/EV.h"
-#include "../inc/Isolation.h"
-#include "../inc/Basics.h"
-#include "../inc/Cut.h"
+// #include <iostream>
+// #include <vector>
+// #include "Pythia8/Pythia.h"
 
-using std::vector ;
-using namespace Pythia8 ;
+// #include "../include/EV.h"
+#include "../include/Isolation.h"
+// #include "../inc/Basics.h"
+// #include "../inc/Cut.h"
+
+// using std::vector ;
+// using namespace Pythia8 ;
 
 //==============================================================
 /*
@@ -26,11 +27,11 @@ satisfy the cut condition.
 
 //--------------------------------------------------------------
 // Constructor
-Isolation::Isolation(EV& ev) : Cut(ev) {}
+Isolation::Isolation(EV& ev) : Cut(ev) {logger.SetUnit("Isolation");}
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void Isolation::cut_cond(vector<ExParticle>& in_parlst)
+void Isolation::cut_cond(std::vector<ExParticle>& in_parlst)
 {
   
   for(size_t i=0 ; i < in_parlst.size() ; ++i )

@@ -5,17 +5,19 @@
 
 */
 
-#include <iostream>
-#include <vector>
+// #include <iostream>
+// #include <vector>
 #include <random>
 #include <chrono>
 #include <algorithm>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/ExParticle.h"
-#include "../inc/Basics.h"
-#include "../inc/EV.h"
+
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
+
+// #include "../include/ExParticle.h"
+// #include "../include/Basics.h"
+#include "../include/EV.h"
 
 using std::vector ;
 using namespace Pythia8 ;
@@ -121,7 +123,7 @@ float ExParticle::elecMomRes()
     else if( 50.00 <= this->pT() && this->pT() <= 100.00)
       pt_res = 1.347*0.01 ;
 
-    else if( 100 < this->pT() )
+    else //  100 < this->pT()
       pt_res = 1.347*0.01 ;
   }
   // -----------------------
@@ -158,7 +160,7 @@ float ExParticle::elecMomRes()
     else if( 50.00 <= this->pT() && this->pT() <= 100.00)
       pt_res = 3.530*0.01 ;
 
-    else if( 100 < this->pT() )
+    else // if( 100 < this->pT() )
       pt_res = 3.530*0.01 ;
   }
   // -----------------------

@@ -6,44 +6,42 @@
 */
 
 #include <iostream>
-#include <vector>
+// #include <vector>
 #include <algorithm>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/EV.h"
-#include "../inc/Basics.h"
-#include "../inc/GenJet.h"
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
+#include "../include/EV.h"
+// #include "../include/Basics.h"
+#include "../include/GenJet.h"
 
-using std::vector ;
-using namespace Pythia8 ;
+// using std::vector ;
+// using namespace Pythia8 ;
 
 //==============================================================
 
 //--------------------------------------------------------------
 // Constructor
 // Takes event number and an event.
-EV::EV(int set_ev_num, Event& event):event_number(set_ev_num)
+EV::EV(int set_ev_num, Pythia8::Event& event) :
+ event_number(set_ev_num)
 {
-
   for(int i=0 ; i < event.size() ; ++i)
   {
-      ExParticle pt(event[i]) ;
-      // sets the event pointer for pt
-      setEVPtr(pt) ;
+    ExParticle pt(event[i]) ;
+    // sets the event pointer for pt
+    setEVPtr(pt) ;
 
-      // Saving the event into a particle vector
-      Full_Event.push_back(pt) ;
+    // Saving the event into a particle vector
+    Full_Event.push_back(pt) ;
 
-      /*
-        // Filling the pseudojet list with particles.
-        Note (May-12-2019): This doesn't have to be this early,
-         but might save time by removing a loop.
-      */
-      gen_psjts(event[i]) ;
-
+    /*
+      // Filling the pseudojet list with particles.
+      Note (May-12-2019): This doesn't have to be this early,
+        but might save time by removing a loop.
+    */
+    gen_psjts(event[i]) ;
   }
-
 }
 
 //--------------------------------------------------------------
@@ -92,7 +90,7 @@ void EV::gen_psjts(ExParticle p)
 //--------------------------------------------------------------
 // Inputing options
 
-void EV::input(string property, bool value)
+void EV::input(std::string property, bool value)
 {
   if(property == "Report_Taus")
   {
@@ -117,14 +115,14 @@ for(size_t i=0 ; i < Full_Event.size() ; ++i)
 
   if(Full_Event[i].daughter2()>=Full_Event[i].daughter1() && tau_report)
   {
-    vector<ExParticle>::const_iterator first = Full_Event.begin() +
+    std::vector<ExParticle>::const_iterator first = Full_Event.begin() +
      Full_Event[i].daughter1() ;
-    vector<ExParticle>::const_iterator last = Full_Event.begin() +
+    std::vector<ExParticle>::const_iterator last = Full_Event.begin() +
      Full_Event[i].daughter2() + 1 ;
-    vector<ExParticle> Daughter_Range(first, last) ;
+    std::vector<ExParticle> Daughter_Range(first, last) ;
 
     // Actual, Visible
-    vector<Vec4> Tau_Mom{Full_Event[i].p(), Full_Event[i].visMom() } ;
+    std::vector<Pythia8::Vec4> Tau_Mom{Full_Event[i].p(), Full_Event[i].visMom() } ;
 
     fprintf(pTAU_REPORT_FILE, "\n %s Event # %-5d %s", pr(25,'-').c_str()
     ,event_number, pr(25,'-').c_str() ) ;
@@ -160,7 +158,7 @@ if(tau_report) fclose(pTAU_REPORT_FILE) ;
 //--------------------------------------------------------------
 // Prints a table of particles in list with their info.
 template <class T>
-void EV::print_table(std::FILE * file, vector<T> list)
+void EV::print_table(std::FILE * file, std::vector<T> list)
 {
   // Double numbers' precision
   int prec = 5;
@@ -173,11 +171,11 @@ void EV::print_table(std::FILE * file, vector<T> list)
        "P_T", "P_Z", "P_Rap", "M_Vis") ;
     fprintf(file, " | %s |\n",pr(97,'-').c_str() ) ;
 
-    for(uint j  = 0 ; j < (uint) list.size() ; j++)
+    for(size_t j  = 0 ; j < list.size() ; j++)
     {
       ExParticle p  = list[j] ;
 
-      fprintf(file," | %2u %8s %+8d %13.*E %13.*E %13.*E %+13.*E %+6.1f %13.*E |\n",
+      fprintf(file," | %zu %8s %+8d %13.*E %13.*E %13.*E %+13.*E %+6.1f %13.*E |\n",
        j+1, p.name().c_str(), p.status(),
        prec, p.e(), prec, p.visMom().e(),
        prec, p.visMom().pT(), prec, p.visMom().pz(),
@@ -198,7 +196,7 @@ int EV::i() const
 //--------------------------------------------------------------
 //Returns a reference to the full event
 
-vector<ExParticle>& EV::Full_Ev()
+std::vector<ExParticle>& EV::Full_Ev()
 {
   return Full_Event ;
 }
@@ -238,20 +236,20 @@ bool EV::had_dec(ExParticle& p)
 //--------------------------------------------------------------
 // Returns the hadronically decaying taus.
 
-vector<ExParticle>& EV::htau()
+std::vector<ExParticle>& EV::htau()
 {
   return h_taus ;
 }
 
 //--------------------------------------------------------------
-Vec4 EV::vis_p(ExParticle& p)
+Pythia8::Vec4 EV::vis_p(ExParticle& p)
 // Returns the visible momentum of a particle
 {
 
   if ( p.isFinal() ) return p.mom() ;
 
-  Vec4              four_mom(0) ;
-  vector<ExParticle>  Temp_Parts ;
+  Pythia8::Vec4           four_mom(0) ;
+  std::vector<ExParticle>  Temp_Parts ;
   Temp_Parts.push_back(p) ;
 
 
@@ -262,17 +260,16 @@ Vec4 EV::vis_p(ExParticle& p)
     if(0 < Temp_Parts[j].daughter1() && 
        Temp_Parts[j].daughter1()<= Temp_Parts[j].daughter2())
     {
-
-        for(int i= Temp_Parts[j].daughter1() ; i<= Temp_Parts[j].daughter2() ; ++i )
-        {
-            // If the daughters are not final, then their daughters
-            // will be checked and so on.
-            if(Full_Event[i].isFinal())
-            {
-              if(Full_Event[i].isVisible()) four_mom += Full_Event[i].mom() ;
-            }
-            else Temp_Parts.push_back(Full_Event[i]) ;
-        }
+      for(int i= Temp_Parts[j].daughter1() ; i<= Temp_Parts[j].daughter2() ; ++i )
+      {
+          // If the daughters are not final, then their daughters
+          // will be checked and so on.
+          if(Full_Event[i].isFinal())
+          {
+            if(Full_Event[i].isVisible()) four_mom += Full_Event[i].mom() ;
+          }
+          else Temp_Parts.push_back(Full_Event[i]) ;
+      }
     }
     else four_mom += Temp_Parts[j].mom() ;
   }
@@ -284,10 +281,10 @@ Vec4 EV::vis_p(ExParticle& p)
 // Overloading "()":
 // ev({11,-11}) returns a list of particles with id's 11 and -11.
 
-vector<ExParticle> EV::operator() (vector<int> sel_id)
+std::vector<ExParticle> EV::operator() (std::vector<int> sel_id)
 {
 
-  vector<ExParticle> particle_set ;
+  std::vector<ExParticle> particle_set ;
 
   for(size_t     i  = 0 ; i < Full_Event.size() ; ++i)
   {
@@ -332,7 +329,7 @@ void EV::setEVWeight()
 
 //--------------------------------------------------------------
 // Returns a reference to the pseudo_jets stored in the event
-vector<fastjet::PseudoJet>& EV::psjet()
+std::vector<fastjet::PseudoJet>& EV::psjet()
 {
   return ps_jts ;
 }
@@ -340,30 +337,30 @@ vector<fastjet::PseudoJet>& EV::psjet()
 
 //--------------------------------------------------------------
 // Returns a reference to the lep_pseudo_jets stored in the event
-vector<ExParticle>& EV::lep_for_jet()
+std::vector<ExParticle>& EV::lep_for_jet()
 {
   return lep_jts ;
 }
 
 //--------------------------------------------------------------
 // Returns a reference to the leptons that passed all the cuts
-vector<ExParticle>& EV::pass_lepts()
+std::vector<ExParticle>& EV::pass_lepts()
 {
   return iso_leptons ;
 }
 
 //--------------------------------------------------------------
 // Updates the list of leptons that passed the cuts
-void EV::update_pass_lepts(vector<ExParticle> input)
+void EV::update_pass_lepts(std::vector<ExParticle> input)
 {
   iso_leptons = input ;
 }
 
 //--------------------------------------------------------------
 // Updating hadronic tau list for binning
-void EV::update_hadtaus( vector<ExParticle> pass_cuts )
+void EV::update_hadtaus( std::vector<ExParticle> pass_cuts )
 {
-  vector<int> tmp_rm_lst ;
+  std::vector<int> tmp_rm_lst ;
 
   for ( size_t i=0 ; i < h_taus.size() ; ++i)
   {
@@ -381,7 +378,7 @@ void EV::update_hadtaus( vector<ExParticle> pass_cuts )
 //
 void EV::update_ps_jets()
 {
-  vector<int> tmp_rm_lst ;
+  std::vector<int> tmp_rm_lst ;
 
   for(size_t i=0 ; i < lep_jts.size() ; ++i )
   {
@@ -442,7 +439,7 @@ void EV::print(std::string filename)
 //==============================================================
 
 // print_table
-template void EV::print_table<ExParticle>(std::FILE * file, vector<ExParticle>) ;
-template void EV::print_table<Particle>(std::FILE * file, vector<Particle>) ;
+template void EV::print_table<ExParticle>(std::FILE * file, std::vector<ExParticle>) ;
+template void EV::print_table<Pythia8::Particle>(std::FILE * file, std::vector<Pythia8::Particle>) ;
 
 //==============================================================

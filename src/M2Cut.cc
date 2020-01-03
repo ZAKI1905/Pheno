@@ -6,20 +6,21 @@
 */
 
 #include <iostream>
-#include <vector>
-#include "Pythia8/Pythia.h"
-#include "../inc/EV.h"
-#include "../inc/M2Cut.h"
-#include "../inc/Basics.h"
-#include "../inc/Cut.h"
 
-using namespace Pythia8 ;
+// #include <vector>
+// #include "Pythia8/Pythia.h"
+// #include "../inc/EV.h"
+#include "../include/M2Cut.h"
+// #include "../inc/Basics.h"
+// #include "../inc/Cut.h"
+
+// using namespace Pythia8 ;
 
 //==============================================================
 
 //--------------------------------------------------------------
 // Constructor
-M2Cut::M2Cut(EV& ev) : Cut(ev) {}
+M2Cut::M2Cut(EV& ev) : Cut(ev) {logger.SetUnit("M2Cut");}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
@@ -33,13 +34,13 @@ void M2Cut::input(std::string property)
     M2_Cut_Value = std::stof (inp[1]) ;
   }
   else
-  { std::cerr<<endl<<inp[0]<<" is invalid option for M2 cut!"<<std::flush ;
+  { LOG_ERROR((inp[0] + " is invalid option for M2 cut!").c_str()) ;
   } 
 }
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void M2Cut::cut_cond(vector<ExParticle>& in_parlst)
+void M2Cut::cut_cond(std::vector<ExParticle>& in_parlst)
 {
   char special_message_char[100] ;
   bool special_message_on = false ;
@@ -48,7 +49,7 @@ void M2Cut::cut_cond(vector<ExParticle>& in_parlst)
     {
       for(size_t j=i ; j < in_parlst.size() ; ++j)
       {
-        vector<ExParticle> tmp_lst = {in_parlst[i],in_parlst[j]} ;
+        std::vector<ExParticle> tmp_lst = {in_parlst[i],in_parlst[j]} ;
 
           if(in_parlst[i].id()==-in_parlst[j].id() && 
              invM(tmp_lst) < M2_Cut_Value)
@@ -62,7 +63,7 @@ void M2Cut::cut_cond(vector<ExParticle>& in_parlst)
               "\n | -(%2d,%2d) pair with invariant mass %2.3f fail this cut.  |",
               (int)i+1, (int)j+1, invM(tmp_lst)) ;
 
-              string somestring(special_message_char) ;
+              std::string somestring(special_message_char) ;
               special_message += somestring           ;
               special_message_on = true               ;
             }
@@ -76,7 +77,7 @@ void M2Cut::cut_cond(vector<ExParticle>& in_parlst)
   {
     // Adding the top frame
     sprintf(special_message_char," +%s+", pr(57, '-').c_str() ) ;
-    string somestring(special_message_char) ;
+    std::string somestring(special_message_char) ;
     special_message = somestring + special_message ;
 
     // Adding the bottom frame

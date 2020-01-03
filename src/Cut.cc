@@ -8,12 +8,12 @@
 // "algorithm" for "remove" and "remove_if"
 #include <algorithm>
 #include <iostream>
-#include <vector>
-#include "../inc/Basics.h"
-#include "../inc/EV.h"
-#include "../inc/Cut.h"
+// #include <vector>
+// #include "../include/Basics.h"
+// #include "../include/EV.h"
+#include "../include/Cut.h"
 
-using std::vector ;
+// using std::vector ;
 
 //==============================================================
 
@@ -133,7 +133,7 @@ void Cut::input(std::string property)
 
 //--------------------------------------------------------------
 // Applies the cut on in_parlst
-void Cut::apply(vector<ExParticle>& in_parlst)
+void Cut::apply(std::vector<ExParticle>& in_parlst)
 {
 
   // Copying in_parlst for report()

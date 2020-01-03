@@ -9,33 +9,33 @@
 #include <cmath>
 #include <ctime>
 #include <fstream>
-#include <vector>
+// #include <vector>
 #include <chrono>
 #include <ctime>
 #include <omp.h>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/EV.h"
-#include "../inc/Basics.h"
-#include "../inc/Pheno.h"
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
+// #include "../inc/EV.h"
+// #include "../inc/Basics.h"
+#include "../include/Pheno.h"
 
-using namespace Pythia8 ;
+// using namespace Pythia8 ;
 
 
-vector<double> InvMeMu(vector<ExParticle>& parts);
-vector<double> scaleFTauE(vector<ExParticle>&);
-double jettest(vector<ExParticle>&) ; 
+std::vector<double> InvMeMu(std::vector<ExParticle>& parts);
+std::vector<double> scaleFTauE(std::vector<ExParticle>&);
+double jettest(std::vector<ExParticle>&) ; 
 
 ///////////////////////////////////////////////////
 ///////////////      main()     ///////////////////
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  string filename           = "" ;
-  string Tot_Num_Events_str = "" ;
-  string NUM_THREADS_str    = "" ;
-  string report_input_str   = "" ;
+  std::string filename           = "" ;
+  std::string Tot_Num_Events_str = "" ;
+  std::string NUM_THREADS_str    = "" ;
+  std::string report_input_str   = "" ;
 
   filename.assign(argv[1]) ;
   Tot_Num_Events_str.assign(argv[2]) ;
@@ -177,7 +177,7 @@ int main(int argc,char *argv[])
 
 //==============================================================
 // Accessing the jets from particles
-double jettest(vector<ExParticle>& parts) 
+double jettest(std::vector<ExParticle>& parts) 
 {
   size_t jet_set_size = parts[0].EVPtr->GenJetPtr->inclusive_after().size() ;
   double output = jet_set_size*1.0 ;
@@ -187,12 +187,12 @@ double jettest(vector<ExParticle>& parts)
 
 //==============================================================
 // Invariant mass for (mu, e) pair (for LFV_1 )
-vector<double> InvMeMu(vector<ExParticle>& parts)
+std::vector<double> InvMeMu(std::vector<ExParticle>& parts)
 {
   if (parts.size() != 4 )  return {-100, -100, -100};
 
-  vector<ExParticle> sel_EpMum ;
-  vector<ExParticle> sel_EmMup ;
+  std::vector<ExParticle> sel_EpMum ;
+  std::vector<ExParticle> sel_EmMup ;
 
   for (size_t i=0 ; i<parts.size() ; ++i)
   {
@@ -211,7 +211,7 @@ vector<double> InvMeMu(vector<ExParticle>& parts)
 
 //==============================================================
 // Electron & tau momentum scaling ( for LFV_3_1 )
-vector<double> scaleFTauE(vector<ExParticle>& parts)
+std::vector<double> scaleFTauE(std::vector<ExParticle>& parts)
 {
   if ( parts.size() != 3 )  return { -1 } ;
 
@@ -220,15 +220,15 @@ vector<double> scaleFTauE(vector<ExParticle>& parts)
 
   if ( jet_set.size() ==0 )  return { -2 } ;
 
-  vector<double> out ;
+  std::vector<double> out ;
 
   // out.push_back(parts[0].EVPtr->i()) ;
 
   for (size_t i=0 ; i<jet_set.size() ; ++i)
   {
 
-    vector<ExParticle> sel_emu ;
-    vector<ExParticle> Ftau_mu ;
+    std::vector<ExParticle> sel_emu ;
+    std::vector<ExParticle> Ftau_mu ;
 
     // Finding the total charge of each jet
     int j_charge = jet_set[i].user_index() ;
@@ -259,7 +259,7 @@ vector<double> scaleFTauE(vector<ExParticle>& parts)
 
     if (sel_emu.size() != 2 || Ftau_mu.size() != 1)  return { -3 } ;
 
-    Vec4 p_Fta( jet_set[i].px(), jet_set[i].py(), jet_set[i].pz(), jet_set[i].e() ) ;
+    Pythia8::Vec4 p_Fta( jet_set[i].px(), jet_set[i].py(), jet_set[i].pz(), jet_set[i].e() ) ;
 
 
   // ..........................................................
@@ -290,8 +290,8 @@ vector<double> scaleFTauE(vector<ExParticle>& parts)
     EV_weight = 0.0001453;
   // ..........................................................
 
-    Vec4 p_e = sel_emu[0].visMom();
-    Vec4 p_mu_sum = Ftau_mu[0].visMom() + sel_emu[1].visMom();
+    Pythia8::Vec4 p_e = sel_emu[0].visMom();
+    Pythia8::Vec4 p_mu_sum = Ftau_mu[0].visMom() + sel_emu[1].visMom();
 
     double m_ta = 1.777 ; // GeV
     double m_H  = 125   ; // GeV
@@ -324,8 +324,8 @@ vector<double> scaleFTauE(vector<ExParticle>& parts)
 
     if(alpha_ta < 1 || alpha_e < 1) { alpha_e = 1; alpha_ta = 1; }
 
-    Vec4 scaled_p_ta = alpha_ta*p_Fta ;
-    Vec4 scaled_p_e = alpha_e*p_e ;
+    Pythia8::Vec4 scaled_p_ta = alpha_ta*p_Fta ;
+    Pythia8::Vec4 scaled_p_e = alpha_e*p_e ;
     // ..........................................
 
 

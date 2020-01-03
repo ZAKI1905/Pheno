@@ -5,25 +5,26 @@
 
 */
 
-#include <iostream>
-#include <vector>
-#include "Pythia8/Pythia.h"
-#include "../inc/EV.h"
-#include "../inc/IdEff.h"
-#include "../inc/Basics.h"
-#include "../inc/Cut.h"
+// #include <iostream>
+// #include <vector>
+// #include "Pythia8/Pythia.h"
 
-using std::vector ;
-using namespace Pythia8 ;
+// #include "../include/EV.h"
+#include "../include/IdEff.h"
+// #include "../include/Basics.h"
+// #include "../include/Cut.h"
+
+// using std::vector ;
+// using namespace Pythia8 ;
 
 //==============================================================
 //--------------------------------------------------------------
 // Constructor
-IdEff::IdEff(EV& ev) : Cut(ev) {}
+IdEff::IdEff(EV& ev) : Cut(ev) {logger.SetUnit("IdEff");}
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void IdEff::cut_cond(vector<ExParticle>& in_parlst)
+void IdEff::cut_cond(std::vector<ExParticle>& in_parlst)
 /*
 ID_eff_check: Takes an event and checks if the detector missed an
  electron or muon.

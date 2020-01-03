@@ -10,31 +10,31 @@
 #include <cmath>
 #include <ctime>
 #include <fstream>
-#include <vector>
+// #include <vector>
 #include <chrono>
 #include <ctime>
 #include <omp.h>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/EV.h"
-#include "../inc/Basics.h"
-#include "../inc/Pheno.h"
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
+// #include "../inc/EV.h"
+// #include "../inc/Basics.h"
+#include "../include/Pheno.h"
 
-using namespace Pythia8 ;
+// using namespace Pythia8 ;
 
 // LFV_2_2 
-vector<double> InvEpMum2(vector<ExParticle>& parts);
+std::vector<double> InvEpMum2(std::vector<ExParticle>& parts);
 
 ///////////////////////////////////////////////////
 ///////////////      main()     ///////////////////
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  string filename           = "" ;
-  string Tot_Num_Events_str = "" ;
-  string NUM_THREADS_str    = "" ;
-  string report_input_str   = "" ;
+  std::string filename           = "" ;
+  std::string Tot_Num_Events_str = "" ;
+  std::string NUM_THREADS_str    = "" ;
+  std::string report_input_str   = "" ;
 
   filename.assign(argv[1]) ;
   Tot_Num_Events_str.assign(argv[2]) ;
@@ -181,12 +181,12 @@ int main(int argc,char *argv[])
 // Invariant mass for (mu-, e+) pairs (for LFV_2_2 )
 // Since we don't know which pair comes from fi, 
 // we just report both combinations of invariant masses
-vector<double> InvEpMum2(vector<ExParticle>& parts)
+std::vector<double> InvEpMum2(std::vector<ExParticle>& parts)
 {
   if (parts.size() != 4 )  return {-1, -1, -1, -1, -1};
 
-  vector<ExParticle> sel_Ep ;
-  vector<ExParticle> sel_Mum ;
+  std::vector<ExParticle> sel_Ep ;
+  std::vector<ExParticle> sel_Mum ;
 
   for (size_t i=0 ; i<parts.size() ; ++i)
   {

@@ -1,12 +1,12 @@
 #ifndef Cut_H
 #define  Cut_H
 
-#include <vector>
+// #include <vector>
 #include "Basics.h"
 #include "EV.h"
 #include "ExParticle.h"
 
-using std::vector ;
+// using std::vector ;
 
 //=============================================================
 /*
@@ -19,7 +19,9 @@ class Cut
   friend class Pheno ;   
 
   //--------------------------------------------------------------
-  
+  protected:
+    Logger logger ;
+  //--------------------------------------------------------------
   public:
 
     // Constructor takes a reference to an event
@@ -31,27 +33,32 @@ class Cut
     //-------- Applying Cut ------------
     // Usual definition for when we want to modify the 
     // input particle list
-    void apply(vector<ExParticle>&) ; 
-    //----------------------------------
+    void apply(std::vector<ExParticle>&) ; 
+
+    // /* Overloaded definiton, if we want to save the 
+    //   particles passing the cut in another list instead.
+    // */
+    // void apply(std::vector<Particle>&, std::vector<Particle>& )    ;  
+    // //----------------------------------
 
   //--------------------------------------------------------------
 
   protected:
 
     // Cut label
-    string name = "unnamed_cut" ;
+    std::string name = "unnamed_cut" ;
 
     // Ref. to the event
     EV& ev_ref ;  
 
     // cut_cond checks cut and adds those not passing it to rm_list 
-    virtual void cut_cond(vector<ExParticle>&) = 0 ;   
+    virtual void cut_cond(std::vector<ExParticle>&) = 0 ;   
 
     // Saves cut details in a .txt file
     void report() ;    
 
     // The removal list
-    vector<int> rm_list ;  
+    std::vector<int> rm_list ;  
 
     // Report cut or not
     bool  report_cut = false ;  
@@ -66,10 +73,10 @@ class Cut
     char  cut_report_char[100] ;  
     
     // Copy of input particles for reporting
-    vector<ExParticle>  in_parts_cpy ;  
+    std::vector<ExParticle>  in_parts_cpy ;  
 
     // Copy of output particles for reporting
-    vector<ExParticle> out_parts_cpy ;  
+    std::vector<ExParticle> out_parts_cpy ;  
 
     // inputing the cut options
     virtual void  input(std::string) ;   

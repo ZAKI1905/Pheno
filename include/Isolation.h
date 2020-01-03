@@ -1,13 +1,13 @@
 #ifndef Isolation_H
 #define Isolation_H
 
-#include <vector>
-#include "Pythia8/Pythia.h"
-#include "Basics.h"
+// #include <vector>
+// #include "Pythia8/Pythia.h"
+// #include "Basics.h"
 #include "Cut.h"
 
-using std::vector ;
-using namespace Pythia8 ;
+// using std::vector ;
+// using namespace Pythia8 ;
 
 //==============================================================
 
@@ -25,7 +25,7 @@ class Isolation : public Cut
   private:
 
     // Virtual method from cut class
-      void cut_cond(vector<ExParticle>&) ;   
+    void cut_cond(std::vector<ExParticle>&) ;   
 
     // These values have to be reset for each particle!
     

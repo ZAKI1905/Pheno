@@ -1,11 +1,11 @@
 #ifndef M4Cut_H
 #define M4Cut_H
 
-#include <vector>
-#include "Pythia8/Pythia.h"
+// #include <vector>
+// #include "Pythia8/Pythia.h"
 #include "Cut.h"
 
-using namespace Pythia8 ;
+// using namespace Pythia8 ;
 
 //==============================================================
 class M4Cut : public Cut
@@ -15,19 +15,15 @@ class M4Cut : public Cut
   friend class Pheno ;   
 
   //--------------------------------------------------------------
-
   public:
-
     // Constructor takes a reference to the event
     M4Cut(EV&) ;
    
-
   //--------------------------------------------------------------
-
   private:
 
     // Virtual method from cut class
-    void cut_cond(vector<ExParticle>&) ;   
+    void cut_cond(std::vector<ExParticle>&) ;   
     void input(std::string) ; 
 
     // The minimum of m4l
@@ -37,7 +33,7 @@ class M4Cut : public Cut
     float M4_cut_max = 10000 ;   
 
     // Sorts particles based on pT
-    void pT_sort(vector<ExParticle>&) ;
+    void pT_sort(std::vector<ExParticle>&) ;
 };
 
 //==============================================================

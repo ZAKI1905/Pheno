@@ -1,12 +1,12 @@
 #ifndef STBinner_H
 #define STBinner_H
 
-#include <vector>
-#include "Pythia8/Pythia.h"
+// #include <vector>
+// #include "Pythia8/Pythia.h"
 #include "EV.h"
 #include "Binner.h"
 
-using namespace Pythia8 ;
+// using namespace Pythia8 ;
 
 //==============================================================
 class STBinner : public Binner
@@ -16,7 +16,6 @@ class STBinner : public Binner
   friend class Pheno ;   
 
   //--------------------------------------------------------------
-
   public:
 
     // Constructor takes a reference to the event
@@ -24,7 +23,6 @@ class STBinner : public Binner
     
 
   //--------------------------------------------------------------
-
   private:
 
     // Reporting the bin information (virtual method from Binner)
@@ -40,20 +38,20 @@ class STBinner : public Binner
     void bin_it(bool cut_report, std::string cut_file) ; 
 
     // The bin set
-    vector<vector<vector<double> > > bin_set = 
-    vector<vector<vector<double> > >(10, vector<vector<double> >(3, vector<double>(5)) ) ;
+    std::vector<std::vector<std::vector<double> > > bin_set = 
+    std::vector<std::vector<std::vector<double> > >(10, std::vector<std::vector<double> >(3, std::vector<double>(5)) ) ;
 
     // The set of charged leptons that passed the cuts
-    vector<ExParticle> charged_lept ;
+    std::vector<ExParticle> charged_lept ;
 
     // The set of jets
-    vector<fastjet::PseudoJet> jet_set ;
+    std::vector<fastjet::PseudoJet> jet_set ;
 
     // Returns the value of S_T
     double S_T() ;
 
     // S_T limits for the bins:
-    vector<float> st_limit ;
+    std::vector<float> st_limit ;
     
     // Sets the on-off-Z status of the event
     void on_off_Z() ;
@@ -66,7 +64,7 @@ class STBinner : public Binner
     int on_z = -1 ;
 
     // checks the lepton number conditions
-    vector<int> lep_num_check() ;
+    std::vector<int> lep_num_check() ;
 
     float one_event = 1.0 ;
 

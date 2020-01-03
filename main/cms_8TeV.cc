@@ -14,31 +14,33 @@
 #include <cmath>
 #include <ctime>
 #include <fstream>
-#include <vector>
+// #include <vector>
 #include <chrono>
 #include <ctime>
 #include <omp.h>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/EV.h"
-#include "../inc/Basics.h"
-#include "../inc/Pheno.h"
 
-using namespace Pythia8 ;
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
+// #include "../inc/EV.h"
+// #include "../inc/Basics.h"
+
+#include "../include/Pheno.h"
+
+// using namespace Pythia8 ;
 
 
-double ftest(vector<ExParticle>&);
+double ftest(std::vector<ExParticle>&);
 
 ///////////////////////////////////////////////////
 ///////////////      main()     ///////////////////
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  string filename           = "" ;
-  string Tot_Num_Events_str = "" ;
-  string NUM_THREADS_str    = "" ;
-  string report_input_str   = "" ;
+  std::string filename           = "" ;
+  std::string Tot_Num_Events_str = "" ;
+  std::string NUM_THREADS_str    = "" ;
+  std::string report_input_str   = "" ;
 
   filename.assign(argv[1]) ;
   Tot_Num_Events_str.assign(argv[2]) ;
@@ -178,7 +180,7 @@ int main(int argc,char *argv[])
 //==============================================================
 // You can change the body of this function
 // and use it for recording variables, and vectors
-double ftest(vector<ExParticle>& parts)
+double ftest(std::vector<ExParticle>& parts)
 {
   double test_out = 0 ;
 

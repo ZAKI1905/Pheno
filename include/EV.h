@@ -1,15 +1,15 @@
 #ifndef EV_H
 #define EV_H
 
-#include <vector>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
+// #include <Pythia8/Pythia.h>
+// #include <fastjet/ClusterSequence.hh>
+// #include <fastjet/Selector.hh>
+
 #include "Basics.h"
 #include "ExParticle.h"
 
-using std::vector ;
-using namespace Pythia8 ;
+// using std::vector ;
+// using namespace Pythia8 ;
 
 //==============================================================
 // Forward declaration
@@ -38,7 +38,7 @@ class EV
   public:
 
     // Constructor
-    EV(int, Event&) ; 
+    EV(int, Pythia8::Event&) ; 
     // Destructor
     ~EV() ;
 
@@ -57,55 +57,58 @@ class EV
     void  find_had_tau(std::string filename) ;
 
     // removing the taus not passing cuts
-    void  update_hadtaus(vector<ExParticle>) ; 
+    void  update_hadtaus(std::vector<ExParticle>) ; 
 
     // returns a reference to full event
-    vector<ExParticle>& Full_Ev() ; 
+    std::vector<ExParticle>& Full_Ev() ; 
 
     // returns the size of an event
     size_t  size() const ; 
 
     // Overloading ()
-    vector<ExParticle>  operator() (vector<int>) ; 
+    std::vector<ExParticle>  operator() (std::vector<int>) ; 
 
     // returns the hadronic taus
-    vector<ExParticle>& htau() ; 
+    std::vector<ExParticle>& htau() ; 
 
     // returns the event_number
     int i() const ; 
 
     // returns the visible 4-momentum
-    Vec4  vis_p(ExParticle& p) ; 
+    Pythia8::Vec4  vis_p(ExParticle& p) ; 
 
     //------------------FASTJET----------------------
     // returns a reference to the ps_jts
-    vector<fastjet::PseudoJet>& psjet() ; 
+    std::vector<fastjet::PseudoJet>& psjet() ; 
 
     // returns a reference to the lep_jts
-    vector<ExParticle>& lep_for_jet() ; 
+    std::vector<ExParticle>& lep_for_jet() ; 
 
     // Updates the ps_jet set based on the cuts
     void  update_ps_jets() ; 
+
+    // GenJet pointer for STBinner
+    GenJet* GenJetPtr = NULL ;
     //-----------------------------------------------
 
     //-----------------------CUTS--------------------
     // returns a reference to leptons that passed all the cuts
-    vector<ExParticle>& pass_lepts() ; 
-    void  update_pass_lepts(vector<ExParticle> ) ;
+    std::vector<ExParticle>& pass_lepts() ; 
+    void  update_pass_lepts(std::vector<ExParticle> ) ;
     //-----------------------------------------------
 
     // Prints the full event given the file name
     void  print(std::string) ; 
 
     template <class T>
-    void  print_table(std::FILE *, vector<T>) ;
+    void  print_table(std::FILE *, std::vector<T>) ;
 
 //--------------------------------------------------------------
 
   private:
 
     // inputs options
-    void  input(string, bool) ; 
+    void  input(std::string, bool) ; 
 
     // The event number
     int event_number ; 
@@ -120,22 +123,19 @@ class EV
     bool eVWeightisSet  = false ;
     
     // The hadronically decaying taus
-    vector<ExParticle>  h_taus ; 
+    std::vector<ExParticle>  h_taus ; 
 
     // True if p hadronically decays
     bool  had_dec(ExParticle &) ; 
 
     // The full event
-    vector<ExParticle>  Full_Event ; 
+    std::vector<ExParticle>  Full_Event ; 
 
     // Saves the Cut pointer
     void addCutPtr(std::shared_ptr<Cut>) ;
 
     // A list of Cut pointers that have been applied to the event
-    vector<std::shared_ptr<Cut> > CutPtr ;
-
-    // GenJet pointer for STBinner
-    GenJet* GenJetPtr ;
+    std::vector<std::shared_ptr<Cut> > CutPtr ;
 
     // Adds GenJet pointer for STBinner
     void addGenJetPtr(GenJet*) ;
@@ -150,16 +150,15 @@ class EV
 
     //------------------FASTJET----------------------
     // Pseudojets as an input to fastjet
-    vector<fastjet::PseudoJet>  ps_jts ; 
+    std::vector<fastjet::PseudoJet>  ps_jts ; 
 
     // Leptons as an input to fastjet
-    vector<ExParticle>  lep_jts ; 
+    std::vector<ExParticle>  lep_jts ; 
     //-----------------------------------------------
     
     // Leptons that passed all the cuts 
-    vector<ExParticle>  iso_leptons ;   
+    std::vector<ExParticle>  iso_leptons ;   
   
-
 };
 
 //==============================================================

@@ -1,16 +1,16 @@
 #ifndef Binner_H
 #define Binner_H
 
-#include <vector>
-#include "Pythia8/Pythia.h"
+// #include <vector>
+// #include <Pythia8/Pythia.h>
 
-using namespace Pythia8 ;
+#include "EV.h"
+// using namespace Pythia8 ;
 
 //==============================================================
 class Binner
 {
 //--------------------------------------------------------------
-
 public:
 
   // Constructor
@@ -32,7 +32,6 @@ public:
     virtual void report(std::string) = 0 ;
 
 //--------------------------------------------------------------
-
 protected:
 
   // Pointer to the event 

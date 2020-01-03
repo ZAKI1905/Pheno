@@ -5,24 +5,25 @@
 
 */
 
-#define PBSTR "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
-#define PBWIDTH 60
+// #define PBSTR "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+// #define PBWIDTH 60
 
 extern const int  ID_ELECTRON  = 11 ;
 extern const int  ID_MUON      = 13 ;
 extern const int  ID_TAU       = 15 ;
 
 #include <algorithm>
-#include <vector>
+// #include <vector>
 #include <random>
 #include <chrono>
 #include <ctime>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/Basics.h"
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
 
-using    namespace Pythia8 ;
+#include "../include/Basics.h"
+
+// using    namespace Pythia8 ;
 
 extern const std::vector<int> lept_id_list { ID_ELECTRON, -ID_ELECTRON,
                                 ID_MUON, -ID_MUON, ID_TAU, -ID_TAU } ;
@@ -46,7 +47,7 @@ bool endswith (std::string const &fullString, std::string const &ending)
 //==============================================================
 // Function to remove occurences of a certain char
 // ( e.g. spaces ) from a given string 
-std::string strip(string str, char c) 
+std::string strip(std::string str, char c) 
 { 
   std::string out_str ;
   
@@ -89,7 +90,7 @@ bool contains<ExParticle>( std::vector<ExParticle>& Vec, ExParticle p )
 
 //==============================================================
 // Counts the number of particles with ID's specified in the list
-int count( vector<ExParticle>& Vec, vector<int> id_list ) 
+int count( std::vector<ExParticle>& Vec, std::vector<int> id_list ) 
 {
   
   int counter = 0 ;
@@ -107,7 +108,7 @@ int count( vector<ExParticle>& Vec, vector<int> id_list )
 //==============================================================
 // List as an argument
 template <class T>
-void add_elem(vector<T>& lst, T ele)
+void add_elem(std::vector<T>& lst, T ele)
 // Add an int elements to a vector of ints, 
 // only if it doesn't already exist.
 {
@@ -116,7 +117,7 @@ void add_elem(vector<T>& lst, T ele)
 
 
 //==============================================================
-template <class T> void rm_elem(vector<T>& list, vector<int> rm_index_list)
+template <class T> void rm_elem(std::vector<T>& list, std::vector<int> rm_index_list)
 // Removing certain members of a vector, 
 // given another vector containing an index set.
 {
@@ -134,9 +135,10 @@ template <class T> void rm_elem(vector<T>& list, vector<int> rm_index_list)
 
 
 //==============================================================
-string pr(int size, char ch)
+std::string pr(int size, char ch)
 // const char* pr(int size, char ch)
-{ string rep(size,ch) ;
+{ 
+  std::string rep(size,ch) ;
   return rep          ;
 }
 
@@ -146,10 +148,10 @@ string pr(int size, char ch)
   Parses lineIn based on the given delim from the left side,
    for slice_nums times
 */
-vector<std::string> pars(std::string lineIn, std::string delim, int slice_nums)
+std::vector<std::string> pars(std::string lineIn, std::string delim, int slice_nums)
 {
   // Default token_nums is 1
-  vector<std::string> tokens ;
+  std::vector<std::string> tokens ;
   int token_counter = 0 ;
   std::string intermediate ;
   size_t pos = 0 ;
@@ -175,7 +177,7 @@ vector<std::string> pars(std::string lineIn, std::string delim, int slice_nums)
 }
 
 //==============================================================
-vector<std::string> pars(std::string lineIn, vector<std::string> delim_lst)
+std::vector<std::string> pars(std::string lineIn, std::vector<std::string> delim_lst)
 {
   std::vector<std::string> tokens ;
   size_t pos = 0 ;
@@ -201,42 +203,42 @@ vector<std::string> pars(std::string lineIn, vector<std::string> delim_lst)
 //==============================================================
 // Takes a string input like "s1,s2,s3,s4" and returns a vector
 // {s1,s2,s3,s4}, the delim option is set to "," by default
-void stolst(vector<std::string>& out_lst, std::string in_lst_str, std::string delim)
+void stolst(std::vector<std::string>& out_lst, std::string in_lst_str, std::string delim)
 {
   // Parsing the input as far as possible (hence the option '-1')
-    vector<std::string> tmp = pars( in_lst_str, delim, -1 )  ;
+  std::vector<std::string> tmp = pars( in_lst_str, delim, -1 )  ;
 
-    for( size_t i=0 ; i < tmp.size() ; ++i)
-    {
-      out_lst.push_back( tmp[i] ) ;
-    }  
+  for( size_t i=0 ; i < tmp.size() ; ++i)
+  {
+    out_lst.push_back( tmp[i] ) ;
+  }  
 }
 
 //==============================================================
 // Takes a string input like "1,2,3,4" and returns a vector {1,2,3,4}
 // the delim option is set to "," by default
-void stolst(vector<int>& out_lst, std::string in_lst_str, std::string delim)
+void stolst(std::vector<int>& out_lst, std::string in_lst_str, std::string delim)
 {
   // Parsing the input as far as possible (hence the option '-1')
-    vector<std::string> tmp = pars( in_lst_str, delim, -1 ) ;
+  std::vector<std::string> tmp = pars( in_lst_str, delim, -1 ) ;
 
-    for( size_t i=0 ; i < tmp.size() ; ++i)
-    {
-      out_lst.push_back( std::stoi(tmp[i]) ) ;
-    }  
+  for( size_t i=0 ; i < tmp.size() ; ++i)
+  {
+    out_lst.push_back( std::stoi(tmp[i]) ) ;
+  }  
 }
 
 //==============================================================
 // Overloading for float inputs
-void stolst(vector<float>& out_lst, std::string in_lst_str, std::string delim)
+void stolst(std::vector<float>& out_lst, std::string in_lst_str, std::string delim)
 {
-  // Parsing the input as far as possible (hence the option '-1')
-    vector<std::string> tmp = pars( in_lst_str, delim, -1 ) ;
+// Parsing the input as far as possible (hence the option '-1')
+  std::vector<std::string> tmp = pars( in_lst_str, delim, -1 ) ;
 
-    for( size_t i=0 ; i < tmp.size() ; ++i)
-    {
-      out_lst.push_back( std::stof(tmp[i]) ) ;
-    }  
+  for( size_t i=0 ; i < tmp.size() ; ++i)
+  {
+    out_lst.push_back( std::stof(tmp[i]) ) ;
+  }  
 }
 
 //==============================================================
@@ -269,20 +271,20 @@ std::vector<int> ev_range_pars(std::string input)
 }
 //==============================================================
 // Returns the invariant mass of a list of particles
-double invM(vector<ExParticle>& prt_lst) 
+double invM(std::vector<ExParticle>& prt_lst) 
 {
-    Vec4 tmp_4Mom = 0.0 ;
+  Pythia8::Vec4 tmp_4Mom = 0.0 ;
 
-    for( size_t i=0 ; i < prt_lst.size() ; ++i ) 
-      tmp_4Mom += prt_lst[i].visMom() ;
+  for( size_t i=0 ; i < prt_lst.size() ; ++i ) 
+    tmp_4Mom += prt_lst[i].visMom() ;
 
-    return tmp_4Mom.mCalc() ;
+  return tmp_4Mom.mCalc() ;
 }
 
 //==============================================================
 // Returns the number of opposite sign same flavor leptons 
 // in a list
-int OSSF(vector<ExParticle>& ev)
+int OSSF(std::vector<ExParticle>& ev)
 {
   int OSSF_N = 0 ;
 
@@ -306,7 +308,7 @@ int OSSF(vector<ExParticle>& ev)
 //==============================================================
 // Returns the number of opposite sign opposite flavor leptons
 // in a list
-int OSOF(vector<ExParticle>& ev)
+int OSOF(std::vector<ExParticle>& ev)
 {
   int OSOF_N = 0 ;
 
@@ -341,7 +343,7 @@ double R(ExParticle& p1, ExParticle& p2)
 
 //-------------------------------------------------------
 template <class T> 
-void saveVec(vector<T> list, std::string out_file_str)
+void saveVec(std::vector<T> list, std::string out_file_str)
 {
   if (list.size() ==0 ) return ;
   out_file_str = out_file_str + ".dat" ;
@@ -358,7 +360,7 @@ void saveVec(vector<T> list, std::string out_file_str)
 //-------------------------------------------------------
 // Specialization for int instances
 template <> 
-void saveVec<int>(vector<int> list, std::string out_file_str)
+void saveVec<int>(std::vector<int> list, std::string out_file_str)
 {
   if (list.size() ==0 ) return ;
 
@@ -391,7 +393,7 @@ void saveVec<int>(vector<int> list, std::string out_file_str)
 //-------------------------------------------------------
 // Specialization for string instances
 template <> 
-void saveVec<std::string>(vector<std::string> list, std::string out_file_str)
+void saveVec<std::string>(std::vector<std::string> list, std::string out_file_str)
 {
   if (list.size() ==0 ) return ;
   out_file_str = out_file_str + ".dat" ;
@@ -408,10 +410,10 @@ void saveVec<std::string>(vector<std::string> list, std::string out_file_str)
 //-------------------------------------------------------
 // Overloading saveVec for rec_var<T> inputs
 template <class T>
-void saveVec(vector<rec_var<T> > list)
+void saveVec(std::vector<rec_var<T> > list)
 {
   if (list.size() ==0 ) return ;
-  string out_file_str = list[0].name + ".dat" ;
+  std::string out_file_str = list[0].name + ".dat" ;
 
   std::FILE * out_file ;
   out_file = fopen(out_file_str.c_str(), "a") ;
@@ -427,11 +429,11 @@ void saveVec(vector<rec_var<T> > list)
 //-------------------------------------------------------
 // Specialization for double vector instances
 template <> 
-void saveVec<vector<double> >(vector<rec_var<vector<double> > > list)
+void saveVec<std::vector<double> >(std::vector<rec_var<std::vector<double> > > list)
 {
   if (list.size() ==0 ) return ;
 
-  string out_file_str = list[0].name + ".dat" ;
+  std::string out_file_str = list[0].name + ".dat" ;
 
   std::FILE * out_file ;
   out_file = fopen(out_file_str.c_str(), "a") ;
@@ -450,10 +452,10 @@ void saveVec<vector<double> >(vector<rec_var<vector<double> > > list)
 //-------------------------------------------------------
 // Specialization for int instances
 template <>
-void saveVec<int>(vector<rec_var<int> > list)
+void saveVec<int>(std::vector<rec_var<int> > list)
 {
   if (list.size() ==0 ) return ;
-  string out_file_str = list[0].name + ".dat" ;
+  std::string out_file_str = list[0].name + ".dat" ;
 
   std::FILE * out_file ;
   out_file = fopen(out_file_str.c_str(), "a") ;
@@ -472,32 +474,32 @@ void saveVec<int>(vector<rec_var<int> > list)
 //==============================================================
 
 // contains
-template bool contains<int>(vector<int>&, int) ;
-template bool contains<ExParticle>(vector<ExParticle>&, ExParticle) ;
-template bool contains<string>(vector<string>&, string) ;
+template bool contains<int>(std::vector<int>&, int) ;
+// template bool contains<ExParticle>(std::vector<ExParticle>&, ExParticle) ;
+template bool contains<std::string>(std::vector<std::string>&, std::string) ;
 //--------------------------------
 
 // add_elem
-template void add_elem<int>(vector<int>&, int) ;
-template void add_elem<ExParticle>(vector<ExParticle>&, ExParticle) ;
+template void add_elem<int>(std::vector<int>&, int) ;
+template void add_elem<ExParticle>(std::vector<ExParticle>&, ExParticle) ;
 //--------------------------------
 
 // rm_elem
-template void rm_elem<int>(vector<int>&, vector<int>) ;
-template void rm_elem<ExParticle>(vector<ExParticle>&, vector<int>) ;
-template void rm_elem<fastjet::PseudoJet>(vector<fastjet::PseudoJet>&,
- vector<int>) ;
+template void rm_elem<int>(std::vector<int>&, std::vector<int>) ;
+template void rm_elem<ExParticle>(std::vector<ExParticle>&, std::vector<int>) ;
+template void rm_elem<fastjet::PseudoJet>(std::vector<fastjet::PseudoJet>&,
+ std::vector<int>) ;
 //--------------------------------
 
 // SaveVec
-template void saveVec<int>(vector<int>, std::string) ;
-template void saveVec<float>(vector<float>, std::string) ;
-template void saveVec<double>(vector<double>, std::string) ;
-template void saveVec<std::string>(vector<std::string>, std::string) ;
+// template void saveVec<int>(std::vector<int>, std::string) ;
+template void saveVec<float>(std::vector<float>, std::string) ;
+template void saveVec<double>(std::vector<double>, std::string) ;
+// template void saveVec<std::string>(std::vector<std::string>, std::string) ;
 
-template void saveVec<double>(vector<rec_var<double> >) ;
-template void saveVec<vector<double> >(vector<rec_var<vector<double> > >) ;
-template void saveVec<int>(vector<rec_var<int> >) ;
-template void saveVec<float>(vector<rec_var<float> >) ;
+template void saveVec<double>(std::vector<rec_var<double> >) ;
+// template void saveVec<std::vector<double> >(std::vector<rec_var<std::vector<double> > >) ;
+// template void saveVec<int>(std::vector<rec_var<int> >) ;
+// template void saveVec<float>(std::vector<rec_var<float> >) ;
 
 //==============================================================

@@ -10,31 +10,31 @@
 #include <cmath>
 #include <ctime>
 #include <fstream>
-#include <vector>
+// #include <vector>
 #include <chrono>
 #include <ctime>
 #include <omp.h>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/EV.h"
-#include "../inc/Basics.h"
-#include "../inc/Pheno.h"
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
+// #include "../inc/EV.h"
+// #include "../inc/Basics.h"
+#include "../include/Pheno.h"
 
-using namespace Pythia8 ;
+// using namespace Pythia8 ;
 
 
-vector<double> InvMeMu(vector<ExParticle>& parts);
+std::vector<double> InvMeMu(std::vector<ExParticle>& parts);
 
 ///////////////////////////////////////////////////
 ///////////////      main()     ///////////////////
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  string filename           = "" ;
-  string Tot_Num_Events_str = "" ;
-  string NUM_THREADS_str    = "" ;
-  string report_input_str   = "" ;
+  std::string filename           = "" ;
+  std::string Tot_Num_Events_str = "" ;
+  std::string NUM_THREADS_str    = "" ;
+  std::string report_input_str   = "" ;
 
   filename.assign(argv[1]) ;
   Tot_Num_Events_str.assign(argv[2]) ;
@@ -183,12 +183,12 @@ int main(int argc,char *argv[])
 
 //==============================================================
 // Invariant mass for (mu, e) pair (for LFV_1 )
-vector<double> InvMeMu(vector<ExParticle>& parts)
+std::vector<double> InvMeMu(std::vector<ExParticle>& parts)
 {
   if (parts.size() != 4 )  return {-100, -100, -100};
 
-  vector<ExParticle> sel_EpMum ;
-  vector<ExParticle> sel_EmMup ;
+  std::vector<ExParticle> sel_EpMum ;
+  std::vector<ExParticle> sel_EmMup ;
 
   for (size_t i=0 ; i<parts.size() ; ++i)
   {

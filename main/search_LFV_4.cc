@@ -10,22 +10,22 @@
 #include <cmath>
 #include <ctime>
 #include <fstream>
-#include <vector>
+// #include <vector>
 #include <chrono>
 #include <ctime>
 #include <omp.h>
-#include "Pythia8/Pythia.h"
-#include "fastjet/ClusterSequence.hh"
-#include "fastjet/Selector.hh"
-#include "../inc/EV.h"
-#include "../inc/Basics.h"
-#include "../inc/Pheno.h"
+// #include "Pythia8/Pythia.h"
+// #include "fastjet/ClusterSequence.hh"
+// #include "fastjet/Selector.hh"
+// #include "../inc/EV.h"
+// #include "../inc/Basics.h"
+#include "../include/Pheno.h"
 
-using namespace Pythia8 ;
+// using namespace Pythia8 ;
 
 // LFV_4_1  (mu+ mu+ ta- ta-)
-vector<double> scaleTauE_LFV4(vector<ExParticle>&);
-vector<double> alpha(vector<ExParticle>&, vector<ExParticle>&) ;
+std::vector<double> scaleTauE_LFV4(std::vector<ExParticle>&);
+std::vector<double> alpha(std::vector<ExParticle>&, std::vector<ExParticle>&) ;
 bool check(std::vector<double>) ;
 
 ///////////////////////////////////////////////////
@@ -33,10 +33,10 @@ bool check(std::vector<double>) ;
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  string filename           = "" ;
-  string Tot_Num_Events_str = "" ;
-  string NUM_THREADS_str    = "" ;
-  string report_input_str   = "" ;
+  std::string filename           = "" ;
+  std::string Tot_Num_Events_str = "" ;
+  std::string NUM_THREADS_str    = "" ;
+  std::string report_input_str   = "" ;
 
   filename.assign(argv[1]) ;
   Tot_Num_Events_str.assign(argv[2]) ;
@@ -179,15 +179,15 @@ int main(int argc,char *argv[])
 
 //==============================================================
 // Electron & tau momentum scaling ( for LFV_4_1 )
-vector<double> scaleTauE_LFV4(vector<ExParticle>& parts)
+std::vector<double> scaleTauE_LFV4(std::vector<ExParticle>& parts)
 {
   if (parts.size() != 4)  return {-1} ;
 
-  vector<ExParticle> comb_a_emu ;
-  vector<ExParticle> comb_b_emu ;
-  vector<ExParticle> comb_a_taumu ;
-  vector<ExParticle> comb_b_taumu ;
-  vector<ExParticle> mu_set ;
+  std::vector<ExParticle> comb_a_emu ;
+  std::vector<ExParticle> comb_b_emu ;
+  std::vector<ExParticle> comb_a_taumu ;
+  std::vector<ExParticle> comb_b_taumu ;
+  std::vector<ExParticle> mu_set ;
 
   // Adding tau- and electron
   for (size_t i=0 ; i<parts.size() ; ++i)
@@ -215,31 +215,31 @@ vector<double> scaleTauE_LFV4(vector<ExParticle>& parts)
   comb_a_emu.push_back(mu_set[0]) ;  comb_a_taumu.push_back(mu_set[1]) ;
   comb_b_emu.push_back(mu_set[1]) ;  comb_b_taumu.push_back(mu_set[0]) ;
 
-  vector<double> alpha_a = alpha(comb_a_emu, comb_a_taumu) ;
-  vector<double> alpha_b = alpha(comb_b_emu, comb_b_taumu) ;
+  std::vector<double> alpha_a = alpha(comb_a_emu, comb_a_taumu) ;
+  std::vector<double> alpha_b = alpha(comb_b_emu, comb_b_taumu) ;
 
   // for debugging alpha's
-  // vector<double> out =  { alpha_a[0], alpha_a[1], alpha_a[2], alpha_b[0], alpha_b[1], alpha_b[2] } ;
+  // std::vector<double> out =  { alpha_a[0], alpha_a[1], alpha_a[2], alpha_b[0], alpha_b[1], alpha_b[2] } ;
   
   bool alpha_a_status = check(alpha_a) ;
   bool alpha_b_status = check(alpha_b) ;
 
   // if both scaling seem okay, return error code -3
   if ( alpha_a_status && alpha_b_status ) 
-    {cout<<"(-3) a: ["<<alpha_a[0]<<", "<<alpha_a[1]<<"] - b: ["<<alpha_b[0]<<", "<<alpha_b[1]<<"].\n";
+    {std::cout<<"(-3) a: ["<<alpha_a[0]<<", "<<alpha_a[1]<<"] - b: ["<<alpha_b[0]<<", "<<alpha_b[1]<<"].\n";
     return {-3} ;}
 
   // if both scaling aren't okay, return error code -4
   if ( !alpha_a_status && !alpha_b_status ) 
-    {cout<<"(-4) a: ["<<alpha_a[0]<<", "<<alpha_a[1]<<"] - b: ["<<alpha_b[0]<<", "<<alpha_b[1]<<"].\n";
+    {std::cout<<"(-4) a: ["<<alpha_a[0]<<", "<<alpha_a[1]<<"] - b: ["<<alpha_b[0]<<", "<<alpha_b[1]<<"].\n";
     return {-4} ;}
   
-  Vec4 p_ta = comb_a_taumu[0].visMom() ; // same between a & b
-  Vec4 p_e = comb_a_emu[0].visMom()   ; // same between a & b
+ Pythia8::Vec4 p_ta = comb_a_taumu[0].visMom() ; // same between a & b
+ Pythia8::Vec4 p_e = comb_a_emu[0].visMom()   ; // same between a & b
 
   // assume combination 'a' is correct:
-  vector<ExParticle> sel_taumu  = comb_a_taumu ;
-  vector<ExParticle> sel_emu    = comb_a_emu ;
+  std::vector<ExParticle> sel_taumu  = comb_a_taumu ;
+  std::vector<ExParticle> sel_emu    = comb_a_emu ;
   double alpha_e  = alpha_a[0] ;
   double alpha_ta = alpha_a[1] ;
   double tauMuInv = alpha_a[2] ;
@@ -259,8 +259,8 @@ vector<double> scaleTauE_LFV4(vector<ExParticle>& parts)
     mfi_sq_p = alpha_b[5] ;
 
 
-  Vec4 scaled_p_ta = alpha_ta*p_ta ;
-  Vec4 scaled_p_e = alpha_e*p_e ;
+ Pythia8::Vec4 scaled_p_ta = alpha_ta*p_ta ;
+ Pythia8::Vec4 scaled_p_e = alpha_e*p_e ;
   // ..........................................
 
 
@@ -269,7 +269,7 @@ vector<double> scaleTauE_LFV4(vector<ExParticle>& parts)
 
   double M4_scaled = (scaled_p_ta + sel_taumu[1].visMom() + scaled_p_e + sel_emu[1].visMom() ).mCalc() ;
 
-  vector<double> out = {tauMuInv, eMuInv, M4, mfi_sq_p, 
+  std::vector<double> out = {tauMuInv, eMuInv, M4, mfi_sq_p, 
                         tauMuInv_scaled, eMuInv_scaled, M4_scaled} ;
 
 
@@ -278,12 +278,12 @@ vector<double> scaleTauE_LFV4(vector<ExParticle>& parts)
 
 //==============================================================
 // Solves the scaling factors alpha
-vector<double> alpha(vector<ExParticle>& emu_set, vector<ExParticle>& taumu_set)
+std::vector<double> alpha(std::vector<ExParticle>& emu_set, std::vector<ExParticle>& taumu_set)
 {
   
-  Vec4 p_ta = taumu_set[0].visMom();
-  Vec4 p_e = emu_set[0].visMom();
-  Vec4 p_mu_sum = taumu_set[1].visMom() + emu_set[1].visMom();
+  Pythia8::Vec4 p_ta = taumu_set[0].visMom();
+ Pythia8::Vec4 p_e = emu_set[0].visMom();
+ Pythia8::Vec4 p_mu_sum = taumu_set[1].visMom() + emu_set[1].visMom();
 
   double m_ta = 1.777 ; // GeV
   double m_H  = 125   ; // GeV

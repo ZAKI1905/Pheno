@@ -5,21 +5,22 @@
 
 */
 
-#include <iostream>
-#include <vector>
-#include "Pythia8/Pythia.h"
-#include "../inc/EV.h"
-#include "../inc/M4Cut.h"
-#include "../inc/Basics.h"
-#include "../inc/Cut.h"
+// #include <iostream>
+// #include <vector>
+// #include "Pythia8/Pythia.h"
 
-using namespace Pythia8 ;
+// #include "../inc/EV.h"
+#include "../include/M4Cut.h"
+// #include "../inc/Basics.h"
+// #include "../inc/Cut.h"
+
+// using namespace Pythia8 ;
 
 //==============================================================
 
 //--------------------------------------------------------------
 // Constructor
-M4Cut::M4Cut(EV& ev) : Cut(ev) {}
+M4Cut::M4Cut(EV& ev) : Cut(ev) {logger.SetUnit("M4Cut");}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
@@ -37,13 +38,13 @@ void M4Cut::input(std::string property)
     M4_cut_max= std::stof (inp[1]) ;
   }
   else
-  { std::cerr<<endl<<inp[0]<<" is invalid option for M4 cut!"<<std::flush ;
+  { std::cerr<<"\n"<<inp[0]<<" is invalid option for M4 cut!"<<std::flush ;
   } 
 }
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void M4Cut::cut_cond(vector<ExParticle>& in_parlst)
+void M4Cut::cut_cond(std::vector<ExParticle>& in_parlst)
 {
 
   //************************************************************
@@ -115,7 +116,7 @@ void M4Cut::cut_cond(vector<ExParticle>& in_parlst)
     "\n | - This event with invariant mass %2.2f GeV fails this cut.  |",
      tmp_m) ;
 
-    string somestring(special_message_char) ;
+    std::string somestring(special_message_char) ;
     special_message += somestring ;
 
     // Adding the top frame
@@ -133,7 +134,7 @@ void M4Cut::cut_cond(vector<ExParticle>& in_parlst)
 
 //--------------------------------------------------------------
 // Sorts particles according to pT
-void M4Cut::pT_sort(vector<ExParticle>& in_list)
+void M4Cut::pT_sort(std::vector<ExParticle>& in_list)
 {
   std::sort(in_list.begin(), in_list.end(),
             [](ExParticle& a, ExParticle& b) 
