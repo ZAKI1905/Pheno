@@ -6,17 +6,10 @@
 */ 
 
 #include <iostream>
-// #include <vector>
-
-// #include "Pythia8/Pythia.h"
-// #include "fastjet/ClusterSequence.hh"
-// #include "fastjet/Selector.hh"
 
 #include "../include/Basics.h"
-#include "../include/EV.h"
+#include "../include/ExEvent.h"
 #include "../include/GenJet.h"
-
-// using std::vector ;
 
 //==============================================================
 /*
@@ -33,14 +26,28 @@
 
 //--------------------------------------------------------------
 // Basic  Constructor
-GenJet::GenJet(EV& ev):ev_ref(ev){ ev.addGenJetPtr(this); logger.SetUnit("GenJet"); }
+GenJet::GenJet(ExEvent& ev) : ev_ref(ev){ ev.AddGenJetPtr(this); logger.SetUnit("GenJet"); }
+
+//--------------------------------------------------------------
+// Copy  Constructor
+// Careful about the ev_ref !
+GenJet& GenJet::operator=(const GenJet &other)
+{
+  return *this ;
+}
+
+//--------------------------------------------------------------
+// Set Event reference
+void GenJet::SetEventRef(ExEvent& in_event) 
+{
+  ev_ref = in_event ;
+}
 
 //--------------------------------------------------------------
 // Takes a pointer to pseudo jets in the event
-
-void GenJet::gen()
+void GenJet::GenerateJets()
 {
-
+  PROFILE_FUNCTION() ;
   //-----1-Jet Definition-----
   // Defining the jet
    fastjet::JetDefinition jet_def(jet_alg, jet_radius, recomb_scheme, strategy) ;
@@ -50,12 +57,12 @@ void GenJet::gen()
   //--------------------------
 
   //-----2-Ps-Jet-Update------
-    ev_ref.update_ps_jets() ;
+    ev_ref.UpdatePseudoJet() ;
   //--------------------------
 
   //-----3-Cluster Sequence---
   // runs the jet clustering with the jet definitions
-    fastjet::ClusterSequence clust_seq(ev_ref.psjet(), jet_def) ;
+    fastjet::ClusterSequence clust_seq(ev_ref.GetPseudoJets(), jet_def) ;
   //--------------------------
 
   //-----4-Selector-----------
@@ -83,18 +90,18 @@ void GenJet::gen()
   // removing the non-isolated jets from inc_jets_after
     // isolate() ; // for 'cms_8TeV'
   // removing the jets failing tau_h isolation condition
-    fake_isolate() ; // for 'faketaus'
+    FakeTauIsolate() ; // for 'faketaus'
   //--------------------------
 
   //-----7-Reporting Jets-----
-    if( report_jet == true ) { report() ; }
+    if( report_jet_flag == true ) { Report() ; }
   //--------------------------
 
 }
 
 //--------------------------------------------------------------
 // input method that takes jet options
-void GenJet::input(std::vector<std::string> option)
+void GenJet::Input(std::vector<std::string> option)
 {
 
   std::string main_option = option[0] ;
@@ -102,26 +109,26 @@ void GenJet::input(std::vector<std::string> option)
   //-----1-Definition-----
   if(main_option == "Def")
   {
-    setJetDef(option);
+    SetJetDef(option);
   }
 
   //-----2-Selector-----
   else if(main_option == "Selector")
   {
-    setSelector(option);
+    SetSelector(option);
   }
 
   //-----3-Report-------
   else if(main_option == "Report_Jets")
   {
     sprintf(jet_rep_char, "Jet_Report_%s.txt", option[1].c_str());
-    report_jet = true ;
+    report_jet_flag = true ;
   }
 
 }
 //--------------------------------------------------------------
 // Sets jet definition options
-void GenJet::setSelector(std::vector<std::string> selector_set)
+void GenJet::SetSelector(std::vector<std::string> selector_set)
 {
 
   // Start i from "1", since the first element is "Selector".
@@ -231,7 +238,7 @@ void GenJet::setSelector(std::vector<std::string> selector_set)
 
 //--------------------------------------------------------------
 // Sets jet definition options
-void GenJet::setJetDef(std::vector<std::string> jet_def_set)
+void GenJet::SetJetDef(std::vector<std::string> jet_def_set)
 {
   // Start i from "1", since the first element is "Def".
   for (size_t i =1 ; i< jet_def_set.size(); ++i)
@@ -239,23 +246,23 @@ void GenJet::setJetDef(std::vector<std::string> jet_def_set)
       std::vector<std::string> tmp_def = pars(jet_def_set[i],"=");
 
       if (tmp_def[0] == "Algorithm")
-        setJetAlg(tmp_def[1]) ;
+        SetJetAlg(tmp_def[1]) ;
 
       if (tmp_def[0] == "R")
         jet_radius = std::stod(tmp_def[1]) ;
       
       if (tmp_def[0] == "Recomb_Scheme")
-        setRecScheme( tmp_def[1] ) ;
+        SetRecScheme( tmp_def[1] ) ;
 
       if (tmp_def[0] == "Strategy")
-        setStrategy( tmp_def[1] ) ;
+        SetStrategy( tmp_def[1] ) ;
 
     }
 }
 
 //--------------------------------------------------------------
 // Sets jet algorithm
-void GenJet::setJetAlg(std::string jet_alg_str)
+void GenJet::SetJetAlg(std::string jet_alg_str)
 {
 
   if (jet_alg_str == "antikt_algorithm")
@@ -285,7 +292,7 @@ void GenJet::setJetAlg(std::string jet_alg_str)
 
 //--------------------------------------------------------------
 // Sets recombination scheme
-void GenJet::setRecScheme(std::string rec_scheme)
+void GenJet::SetRecScheme(std::string rec_scheme)
 {
   if (rec_scheme == "E_scheme")
     recomb_scheme = fastjet::E_scheme ;
@@ -303,14 +310,14 @@ void GenJet::setRecScheme(std::string rec_scheme)
     recomb_scheme = fastjet::BIpt2_scheme ;
   else
   {
-    std::cout<<"==> WARNING: The recombination scheme is not found, please add it to GenJet::setRecScheme options.\n"<<std::flush; 
+    LOG_WARNING("The recombination scheme is not found, add it to GenJet::SetRecScheme options."); 
   }
 
 }
 
 //--------------------------------------------------------------
 // Sets the Strategy
-void GenJet::setStrategy(std::string strat)
+void GenJet::SetStrategy(std::string strat)
 {
   if (strat == "Best")
     strategy = fastjet::Best ;
@@ -332,7 +339,7 @@ void GenJet::setStrategy(std::string strat)
 
 //--------------------------------------------------------------
 // Isolation condition assuming jets are faking taus
-void GenJet::fake_isolate()
+void GenJet::FakeTauIsolate()
 {
   std::vector<int> remove_jet ;
   char isolate_message_char[200] ;
@@ -353,15 +360,15 @@ void GenJet::fake_isolate()
 
     for(size_t j=0 ; j < ev_ref.size() ; ++j )
     {
-      ExParticle prt_j =  ev_ref.Full_Ev()[j] ;
+      ExParticle prt_j =  ev_ref.FullEvent()[j] ;
       /* 
         Checking if part_j is final state
       */
-      if( prt_j.isVisible() && prt_j.isFinal() && prt_j.mom().eT() > 0.001 )
+      if( prt_j.isVisible() && prt_j.isFinal() && prt_j.GetMom().eT() > 0.001 )
       {   
         // Checking if they are within 0.1 < R < 0.3 cone
-        if(  0.1 < distance(jet_i, prt_j) && distance(jet_i, prt_j) < 0.3 )
-        { sum_ET += prt_j.mom().eT() ;  }
+        if(  0.1 < Distance(jet_i, prt_j) && Distance(jet_i, prt_j) < 0.3 )
+        { sum_ET += prt_j.GetMom().eT() ;  }
       }
     }
 
@@ -369,7 +376,7 @@ void GenJet::fake_isolate()
     {
       add_elem(remove_jet, (int) i) ;
       
-      if (report_jet) 
+      if (report_jet_flag) 
       {
         sprintf(isolate_message_char,
           "\n - Jet with (phi, prap)= (%4.2f, %4.2f) failed the tau_h isolation condition.\n",
@@ -386,29 +393,29 @@ void GenJet::fake_isolate()
 }
 
 //--------------------------------------------------------------
-void GenJet::isolate()
+void GenJet::Isolate()
 {
   std::vector<int> remove_jet ;
   double  d ;
   char isolate_message_char[200] ;
 
-  for (size_t i = 0 ; i < ev_ref.pass_lepts().size() ; ++i)
+  for (size_t i = 0 ; i < ev_ref.PassedLeptons().size() ; ++i)
   {
-    ExParticle p = ev_ref.pass_lepts()[i] ;
+    ExParticle p = ev_ref.PassedLeptons()[i] ;
 
     for (size_t j = 0 ; j < inc_jets_after.size() ; ++j)
     {
-      d = distance(inc_jets_after[j], p) ;
+      d = Distance(inc_jets_after[j], p) ;
       if(  d < 0.3 )
 
       {
-        if (report_jet) 
+        if (report_jet_flag) 
         {
         sprintf(isolate_message_char,
          "\n - Isolated %s with (phi, prap)=(%4.2f, %4.2f)\
           has R= %-4.2f from the jet with (%4.2f, %4.2f) and\
            it's removed (since R < 0.3).\n", p.name().c_str(),
-            p.visMom().phi(), p.visMom().eta(), d, inc_jets_after[j].phi(),
+            p.GetVisMom().phi(), p.GetVisMom().eta(), d, inc_jets_after[j].phi(),
              inc_jets_after[j].pseudorapidity()) ;
 
         std::string somestring(isolate_message_char) ;
@@ -426,17 +433,17 @@ void GenJet::isolate()
 
 //--------------------------------------------------------------
 // Returns the distance between the pseudo jet and a particle
-double GenJet::distance(fastjet::PseudoJet& psjet, ExParticle& p) 
+double GenJet::Distance(fastjet::PseudoJet& psjet, ExParticle& p) 
 {
-  return pow((pow((psjet.pseudorapidity() - p.visMom().eta() ), 2)
-  + pow( ( psjet.phi() - p.visMom().phi() ), 2) ), 0.5) ;
+  return pow((pow((psjet.pseudorapidity() - p.GetVisMom().eta() ), 2)
+  + pow( ( psjet.phi() - p.GetVisMom().phi() ), 2) ), 0.5) ;
 }
 
 //--------------------------------------------------------------
 /*
   Reports the details of the jet production into a text file.
 */
-void GenJet::report()
+void GenJet::Report()
 {
   std::FILE * jet_rep_file  ;
 
@@ -454,11 +461,11 @@ void GenJet::report()
   sprintf(Jet_Def_Description, "%s", my_jet_dscr.c_str()) ;
 
   // Before Selection:
-  print_jettable(jet_rep_file, inc_jets_before, Jet_Def_Description,
+  PrintJetTable(jet_rep_file, inc_jets_before, Jet_Def_Description,
    "Before Selection", ev_ref.i() ) ;
 
   // After Selection:
-  print_jettable(jet_rep_file, inc_jets_after, Jet_Def_Description,
+  PrintJetTable(jet_rep_file, inc_jets_after, Jet_Def_Description,
    "After Selection", ev_ref.i() ) ;
 
   // Writing the isolate method reports
@@ -473,7 +480,7 @@ void GenJet::report()
 /*
   Printing the jet report
 */
-template <class T> void GenJet::print_jettable(std::FILE * file,
+template <class T> void GenJet::PrintJetTable(std::FILE * file,
  std::vector<T> list, char* File_Description,  const char* Table_Title, int iEv)
 {
 
@@ -524,7 +531,7 @@ template <class T> void GenJet::print_jettable(std::FILE * file,
 
 //--------------------------------------------------------------
 // Returns the inclusive jets after cuts
-std::vector<fastjet::PseudoJet> GenJet::inclusive_after()
+std::vector<fastjet::PseudoJet> GenJet::InclusiveJetsAfter()
 {
   return inc_jets_after;
 }

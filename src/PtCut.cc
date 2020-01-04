@@ -5,25 +5,17 @@
 
 */
 
-// #include <iostream>
-// #include <vector>
-// #include "Pythia8/Pythia.h"
-// #include "../inc/EV.h"
 #include "../include/PtCut.h"
-// #include "../inc/Basics.h"
-// #include "../inc/Cut.h"
-
-using namespace Pythia8 ;
 
 //==============================================================
 
 //--------------------------------------------------------------
 // Constructor
-PtCut::PtCut(EV& ev) : Cut(ev) {logger.SetUnit("PtCut");}
+PtCut::PtCut(ExEvent& ev) : Cut(ev) {logger.SetUnit("PtCut");}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void PtCut::input(std::string property)
+void PtCut::Input(std::string property)
 {
   // Parsing the command
   std::vector<std::string> inp = pars(property, "=") ;
@@ -46,17 +38,17 @@ void PtCut::input(std::string property)
   }
   else
   {
-    std::cerr<<endl<<inp[0]<<" is invalid option for pT cut!"<<std::flush ;
+    LOG_ERROR((inp[0] + " is invalid option for pT cut!").c_str()) ;
   } 
   
 }
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void PtCut::cut_cond(vector<ExParticle>& in_parlst)
+void PtCut::CutCond(std::vector<ExParticle>& in_parlst)
 {
 
-  pT_sorter(in_parlst)                    ;
+  pT_Sorter(in_parlst)                    ;
   size_t emu_fail_idx = in_parlst.size()  ;
   size_t tau_fail_idx = in_parlst.size()  ;
   size_t tau_head_idx = in_parlst.size()  ;
@@ -64,7 +56,7 @@ void PtCut::cut_cond(vector<ExParticle>& in_parlst)
   for(size_t i=0 ; i < in_parlst.size() ; ++i )
   { 
     // If pT is less than the cut
-    if( in_parlst[i].visMom().pT() < pt_cut_val(i+1, in_parlst[i]) )
+    if( in_parlst[i].GetVisMom().pT() < pT_CutVal(i+1, in_parlst[i]) )
     {
       /* It's possible that it's a tau that first fails
        the cut (unlikely), but still no problem. */
@@ -81,7 +73,7 @@ void PtCut::cut_cond(vector<ExParticle>& in_parlst)
       // Check the pT condition this time for taus
       while (i < in_parlst.size())
       {
-        if( in_parlst[i].visMom().pT() < pt_cut_val(i+1, in_parlst[i]) )
+        if( in_parlst[i].GetVisMom().pT() < pT_CutVal(i+1, in_parlst[i]) )
         {
           tau_fail_idx = i ;
           break ;
@@ -128,7 +120,7 @@ bool PtCut::operator()(const ExParticle& p1, const ExParticle& p2)
     {
        // const issue which might be fixed by overloading
       ExParticle tmp_p1 = p1, tmp_p2 = p2 ;
-      comp_pT_value_bool = (tmp_p1.mom().pT() > tmp_p2.mom().pT()) ;
+      comp_pT_value_bool = (tmp_p1.GetMom().pT() > tmp_p2.GetMom().pT()) ;
            
     } 
   // If both of the particles are tau, push the one with lower pT to higher index
@@ -136,7 +128,7 @@ bool PtCut::operator()(const ExParticle& p1, const ExParticle& p2)
     {       
       // const issue which might be fixed by overloading
       ExParticle tmp_p1 = p1, tmp_p2 = p2 ;
-      comp_pT_value_bool = (tmp_p1.visMom().pT() > tmp_p2.visMom().pT() ) ;
+      comp_pT_value_bool = (tmp_p1.GetVisMom().pT() > tmp_p2.GetVisMom().pT() ) ;
     }
 
     return comp_pT_value_bool ;
@@ -144,7 +136,7 @@ bool PtCut::operator()(const ExParticle& p1, const ExParticle& p2)
 
 //--------------------------------------------------------------
 // Sorts a list of particles based on the "func" comparison
-vector<ExParticle> PtCut::pT_sorter(vector<ExParticle>& partlist)
+std::vector<ExParticle> PtCut::pT_Sorter(std::vector<ExParticle>& partlist)
 { // Particle Sorter: Sorts a vector containing particle instances by their pT.
 
   std::sort(partlist.begin(), partlist.end(), *this ) ;
@@ -153,7 +145,7 @@ vector<ExParticle> PtCut::pT_sorter(vector<ExParticle>& partlist)
 
 //--------------------------------------------------------------
 // dictionary for the pT cut values
-float PtCut::pt_cut_val(size_t rank, ExParticle& p)
+float PtCut::pT_CutVal(size_t rank, ExParticle& p)
 {
   float return_val = 0  ;
   // If electron or muon
@@ -171,7 +163,7 @@ float PtCut::pt_cut_val(size_t rank, ExParticle& p)
 
   /* If hadronic tau (the hadronic condition is redundant
    sometime, depending on EV::operator() method definition) */
-  else if( p.idAbs() == ID_TAU && p.isHadDec() ) 
+  else if( p.idAbs() == ID_TAU && p.IsHadDec() ) 
   {
     return_val = had_tau_pT_cut ;
   }

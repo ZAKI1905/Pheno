@@ -5,18 +5,12 @@
 
 */
 
-// #include <vector>
 #include <iostream>
 #include <omp.h>
 #include <chrono>
 #include <thread>
-// #include "Pythia8/Pythia.h"
 
 #include "../include/Pheno.h"
-// #include "../inc/Basics.h"
-// #include "../inc/ExParticle.h"
-// #include "../inc/EV.h"
-// #include "../inc/GenJet.h"
 #include "../include/IdEff.h"
 #include "../include/Isolation.h"
 #include "../include/M2Cut.h"
@@ -25,9 +19,6 @@
 #include "../include/PrapCut.h"
 #include "../include/OffZCut.h"
 #include "../include/STBinner.h"
-
-
-// using namespace Pythia8 ;
 
 //==============================================================
 
@@ -45,7 +36,7 @@ Pheno::~Pheno()
 
 //--------------------------------------------------------------
 
-void Pheno::input(std::string command, bool strip_space)
+void Pheno::Input(std::string command, bool strip_space)
 /*
   Input method that initializes the Pheno class:
 */
@@ -77,11 +68,11 @@ void Pheno::input(std::string command, bool strip_space)
     if ( inp[1] == "true" || inp[1] == "false" )
     { 
       if ( parsed_prop[1] == "cuts" )
-        Report_Cuts  = value ;
+        report_cuts_flag  = value ;
       if ( parsed_prop[1] == "jets" )
-        Report_Jets  = value ;
+        report_jets_flag  = value ;
       if ( parsed_prop[1] == "taus" )
-        Report_Taus  = value ;
+        report_taus_flag  = value ;
     }
     else 
     {
@@ -110,7 +101,7 @@ void Pheno::input(std::string command, bool strip_space)
     std::vector<std::string> tmp_req_lst ;
     stolst( tmp_req_lst, inp[1] )  ;
 
-    state_dict(tmp_req_lst) ;
+    StateDict(tmp_req_lst) ;
   }
 
   if(prop == "cuts")
@@ -135,8 +126,8 @@ void Pheno::input(std::string command, bool strip_space)
   {
     if ( inp[1] == "run" )
     {
-      GenJetIdx = cut_list.size() - 1 ;
-      LOG_INFO((" GenJetIdx is = " + std::to_string(GenJetIdx) ).c_str() );
+      gen_jet_idx = cut_list.size() - 1 ;
+      // LOG_INFO((" gen_jet_idx is = " + std::to_string(gen_jet_idx) ).c_str() );
     }
     else
     {
@@ -145,7 +136,6 @@ void Pheno::input(std::string command, bool strip_space)
       stolst( tmp_fj_commands, pars(inp[1], ":")[1] )  ;
 
       fastjet_commands.push_back(tmp_fj_commands) ;
-
     }
     
   }
@@ -159,15 +149,15 @@ void Pheno::input(std::string command, bool strip_space)
     bin_list.push_back(tmp_bin_lst) ;
   }
 
-  if( prop == "Events") { Tot_Num_Events = std::stoi(inp[1]) ; }
+  if( prop == "Events") { tot_num_events = std::stoi(inp[1]) ; }
 
   if(prop == "file:lhe"    )
   {
     // Saving the LHE file path:
-    LHE_Path = inp[1] ;
+    LHE_path = inp[1] ;
 
     // Parsing the lhe file path
-    std::vector<std::string> parsed_lhe_path = pars(LHE_Path, "/", -1) ;
+    std::vector<std::string> parsed_lhe_path = pars(LHE_path, "/", -1) ;
 
     // Extracting the lhe file name
     inp[1] = parsed_lhe_path [ parsed_lhe_path.size() - 1] ;
@@ -175,11 +165,11 @@ void Pheno::input(std::string command, bool strip_space)
     // Removing the ".lhe" extenstion from the LHE file:
     std::vector<std::string> lhe_file_string = pars(inp[1], ".") ;
 
-    File_LHE     = lhe_file_string[0] ;
+    file_LHE     = lhe_file_string[0] ;
 
     // LHE file path minus the file name ( + 4 for '.lhe')
-    size_t lhe_str_len = File_LHE.length() + 4 ;
-    LHE_Path = LHE_Path.substr(0, LHE_Path.length() - lhe_str_len);
+    size_t lhe_str_len = file_LHE.length() + 4 ;
+    LHE_path = LHE_path.substr(0, LHE_path.length() - lhe_str_len);
 
   }
 
@@ -196,7 +186,7 @@ void Pheno::input(std::string command, bool strip_space)
 
 //--------------------------------------------------------------
 template<class T>
-void Pheno::input(std::string input, T (*func)(std::vector<ExParticle>& parts) )
+void Pheno::Input(std::string input, T (*func)(std::vector<ExParticle>& parts) )
 {
   // Parsing the command
   std::vector<std::string> inp = pars(input, "=") ;
@@ -214,7 +204,7 @@ void Pheno::input(std::string input, T (*func)(std::vector<ExParticle>& parts) )
 //--------------------------------------------------------------
 // Specialization for int instances
 template<>
-void Pheno::input<int>(std::string input, int (*func)(std::vector<ExParticle>& parts) )
+void Pheno::Input<int>(std::string input, int (*func)(std::vector<ExParticle>& parts) )
 {
   // Parsing the command
   std::vector<std::string> inp = pars(input, "=") ;
@@ -232,7 +222,7 @@ void Pheno::input<int>(std::string input, int (*func)(std::vector<ExParticle>& p
 //--------------------------------------------------------------
 // Specialization for double vectors instances
 template<>
-void Pheno::input<std::vector<double> >(std::string input, std::vector<double> (*func)(std::vector<ExParticle>& parts) )
+void Pheno::Input<std::vector<double> >(std::string input, std::vector<double> (*func)(std::vector<ExParticle>& parts) )
 {
   // Parsing the command
   std::vector<std::string> inp = pars(input, "=") ;
@@ -248,7 +238,7 @@ void Pheno::input<std::vector<double> >(std::string input, std::vector<double> (
 }
 
 //--------------------------------------------------------------
-int Pheno::comp_str2int(std::string input)
+int Pheno::CompStr2Int(std::string input)
 {
   if (input == ">=")
     return 1 ;
@@ -267,7 +257,7 @@ int Pheno::comp_str2int(std::string input)
 }
 
 //--------------------------------------------------------------
-void Pheno::state_dict( std::vector<std::string> lst_in)
+void Pheno::StateDict( std::vector<std::string> lst_in)
 {
   // The binary comparisons: {">=", "<=", ">", "<", "=", "!="}
   // Note that ">=" should precede "=" and ">" for pars to
@@ -277,7 +267,7 @@ void Pheno::state_dict( std::vector<std::string> lst_in)
   {
     std::vector<std::string> name_str = pars(lst_in[i], binary_comp) ;
     std::vector<std::vector<int> > tmp_lst = { { std::stoi(name_str[2]),
-                                      comp_str2int(name_str[1]) } } ;
+                                      CompStr2Int(name_str[1]) } } ;
 
         if ( name_str[0] == "e+"  )
         tmp_lst.push_back({-ID_ELECTRON}) ;
@@ -322,47 +312,49 @@ void Pheno::state_dict( std::vector<std::string> lst_in)
 }
 
 //--------------------------------------------------------------
-void Pheno::run()
+void Pheno::Run()
 {
+  PROFILE_FUNCTION() ;
   omp_set_num_threads(req_threads) ;
   LOG_INFO( ("Threads requested: " + std::to_string(req_threads)).c_str()) ;
 
-  num_cuts_passed.resize(Tot_Num_Events) ;
+  num_cuts_passed.resize(tot_num_events) ;
   
   // Initializing the binner classes
-  initBinner() ;
+  InitBinner() ;
 
-  #pragma omp parallel for firstprivate(show_pythia_banner, cut_list, Report_Cuts, Report_Taus, Report_Jets, print_ev_set, File_LHE, pythia_commands, fastjet_commands) shared(binner_ptr_lst)
+  #pragma omp parallel for firstprivate(show_pythia_banner, cut_list, report_cuts_flag, report_taus_flag, report_jets_flag, print_ev_set, file_LHE, pythia_commands, fastjet_commands) shared(binner_ptr_lst)
   for (int j=0 ; j<req_threads ; ++j)
   {
     // Asking one of the threads to save the available threads
     if( j==0 ) threads = omp_get_num_threads() ;
 
-    runPythia(j) ;
+    RunPythia(j) ;
 
   }
 
-  final_report() ;
+  FinalReport() ;
 }
 
 //-----------------------------------
-void Pheno::runPythia(int pr_id)
+void Pheno::RunPythia(int pr_id)
 /*
   Runs pythia, input the events in EV's and apply cuts
   and make reports, along with binning.
 */
 {
+  PROFILE_FUNCTION() ;
 
   //Generator.
     Pythia8::Pythia pythia("", show_pythia_banner) ;
 
   // Making a shared character for naming all the files
     char shared_file_char[150] ;
-    sprintf(shared_file_char, "%s_%d", File_LHE.c_str(), pr_id) ;
+    sprintf(shared_file_char, "%s_%d", file_LHE.c_str(), pr_id) ;
 
   // Inputing the LHE file in pythia
     std::string tmp_pyth_lhe(shared_file_char);
-    tmp_pyth_lhe = "Beams:LHEF = "+ LHE_Path + tmp_pyth_lhe + ".lhe";
+    tmp_pyth_lhe = "Beams:LHEF = "+ LHE_path + tmp_pyth_lhe + ".lhe";
 
     pythia_commands.push_back(tmp_pyth_lhe) ;
 
@@ -376,7 +368,7 @@ void Pheno::runPythia(int pr_id)
    // For now I don't know how to implement this (May-12-2019)
    // for (size_t i=0 ;  i<fastjet_commands.size() ; ++i)
    //       {
-   //         GenJet.input(fastjet_commands[i]) ;
+   //         GenJet.Input(fastjet_commands[i]) ;
    //       }
 
   pythia.init() ;
@@ -391,20 +383,21 @@ void Pheno::runPythia(int pr_id)
   // Begin event loop; generate until none left in input file.
   for (int iEvent=0  ; ; ++iEvent)
   {
+    PROFILE_SCOPE("Event Loop") ;
+
     // Generate events, and check whether generation failed.
     if (!pythia.next())
     {
-        // If failure because reached end of file then exit event loop.
-        if (pythia.info.atEndOfFile()) break ;
+      // If failure because reached end of file then exit event loop.
+      if (pythia.info.atEndOfFile()) break ;
 
-        // First few failures write off as "acceptable" errors, then quit.
-        if (++iAbort < nAbort) continue ;
-        break ;
+      // First few failures write off as "acceptable" errors, then quit.
+      if (++iAbort < nAbort) continue ;
+      break ;
     }
-  
     // ------------------------------Event info--------------------------
     int num_proc = req_threads ;
-    iEvent_Glob = pr_id*(Tot_Num_Events / num_proc) + iEvent + 1 ;
+    iEvent_Glob = pr_id*(tot_num_events / num_proc) + iEvent + 1 ;
 
     // if ( pr_id == 0 && iEvent % 100 == 0)
     //   {
@@ -413,7 +406,7 @@ void Pheno::runPythia(int pr_id)
     //   }
 
     // Creating the ev object, by taking a pythia event and it's number
-    EV ev(iEvent_Glob, pythia.event) ;
+    ExEvent ev(iEvent_Glob, pythia.event) ;
 
     // Reporting events
     if( contains(print_ev_set, iEvent_Glob) )
@@ -421,18 +414,18 @@ void Pheno::runPythia(int pr_id)
       std::string event_rep_str(shared_file_char) ;
       event_rep_str = "Event_Report_"+event_rep_str + "_" +
                       std::to_string(iEvent_Glob)+".txt" ;
-      ev.print(event_rep_str) ;
+      ev.Print(event_rep_str) ;
     }
 
     //If Report_Taus (private) is true, it will report them
     std::string tau_rep_str(shared_file_char) ;
     tau_rep_str = "Tau_Report_" + tau_rep_str + ".txt" ;
 
-    bool tau_report_bool = ( Report_Taus || contains( report_taus_set, ev.i() ) ) ;
-    ev.input("Report_Taus", tau_report_bool) ;
+    bool tau_report_bool = ( report_taus_flag || contains( report_taus_set, ev.i() ) ) ;
+    ev.Input("Report_Taus", tau_report_bool) ;
 
     // Find hadronic taus
-    ev.find_had_tau(tau_rep_str) ;
+    ev.FindHadTaus(tau_rep_str) ;
 
     // Leptons are the only particles to loop over.
     std::vector<ExParticle> PartList = ev(lept_id_list) ;
@@ -451,7 +444,7 @@ void Pheno::runPythia(int pr_id)
     GenJet genjet(ev) ; //GenJet constructor
 
     // Number of cuts passed by an event
-    int cut_counter  = run_cuts(ev, PartList, cut_list, shared_file_char) ;
+    int cut_counter  = RunCuts(ev, PartList, cut_list, shared_file_char) ;
 
     // +1 for the intial N_l check
     int tot_num_cuts = cut_list.size() + 1 ;
@@ -465,10 +458,10 @@ void Pheno::runPythia(int pr_id)
 
     // Update the list of hadronic taus (keep the ones that passed all the cuts)
     // Needed for the binning procedure
-    ev.update_hadtaus(PartList) ;
+    ev.UpdateHadTaus(PartList) ;
 
     #pragma omp critical
-    binner(ev, shared_file_char) ;
+    BinEvents(ev, shared_file_char) ;
 
     }
   // ======================= END EVENT LOOP =======================
@@ -516,10 +509,10 @@ bool Pheno::break_ev_loop(std::vector<ExParticle>& prt_lst)
 
 //-------------------------------------------------------
 // Cuts
-int Pheno::run_cuts(EV& ev, std::vector<ExParticle>& part_lst,
+int Pheno::RunCuts(ExEvent& ev, std::vector<ExParticle>& part_lst,
  std::vector<std::vector<std::string> > cut_list, char* shared_file_char)
 {
-
+  PROFILE_FUNCTION() ;
   //------Setting the cut report filename--------
   std::string cut_file_str(shared_file_char) ;
   cut_file_str = "Pythia_Cut_Report_" + cut_file_str + ".txt" ;
@@ -536,7 +529,7 @@ int Pheno::run_cuts(EV& ev, std::vector<ExParticle>& part_lst,
     cut_count++ ;
 
   // Recording var's before any cuts
-  record(-1, part_lst) ;
+  Record(-1, part_lst) ;
 
   for( size_t i=0 ; i<cut_list.size() ; ++i)
   {
@@ -544,7 +537,7 @@ int Pheno::run_cuts(EV& ev, std::vector<ExParticle>& part_lst,
     cut_name = cut_list[i][0] ;
     cut_rep_title += cut_name ;
 
-    std::shared_ptr<Cut> c1 = cut_dict(ev, cut_name) ;
+    std::shared_ptr<Cut> c1 = CutDict(ev, cut_name) ;
 
     // Checking if c1 is NULL pointer
     if ( !c1 )
@@ -557,22 +550,22 @@ int Pheno::run_cuts(EV& ev, std::vector<ExParticle>& part_lst,
     }
 
     // Saving the pointer to current cut to the event
-    ev.addCutPtr(c1) ;
+    ev.AddCutPtr(c1) ;
 
     // Saving the name of the cut in the cut instance
-    c1->Cut::input("Name:"+cut_name) ;
+    c1->Cut::Input("Name:"+cut_name) ;
 
-    bool cut_report_bool = ( Report_Cuts || contains( report_cuts_set, ev.i() ) ) ;
-    if(cut_report_bool) c1->Cut::input(cut_rep_title+ ":" + cut_file_str) ;
+    bool cut_report_bool = ( report_cuts_flag || contains( report_cuts_set, ev.i() ) ) ;
+    if(cut_report_bool) c1->Cut::Input(cut_rep_title+ ":" + cut_file_str) ;
 
     // Read the input for each cut
     for( size_t j=1 ; j<cut_list[i].size() ; ++j)
     {
-      c1->input(cut_list[i][j]) ;
+      c1->Input(cut_list[i][j]) ;
     }
 
     // Applying cuts
-    c1->apply(part_lst) ;
+    c1->Apply(part_lst) ;
 
     cut_rep_title += " > " ;
 
@@ -580,12 +573,12 @@ int Pheno::run_cuts(EV& ev, std::vector<ExParticle>& part_lst,
     cut_count++ ;
 
     // Update the list of particles that passed the cuts so far
-    ev.update_pass_lepts(part_lst) ;
+    ev.UpdatePassedLepts(part_lst) ;
 
     // run fastjet
-    if ( i == GenJetIdx ) runGenJet(ev, shared_file_char) ;
+    if ( i == gen_jet_idx ) RunGenJet(ev, shared_file_char) ;
 
-    record(i, part_lst) ;
+    Record(i, part_lst) ;
 
   }
 
@@ -595,7 +588,7 @@ int Pheno::run_cuts(EV& ev, std::vector<ExParticle>& part_lst,
 
 //-------------------------------------------------------
 // Cut dictionary
-std::shared_ptr<Cut> Pheno::cut_dict(EV& ev, std::string input)
+std::shared_ptr<Cut> Pheno::CutDict(ExEvent& ev, std::string input)
 {
 
   std::shared_ptr<Cut> pCut ;
@@ -612,28 +605,27 @@ std::shared_ptr<Cut> Pheno::cut_dict(EV& ev, std::string input)
 
 }
 
-
-
 //-------------------------------------------------------
 // Runs fastjet and saves a list of jets, and reports if Report_Jets is true.
-void Pheno::runGenJet(EV& ev, char* shared_file_char)
+void Pheno::RunGenJet(ExEvent& ev, char* shared_file_char)
 {   
+  PROFILE_FUNCTION() ;
   std::string jet_file_str(shared_file_char) ;
 
-  bool jet_report_bool = ( Report_Jets || contains( report_jets_set, ev.i() ) ) ;
-  if(jet_report_bool) { ev.GenJetPtr->input( {"Report_Jets", jet_file_str} ) ; }
+  bool jet_report_bool = ( report_jets_flag || contains( report_jets_set, ev.i() ) ) ;
+  if(jet_report_bool) { ev.GenJetPtr->Input( {"Report_Jets", jet_file_str} ) ; }
 
   for (size_t i=0 ; i<fastjet_commands.size() ; ++i)
-    ev.GenJetPtr->input(fastjet_commands[i]) ;
+    ev.GenJetPtr->Input(fastjet_commands[i]) ;
 
-  ev.GenJetPtr->gen() ;
+  ev.GenJetPtr->GenerateJets() ;
 }
   
 //-------------------------------------------------------
 // Recording Values
-void Pheno::record(size_t cut_idx, std::vector<ExParticle>& part_lst)
+void Pheno::Record(size_t cut_idx, std::vector<ExParticle>& part_lst)
 {
-
+  PROFILE_FUNCTION() ;
   // #pragma omp single
   rec_double.vars[cut_idx+1].resize( func_double.funcs[cut_idx+1].size() ) ;
   rec_vec_double.vars[cut_idx+1].resize( func_vec_double.funcs[cut_idx+1].size() ) ;
@@ -646,7 +638,7 @@ void Pheno::record(size_t cut_idx, std::vector<ExParticle>& part_lst)
     {
       rec_var<double> tmp_var ;
       tmp_var.val = (*func_double.funcs[cut_idx+1][j].f)(part_lst) ;
-      tmp_var.name = "_rec_" + func_double.funcs[cut_idx+1][j].name + "_" + File_LHE ;
+      tmp_var.name = "_rec_" + func_double.funcs[cut_idx+1][j].name + "_" + file_LHE ;
 
       rec_double.vars[cut_idx+1][j].push_back( tmp_var ) ;
     }
@@ -656,7 +648,7 @@ void Pheno::record(size_t cut_idx, std::vector<ExParticle>& part_lst)
     {
       rec_var<std::vector<double> > tmp_var ;
       tmp_var.val = (*func_vec_double.funcs[cut_idx+1][j].f)(part_lst) ;
-      tmp_var.name = "_rec_" + func_vec_double.funcs[cut_idx+1][j].name + "_" + File_LHE ;
+      tmp_var.name = "_rec_" + func_vec_double.funcs[cut_idx+1][j].name + "_" + file_LHE ;
 
       rec_vec_double.vars[cut_idx+1][j].push_back( tmp_var ) ;
     }
@@ -666,7 +658,7 @@ void Pheno::record(size_t cut_idx, std::vector<ExParticle>& part_lst)
     {
       rec_var<int> tmp_var ;
       tmp_var.val = (*func_int.funcs[cut_idx+1][j].f)(part_lst) ;
-      tmp_var.name = "_rec_" + func_int.funcs[cut_idx+1][j].name + "_" + File_LHE ;
+      tmp_var.name = "_rec_" + func_int.funcs[cut_idx+1][j].name + "_" + file_LHE ;
 
       rec_int.vars[cut_idx+1][j].push_back( tmp_var ) ;
     }
@@ -688,7 +680,7 @@ std::shared_ptr<Binner> Pheno::bin_dict(std::string input)
 
 //-------------------------------------------------------
 // Initializing the binner classes
-void Pheno::initBinner()
+void Pheno::InitBinner()
 {
 
   for( size_t i=0 ; i<bin_list.size() ; ++i)
@@ -701,7 +693,7 @@ void Pheno::initBinner()
     // Read the input for each binner
     for( size_t j=1 ; j<bin_list[i].size() ; ++j)
     {
-      bi->input(bin_list[i][j]) ;
+      bi->Input(bin_list[i][j]) ;
     }
 
     binner_ptr_lst.push_back(bi) ;
@@ -711,27 +703,27 @@ void Pheno::initBinner()
 //-------------------------------------------------------
 // Binning the event
 // Has to be within critical statement in parallel region!
-void Pheno::binner(EV& ev, char* shared_file_char)
+void Pheno::BinEvents(ExEvent& ev, char* shared_file_char)
 {
 
   std::string cut_file_str(shared_file_char) ;
   cut_file_str = "Pythia_Cut_Report_" + cut_file_str + ".txt" ;
 
-  bool cut_report_bool = ( Report_Cuts || contains( report_cuts_set, ev.i() ) ) ;
+  bool cut_report_bool = ( report_cuts_flag || contains( report_cuts_set, ev.i() ) ) ;
 
  // Read the input for each binner
   for( size_t i=0 ; i<binner_ptr_lst.size() ; ++i)
   {
-    binner_ptr_lst[i]->input(ev) ;
-    binner_ptr_lst[i]->bin_it(cut_report_bool, cut_file_str) ;
+    binner_ptr_lst[i]->Input(ev) ;
+    binner_ptr_lst[i]->BinIt(cut_report_bool, cut_file_str) ;
   }
 
-  num_ev_passed += ev.weight() ;
+  num_ev_passed += ev.Weight() ;
 }
 
 //-------------------------------------------------------
 // Reporting
-void Pheno::final_report()
+void Pheno::FinalReport()
 {
   char tmp[100] ;
   sprintf(tmp, "Total number of events passing the cuts: %f.", num_ev_passed) ;
@@ -768,23 +760,18 @@ void Pheno::final_report()
   // .....................................
 
 
-  saveVec(num_cuts_passed, "_rec_Num_Cuts_" + File_LHE);
-  saveVec(input_list,  "_main_inputs_" + File_LHE);
+  saveVec(num_cuts_passed, "_rec_Num_Cuts_" + file_LHE);
+  saveVec(input_list,  "_main_inputs_" + file_LHE);
 
   // Output for each binner
   for( size_t i=0 ; i<binner_ptr_lst.size() ; ++i)
-   { binner_ptr_lst[i]->report(File_LHE) ; }
+   { binner_ptr_lst[i]->Report(file_LHE) ; }
 }
 //==============================================================
 
 //==============================================================
 //                    explicit instantiations
 //==============================================================
-
-template void Pheno::input<double>(std::string, double (*func)(std::vector<ExParticle>&) ) ;
-
-// template void Pheno::input<std::vector<double> >(std::string, std::vector<double> (*func)(std::vector<ExParticle>&) ) ;
-
-// template void Pheno::input<int>(std::string, int (*func)(std::vector<ExParticle>&) ) ;
+template void Pheno::Input<double>(std::string, double (*func)(std::vector<ExParticle>&) ) ;
 
 //==============================================================

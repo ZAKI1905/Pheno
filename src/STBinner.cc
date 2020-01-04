@@ -5,16 +5,8 @@
 
 */
 
-// #include <iostream>
-// #include <vector>
-// #include "Pythia8/Pythia.h"
-// #include "../include/EV.h"
 #include "../include/STBinner.h"
-// #include "../include/Binner.h"
 #include "../include/GenJet.h"
-// #include "../inc/Basics.h"
-
-using namespace Pythia8 ;
 
 //==============================================================
 
@@ -22,19 +14,19 @@ using namespace Pythia8 ;
 STBinner::STBinner() {}
 //--------------------------------------------------------------
 // Adding the event
-void STBinner::input(EV& evIn)
+void STBinner::Input(ExEvent& evIn)
 {
   // Saving the event reference
   evp = &evIn ;
  
   // The leptons that passed the cuts (by definition charged)
-   charged_lept = evp->pass_lepts() ;
+   charged_lept = evp->PassedLeptons() ;
   
   // Setting unit event counter from the event weight
-   one_event  = evp->weight() ;
+   one_event  = evp->Weight() ;
 
   // Saving the inclusive jets after the cuts
-   jet_set = evp->GenJetPtr->inclusive_after() ;
+   jet_set = evp->GenJetPtr->InclusiveJetsAfter() ;
 
 }
 
@@ -47,7 +39,7 @@ void STBinner::input(EV& evIn)
 
 //--------------------------------------------------------------
 // Overloading the input method.
-void STBinner::input(std::string input)
+void STBinner::Input(std::string input)
 {
   // Parsing the command
   std::vector<std::string> inp = pars(input, "=") ;
@@ -57,17 +49,17 @@ void STBinner::input(std::string input)
 
 //--------------------------------------------------------------
 // Virtual method from binner class:
-void STBinner::bin_it(bool cut_report, string cut_f_name)
+void STBinner::BinIt(bool cut_report, std::string cut_f_name)
 {
 
   // Finds the S_T of the event
   double st_val = S_T()  ;
 
   // Sets the "on_z" variable (default = 0)
-  on_off_Z() ;
+  OnOffZ() ;
 
   // Finds which lepton channel the event belongs to
-  vector<int> lep_n = lep_num_check() ;
+  std::vector<int> lep_n = LepNumCheck() ;
 
   /*
     Sorts events according to their S_T value,
@@ -79,7 +71,7 @@ void STBinner::bin_it(bool cut_report, string cut_f_name)
 // ------------------------------------------
     // Assume it's in m_ll < 75 bin
     int             x = 0 ;
-    string on_z_char  = "off-Z" ;
+    std::string on_z_char  = "off-Z" ;
     // If it's on_z:
     if( on_z == 1 ) { x = 1 ; on_z_char = "On-Z" ; }
     // In the special case of channel 8 & 9, where we separate m_{ll} > 105 bin:
@@ -127,7 +119,7 @@ void STBinner::bin_it(bool cut_report, string cut_f_name)
 
     fprintf(pCUT_REPORT_FILE,
     "|    %-5s S_T = %-9.1f GeV,  Event Weight = %-4.2f%-18s|\n|%70s\n","==>",
-     st_val,evp->weight(),".","|") ;
+     st_val,evp->Weight(),".","|") ;
 
     fprintf(pCUT_REPORT_FILE," %s\n", pr(69,'-').c_str() ) ;
     fclose(pCUT_REPORT_FILE) ;
@@ -148,9 +140,9 @@ double STBinner::S_T()
     // Adding the charged leptons' share to S_T
     for( size_t i=0 ; i < charged_lept.size() ; ++i )
     {
-        px_sum         += charged_lept[i].visMom().px() ;
-        py_sum         += charged_lept[i].visMom().py() ;
-        scalar_sum_pT  += charged_lept[i].visMom().pT() ;
+        px_sum         += charged_lept[i].GetVisMom().px() ;
+        py_sum         += charged_lept[i].GetVisMom().py() ;
+        scalar_sum_pT  += charged_lept[i].GetVisMom().pT() ;
     }
 
     // Adding the jets' share to S_T
@@ -167,7 +159,7 @@ double STBinner::S_T()
 }
 
 //--------------------------------------------------------------
-void STBinner::on_off_Z()
+void STBinner::OnOffZ()
 {
   /*
   ---------------------------------- On-Z or Off-Z ----------------------------
@@ -193,7 +185,7 @@ void STBinner::on_off_Z()
       // OSSF condition
       if( charged_lept[i].id() == -charged_lept[j].id() )
       {
-        vector<ExParticle> tmp_lst = {charged_lept[i], charged_lept[j]} ;
+        std::vector<ExParticle> tmp_lst = {charged_lept[i], charged_lept[j]} ;
         // if it's in the second bin
         if( 75 < invM(tmp_lst) 
            && invM(tmp_lst) < 105)
@@ -209,15 +201,15 @@ void STBinner::on_off_Z()
 }
 
 //--------------------------------------------------------------
-vector<int> STBinner::lep_num_check()
+std::vector<int> STBinner::LepNumCheck()
 /*           Lepton Number Cut Conditions
 Checking the number of charged leptons in an event:
 
 */
 {
-  int         hadr_taus = (int) evp->htau().size() ;
+  int         hadr_taus = (int) evp->HadronicTaus().size() ;
 
-  vector<int> output    = {0,0,0,0} ;
+  std::vector<int> output    = {0,0,0,0} ;
 
   //--------------------------------------------------------------------------
 
@@ -280,7 +272,7 @@ Checking the number of charged leptons in an event:
 //--------------------------------------------------------------
 // Internal report for python, and an external report for the user
 // Should be implemented in a "bin" calss maybe.
-void STBinner::report(std::string File_LHE)
+void STBinner::Report(std::string File_LHE) const
 {
     std::FILE * INT_REPORT ;
     char INT_Report_Char[100] ;

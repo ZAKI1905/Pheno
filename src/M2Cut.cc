@@ -7,24 +7,17 @@
 
 #include <iostream>
 
-// #include <vector>
-// #include "Pythia8/Pythia.h"
-// #include "../inc/EV.h"
 #include "../include/M2Cut.h"
-// #include "../inc/Basics.h"
-// #include "../inc/Cut.h"
-
-// using namespace Pythia8 ;
 
 //==============================================================
 
 //--------------------------------------------------------------
 // Constructor
-M2Cut::M2Cut(EV& ev) : Cut(ev) {logger.SetUnit("M2Cut");}
+M2Cut::M2Cut(ExEvent& ev) : Cut(ev) {logger.SetUnit("M2Cut");}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void M2Cut::input(std::string property)
+void M2Cut::Input(std::string property)
 {
   // Parsing the command
   std::vector<std::string> inp = pars(property, "=") ;
@@ -40,7 +33,7 @@ void M2Cut::input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void M2Cut::cut_cond(std::vector<ExParticle>& in_parlst)
+void M2Cut::CutCond(std::vector<ExParticle>& in_parlst)
 {
   char special_message_char[100] ;
   bool special_message_on = false ;
@@ -87,7 +80,6 @@ void M2Cut::cut_cond(std::vector<ExParticle>& in_parlst)
   }
 
 }
-
 //--------------------------------------------------------------
 
 //==============================================================

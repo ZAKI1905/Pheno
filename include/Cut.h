@@ -1,12 +1,9 @@
 #ifndef Cut_H
 #define  Cut_H
 
-// #include <vector>
 #include "Basics.h"
-#include "EV.h"
+#include "ExEvent.h"
 #include "ExParticle.h"
-
-// using std::vector ;
 
 //=============================================================
 /*
@@ -25,7 +22,7 @@ class Cut
   public:
 
     // Constructor takes a reference to an event
-    Cut(EV &) ;
+    Cut(ExEvent &) ;
 
     // Virtual destructor
     virtual ~Cut() ;
@@ -33,7 +30,7 @@ class Cut
     //-------- Applying Cut ------------
     // Usual definition for when we want to modify the 
     // input particle list
-    void apply(std::vector<ExParticle>&) ; 
+    void Apply(std::vector<ExParticle>&) ; 
 
     // /* Overloaded definiton, if we want to save the 
     //   particles passing the cut in another list instead.
@@ -49,13 +46,16 @@ class Cut
     std::string name = "unnamed_cut" ;
 
     // Ref. to the event
-    EV& ev_ref ;  
+    ExEvent& ev_ref ;  
 
     // cut_cond checks cut and adds those not passing it to rm_list 
-    virtual void cut_cond(std::vector<ExParticle>&) = 0 ;   
+    virtual void CutCond(std::vector<ExParticle>&) = 0 ;   
+    
+    // inputing the cut options
+    virtual void  Input(std::string) ;  
 
     // Saves cut details in a .txt file
-    void report() ;    
+    void Report() const ;    
 
     // The removal list
     std::vector<int> rm_list ;  
@@ -76,13 +76,9 @@ class Cut
     std::vector<ExParticle>  in_parts_cpy ;  
 
     // Copy of output particles for reporting
-    std::vector<ExParticle> out_parts_cpy ;  
-
-    // inputing the cut options
-    virtual void  input(std::string) ;   
+    std::vector<ExParticle> out_parts_cpy ;   
 
 };
-
 
 //=============================================================
 

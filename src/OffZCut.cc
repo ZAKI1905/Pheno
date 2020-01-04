@@ -5,26 +5,17 @@
 
 */
 
-// #include <iostream>
-// #include <vector>
-// #include "Pythia8/Pythia.h"
-// #include "../inc/EV.h"
 #include "../include/OffZCut.h"
-// #include "../inc/Basics.h"
-// #include "../inc/Cut.h"
-// #include "../inc/GenJet.h"
-
-// using namespace Pythia8 ;
 
 //==============================================================
 
 //--------------------------------------------------------------
 // Constructor
-OffZCut::OffZCut(EV& ev) : Cut(ev) { logger.SetUnit("OffZCut"); }
+OffZCut::OffZCut(ExEvent& ev) : Cut(ev) { logger.SetUnit("OffZCut"); }
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void OffZCut::input(std::string property)
+void OffZCut::Input(std::string property)
 {
   // Parsing the command
   std::vector<std::string> inp = pars(property, "=") ;
@@ -44,7 +35,7 @@ void OffZCut::input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void OffZCut::cut_cond(std::vector<ExParticle>& in_parlst)
+void OffZCut::CutCond(std::vector<ExParticle>& in_parlst)
 {
   char special_message_char[100] ;
   bool special_message_on = false ;

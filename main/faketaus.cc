@@ -9,19 +9,11 @@
 #include <cmath>
 #include <ctime>
 #include <fstream>
-// #include <vector>
 #include <chrono>
 #include <ctime>
 #include <omp.h>
-// #include "Pythia8/Pythia.h"
-// #include "fastjet/ClusterSequence.hh"
-// #include "fastjet/Selector.hh"
-// #include "../inc/EV.h"
-// #include "../inc/Basics.h"
+
 #include "../include/Pheno.h"
-
-// using namespace Pythia8 ;
-
 
 std::vector<double> InvMeMu(std::vector<ExParticle>& parts);
 std::vector<double> scaleFTauE(std::vector<ExParticle>&);
@@ -32,6 +24,8 @@ double jettest(std::vector<ExParticle>&) ;
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
+  Instrumentor::Get().BeginSession("Fake_Taus", "Profile_Fake_Taus.json");        // Begin session 
+
   std::string filename           = "" ;
   std::string Tot_Num_Events_str = "" ;
   std::string NUM_THREADS_str    = "" ;
@@ -57,67 +51,67 @@ int main(int argc,char *argv[])
   // unless a "false" option is passed as a second argument.
 
   // Number of requested threads
-  phen.input("Threads= " + NUM_THREADS_str) ;
+  phen.Input("Threads= " + NUM_THREADS_str) ;
 
   // Total number of events
-  phen.input("Events= " + Tot_Num_Events_str) ;
-  phen.input("file: lhe=" + filename) ;
+  phen.Input("Events= " + Tot_Num_Events_str) ;
+  phen.Input("file: lhe=" + filename) ;
 
   // reporting options
-  phen.input("report:cuts="+report_input_str) ;
+  phen.Input("report:cuts="+report_input_str) ;
 
   // This is an exception list that will always
   //  print reports for the range of events listed.
   // Use ',' for separatng event ranges, or single events.
   // Use '-' for ranges.
-  // phen.input("report:cuts=1-500") ;
+  // phen.Input("report:cuts=1-500") ;
 
-  phen.input("report:taus="+report_input_str) ;
-  // phen.input("report:taus=5-17,155,122") ;
-  phen.input("report:jets="+report_input_str) ;
-  // phen.input("report:jets=1-1000") ;
+  phen.Input("report:taus="+report_input_str) ;
+  // phen.Input("report:taus=5-17,155,122") ;
+  phen.Input("report:jets="+report_input_str) ;
+  // phen.Input("report:jets=1-1000") ;
 
   // printing event records
-  // phen.input("print_events=1-10,50,300") ;
+  // phen.Input("print_events=1-10,50,300") ;
 
 
   // ----------------------pythia options-------------------------------------
 
-  phen.input( "pythia=Beams:frameType = 4" ) ;
+  phen.Input( "pythia=Beams:frameType = 4" ) ;
 
   // "8" for CTEQ6L1 PDF set.
   // "False" option is for not stripping the space 
   // between 'pSet' & '8'.
-  phen.input( "pythia=PDF:pSet 8", false ) ;
+  phen.Input( "pythia=PDF:pSet 8", false ) ;
 
-  phen.input( "pythia=Random:setSeed = on" ) ;
+  phen.Input( "pythia=Random:setSeed = on" ) ;
 
   // Use -1 for a time dep. random #
-  phen.input( "pythia=Random:seed = -1" ) ;
+  phen.Input( "pythia=Random:seed = -1" ) ;
 
   // Show pythia banner or not?
-  phen.input( "show_pythia_banner= false" ) ;
+  phen.Input( "show_pythia_banner= false" ) ;
 
   // Init settings:
-  phen.input( "pythia= Init:showProcesses  = off" ) ;
-  phen.input( "pythia= Init:showChangedParticleData  = off" ) ;
-  phen.input( "pythia= Init:showMultipartonInteractions  = off" ) ;
-  phen.input( "pythia= Init:showChangedSettings   = off" ) ;
+  phen.Input( "pythia= Init:showProcesses  = off" ) ;
+  phen.Input( "pythia= Init:showChangedParticleData  = off" ) ;
+  phen.Input( "pythia= Init:showMultipartonInteractions  = off" ) ;
+  phen.Input( "pythia= Init:showChangedSettings   = off" ) ;
 
   // Next settings:
-  phen.input( "pythia= Next:numberShowProcess  = 0" ) ;
-  phen.input( "pythia= Next:numberShowInfo  = 0" ) ;
-  phen.input( "pythia= Next:numberShowLHA = 0" ) ;
-  phen.input( "pythia= Next:numberShowEvent = 0" ) ;
+  phen.Input( "pythia= Next:numberShowProcess  = 0" ) ;
+  phen.Input( "pythia= Next:numberShowInfo  = 0" ) ;
+  phen.Input( "pythia= Next:numberShowLHA = 0" ) ;
+  phen.Input( "pythia= Next:numberShowEvent = 0" ) ;
 
 
   // Stat settings:
-  phen.input( "pythia= Stat:showProcessLevel = off" ) ;
+  phen.Input( "pythia= Stat:showProcessLevel = off" ) ;
 
   // ----------------------Cut options----------------------
 
   // Required final states ( use e for both e+ and e-)
-  phen.input( "required_set= ta_h=0, e>=1, mu+>=1, mu->=1" ) ;
+  phen.Input( "required_set= ta_h=0, e>=1, mu+>=1, mu->=1" ) ;
 
   // ---------------------- Cuts ----------------------
   // You can move the recording function(s) between the cuts
@@ -126,51 +120,52 @@ int main(int argc,char *argv[])
   // in included header files can be used.
 
   // ID_Eff cut
-  phen.input( "cuts= ID_Eff: drop_low_eff=true" ) ;
+  phen.Input( "cuts= ID_Eff: drop_low_eff=true" ) ;
 
   // Cut on M_l+l-
-  phen.input( "cuts= M2: M2_Cut_Value=12" ) ;
+  phen.Input( "cuts= M2: M2_Cut_Value=12" ) ;
 
   /*  p_T Cut Conditions:
         e & mu: pt>= 7 GeV  (at least 1 > 20 GeV)
         t_h: pt>= 20 GeV
   */
-  phen.input( "cuts= PT: lead=20, sub_lead=7, extra=7, had_tau=20" ) ;
+  phen.Input( "cuts= PT: lead=20, sub_lead=7, extra=7, had_tau=20" ) ;
 
   /*  prap Cut Conditions:
         e & mu: |eta| < 2.4
         t_h: |eta| < 2.3
   */
-  phen.input( "cuts= PRap: e=2.4, mu=2.4, had_tau=2.3" ) ;
+  phen.Input( "cuts= PRap: e=2.4, mu=2.4, had_tau=2.3" ) ;
 
   // Isolation cut
-  phen.input( "cuts=ISO" ) ;
+  phen.Input( "cuts=ISO" ) ;
 
   //-------------------------
   // fastjet options
-  phen.input("fastjet= Def: Algorithm=antikt_algorithm, R=0.4") ;
-  phen.input("fastjet= Selector: AbsEtaMax=2.3") ;
-  phen.input("fastjet= Selector: PtMin=20") ;
+  phen.Input("fastjet= Def: Algorithm=antikt_algorithm, R=0.4") ;
+  phen.Input("fastjet= Selector: AbsEtaMax=2.3") ;
+  phen.Input("fastjet= Selector: PtMin=20") ;
   
   // running fastjet
-  phen.input("fastjet=run") ;
+  phen.Input("fastjet=run") ;
   //-------------------------
 
   // Demanding  m(l+l-) <= 75 GeV or 105 GeV <= m(l+l-)
-  phen.input( "cuts=OffZ: OffZ_Cut_Min=75, OffZ_Cut_Max=105" ) ;
+  phen.Input( "cuts=OffZ: OffZ_Cut_Min=75, OffZ_Cut_Max=105" ) ;
 
   // -------------------------------------------------------------------------
 
   // -----------------------------------------------------
   // Recording invariant masses
-  phen.input("record=Tau_E_Scaled_5", scaleFTauE) ;
-  // phen.input("record=Testing_Jets", jettest) ;
+  phen.Input("record=Tau_E_Scaled_5", scaleFTauE) ;
+  // phen.Input("record=Testing_Jets", jettest) ;
 
   // -----------------------------------------------------
 
 
-  phen.run() ;
+  phen.Run() ;
 
+  Instrumentor::Get().EndSession();  // End Session
   return 0 ;
 }
 
@@ -179,7 +174,7 @@ int main(int argc,char *argv[])
 // Accessing the jets from particles
 double jettest(std::vector<ExParticle>& parts) 
 {
-  size_t jet_set_size = parts[0].EVPtr->GenJetPtr->inclusive_after().size() ;
+  size_t jet_set_size = parts[0].event_ptr->GenJetPtr->InclusiveJetsAfter().size() ;
   double output = jet_set_size*1.0 ;
   
   return output ;
@@ -216,7 +211,7 @@ std::vector<double> scaleFTauE(std::vector<ExParticle>& parts)
   if ( parts.size() != 3 )  return { -1 } ;
 
   std::vector<fastjet::PseudoJet> jet_set = 
-   parts[0].EVPtr->GenJetPtr->inclusive_after() ;
+   parts[0].event_ptr->GenJetPtr->InclusiveJetsAfter() ;
 
   if ( jet_set.size() ==0 )  return { -2 } ;
 
@@ -290,15 +285,15 @@ std::vector<double> scaleFTauE(std::vector<ExParticle>& parts)
     EV_weight = 0.0001453;
   // ..........................................................
 
-    Pythia8::Vec4 p_e = sel_emu[0].visMom();
-    Pythia8::Vec4 p_mu_sum = Ftau_mu[0].visMom() + sel_emu[1].visMom();
+    Pythia8::Vec4 p_e = sel_emu[0].GetVisMom();
+    Pythia8::Vec4 p_mu_sum = Ftau_mu[0].GetVisMom() + sel_emu[1].GetVisMom();
 
     double m_ta = 1.777 ; // GeV
     double m_H  = 125   ; // GeV
 
-    double M4 = (p_Fta + Ftau_mu[0].visMom() + p_e + sel_emu[1].visMom() ).mCalc() ;
-    double tauMuInv  = (p_Fta + Ftau_mu[0].visMom()).mCalc() ;
-    double eMuInv    = (p_e + sel_emu[1].visMom()).mCalc() ;
+    double M4 = (p_Fta + Ftau_mu[0].GetVisMom() + p_e + sel_emu[1].GetVisMom() ).mCalc() ;
+    double tauMuInv  = (p_Fta + Ftau_mu[0].GetVisMom()).mCalc() ;
+    double eMuInv    = (p_e + sel_emu[1].GetVisMom()).mCalc() ;
 
 
     // ..........................................
@@ -329,10 +324,10 @@ std::vector<double> scaleFTauE(std::vector<ExParticle>& parts)
     // ..........................................
 
 
-    double tauMuInv_scaled  = (scaled_p_ta + Ftau_mu[0].visMom()).mCalc() ;
-    double eMuInv_scaled    = (scaled_p_e + sel_emu[1].visMom()).mCalc() ;
+    double tauMuInv_scaled  = (scaled_p_ta + Ftau_mu[0].GetVisMom()).mCalc() ;
+    double eMuInv_scaled    = (scaled_p_e + sel_emu[1].GetVisMom()).mCalc() ;
 
-    double M4_scaled = (scaled_p_ta + Ftau_mu[0].visMom() + scaled_p_e + sel_emu[1].visMom() ).mCalc() ;
+    double M4_scaled = (scaled_p_ta + Ftau_mu[0].GetVisMom() + scaled_p_e + sel_emu[1].GetVisMom() ).mCalc() ;
 
     out.push_back(EV_weight) ;
     out.push_back(tauMuInv)  ; out.push_back(eMuInv) ; out.push_back(M4) ;
@@ -343,5 +338,4 @@ std::vector<double> scaleFTauE(std::vector<ExParticle>& parts)
 
   return out;
 }
-
 //==============================================================

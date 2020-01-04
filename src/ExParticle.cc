@@ -5,22 +5,11 @@
 
 */
 
-// #include <iostream>
-// #include <vector>
 #include <random>
 #include <chrono>
 #include <algorithm>
 
-// #include "Pythia8/Pythia.h"
-// #include "fastjet/ClusterSequence.hh"
-// #include "fastjet/Selector.hh"
-
-// #include "../include/ExParticle.h"
-// #include "../include/Basics.h"
-#include "../include/EV.h"
-
-using std::vector ;
-using namespace Pythia8 ;
+#include "../include/ExEvent.h"
 
 //==============================================================
 
@@ -30,8 +19,27 @@ using namespace Pythia8 ;
 ExParticle::ExParticle( const Particle& pt) : Particle(pt)
 {
   // initializing the measured momentum
-  setMom() ;
+  SetMom() ;
 }
+
+//--------------------------------------------------------------
+// Copy Constructor
+// ExParticle::ExParticle( const ExParticle& other)
+// {
+// idSave = other.idSave; statusSave = other.statusSave;
+// mother1Save = other.mother1Save; mother2Save = other.mother2Save;
+// daughter1Save = other.daughter1Save; daughter2Save = other.daughter2Save;
+// colSave = other.colSave; acolSave = other.acolSave; pSave = other.pSave;
+// mSave = other.mSave; scaleSave = other.scaleSave; polSave = other.polSave;
+// hasVertexSave = other.hasVertexSave; vProdSave = other.vProdSave;
+// tauSave = other.tauSave; *pdePtr = *other.pdePtr; *evtPtr = *other.evtPtr; 
+
+// decays_to_had = other.decays_to_had; set_had_dec_flag = other.set_had_dec_flag;
+// visible_mom =other.visible_mom; set_vis_mom_flag = other.set_vis_mom_flag;
+// detected_mom = other.detected_mom; *event_ptr = *other.event_ptr;
+// id_eff_val = other.id_eff_val; set_id_eff_flag = other.set_id_eff_flag ;
+
+// }
 
 //--------------------------------------------------------------
 // '==' comparison operator
@@ -46,24 +54,24 @@ bool ExParticle::operator==(const ExParticle& right)
 
 //--------------------------------------------------------------
 // Member function to set the Event pointer.
-void ExParticle::setEVPtr(EV* evPtrIn) { EVPtr = evPtrIn ;}
+void ExParticle::SetEventPtr(ExEvent* evPtrIn) { event_ptr = evPtrIn ;}
 
 //--------------------------------------------------------------
 // Smears the momentum mesured in the detectors for electron
 // and muons
-void ExParticle::setMom()
+void ExParticle::SetMom()
 {
   // If visible, returns the true momentum, otherwise '0'.
   // ptMom = (this->isVisible()) ? this->p() : 0;
 
-  ptMom = this->p() ;
+  detected_mom = this->p() ;
   float pt_res ;
 
   if(this->idAbs() == ID_ELECTRON)
-    pt_res = elecMomRes() ;
+    pt_res = ElectronMomRes() ;
 
   else if(this->idAbs() == ID_MUON)
-    pt_res = muonMomRes() ;
+    pt_res = MuonMomRes() ;
   
   else return ;
 
@@ -74,7 +82,7 @@ void ExParticle::setMom()
   std::default_random_engine        generator(seed);
   std::normal_distribution<double>  distribution( 0, pt_res ) ;
 
-  ptMom = this->p()*( 1 + distribution(generator) ) ;
+  detected_mom = this->p()*( 1 + distribution(generator) ) ;
 
   // cout<<"\n"<<"- Random number is: "<<distribution(generator)<<endl ;
 }
@@ -84,7 +92,7 @@ void ExParticle::setMom()
   the true momentum's value.
   Reference: Fig. 11 of "1502.02701" 
 */
-float ExParticle::elecMomRes()
+float ExParticle::ElectronMomRes()
 {
   float pt_res ;
 
@@ -179,7 +187,7 @@ float ExParticle::elecMomRes()
    "The resolution for muons with momenta up to approximately
    100 GeV is 1% in the barrel and 3% in the endcap."
 */
-float ExParticle::muonMomRes()
+float ExParticle::MuonMomRes()
 {
 
   float pt_res ;
@@ -205,67 +213,65 @@ float ExParticle::muonMomRes()
 
 //--------------------------------------------------------------
 
-Vec4 ExParticle::mom()
+Pythia8::Vec4 ExParticle::GetMom()
 {
-  return ptMom ;
+  return detected_mom ;
 }
 
 //--------------------------------------------------------------
 // If it decays hadronically
-bool ExParticle::isHadDec()
+bool ExParticle::IsHadDec()
 {
+  if( !set_had_dec_flag )
+    SetHadDec() ;
 
-  if( !HadDecisSet )
-    setHadDec() ;
-
-  return DecaysToHad ;
+  return decays_to_had ;
 }
 
 //--------------------------------------------------------------
 
-void ExParticle::setHadDec()
+void ExParticle::SetHadDec()
 {
-  DecaysToHad = EVPtr->had_dec(*this) ;
-  HadDecisSet = true ;
+  decays_to_had = event_ptr->HadronicDecay(*this) ;
+  set_had_dec_flag = true ;
 }
 
 //--------------------------------------------------------------
 
-void ExParticle::setVisMom()
+void ExParticle::SetVisMom()
 {
-  visibleMom  = EVPtr->vis_p(*this) ;
-  visMomisSet = true ;
+  visible_mom  = event_ptr->VisMom(*this) ;
+  set_vis_mom_flag = true ;
 } 
 
 //--------------------------------------------------------------
 
-Vec4 ExParticle::visMom()
+Pythia8::Vec4 ExParticle::GetVisMom()
 {
-  if( !visMomisSet )
-    setVisMom() ;
+  if( !set_vis_mom_flag )
+    SetVisMom() ;
     
-  return visibleMom ;
+  return visible_mom ;
 }
 
 //--------------------------------------------------------------
 
-double ExParticle::idEff()
+double ExParticle::GetIdEff()
 {
-  if( !idEffisSet )
-    setIdEff() ;
+  if( !set_id_eff_flag )
+    SetIdEff() ;
     
   return id_eff_val ;
 }
 
 //--------------------------------------------------------------
-
-void ExParticle::setIdEff()
+void ExParticle::SetIdEff()
 /*
  Evaluates the efficiency of detectors 
  in detecting this particle.
 */
 {
-  idEffisSet = true ;
+  set_id_eff_flag = true ;
 
   if ( this->pT() < 10 )
     {id_eff_val = 0 ; return ;}
@@ -278,7 +284,7 @@ void ExParticle::setIdEff()
     {
       id_eff_val = 0.94 - 2.85/(this->pT()) + 41.9/(pow(this->pT(),2)) - 227/(pow(this->pT(),3));
 
-    } else if(this->idAbs() == ID_TAU &&  this->isHadDec() )
+    } else if(this->idAbs() == ID_TAU &&  this->IsHadDec() )
       {
         id_eff_val = 0.7 ;
       }

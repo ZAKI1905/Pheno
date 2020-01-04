@@ -1,13 +1,9 @@
 #ifndef Pheno_H
 #define Pheno_H
 
-// #include "Pythia8/Pythia.h"
-// #include "EV.h"
 #include "Cut.h"
 #include "GenJet.h"
 #include "Binner.h"
-
-// using    namespace Pythia8 ;
 
 //==============================================================
 class Pheno
@@ -15,8 +11,8 @@ class Pheno
   //--------------------------------------------------------------
   protected:
     Logger logger ;
-//--------------------------------------------------------------
- public:
+  //--------------------------------------------------------------
+  public:
 
   // Constructor
   Pheno() ;
@@ -25,16 +21,16 @@ class Pheno
   ~Pheno() ;
 
   // Inputing the parameters (bool is for stripping the spaces)
-  void input(std::string, bool=true) ;
+  void Input(std::string, bool=true) ;
 
   template<class T>
-  void input(std::string, T (*func)(std::vector<ExParticle>&) ) ;
+  void Input(std::string, T (*func)(std::vector<ExParticle>&) ) ;
   
   // List of input parameters
   std::vector<std::string> input_list;
 
   // records variables
-  void record(size_t cut_idx, std::vector<ExParticle>& ) ;
+  void Record(size_t cut_idx, std::vector<ExParticle>& ) ;
 
 
 //................UNDER CONSTRUCTION................
@@ -76,7 +72,7 @@ class Pheno
 
 
   // handles the parallel options and runPythia
-  void run() ;
+  void Run() ;
 
   std::vector<int> num_cuts_passed ;
 
@@ -85,14 +81,13 @@ class Pheno
   int threads = 1 ;
 
   // Final report
-  void final_report() ;
+  void FinalReport() ;
 
   // runs Pythia!
-  void runPythia(int pr_id) ;
+  void RunPythia(int pr_id) ;
 
-//--------------------------------------------------------------
-
- private:
+  //--------------------------------------------------------------
+  private:
 
     // Start time
     double start_time ;
@@ -108,43 +103,43 @@ class Pheno
     std::vector<std::vector<std::vector<int> > > max_req_states ;
 
     // Dictionary for binary comparison operators
-    int comp_str2int(std::string) ;
+    int CompStr2Int(std::string) ;
 
     // Dictionary for req_states input
-    void state_dict(std::vector<std::string>) ;
+    void StateDict(std::vector<std::string>) ;
 
     // Run cuts (returns the number of cuts passed)
-    int run_cuts(EV&, std::vector<ExParticle>&,
+    int RunCuts(ExEvent&, std::vector<ExParticle>&,
      std::vector<std::vector<std::string> >, char*)  ;
 
     // Cut dictionary
-    std::shared_ptr<Cut>  cut_dict(EV&, std::string) ;
+    std::shared_ptr<Cut>  CutDict(ExEvent&, std::string) ;
 
     // List of cuts to be applied
     std::vector<std::vector<std::string> > cut_list ;
 
     // List of cut pointers
-    std::vector<std::shared_ptr<Cut> > CutPtrList ;
+    std::vector<std::shared_ptr<Cut> > cut_ptr_list ;
 
     //---------------------------------------------
     // Report options:
-    bool Report_Cuts  = false ;
+    bool report_cuts_flag  = false ;
     // Special set of events for reporting cuts
     std::vector<int> report_cuts_set = {} ;  
 
-    bool Report_Taus  = false ;
+    bool report_taus_flag  = false ;
     std::vector<int> report_taus_set = {} ;
 
-    bool Report_Jets  = false ;
+    bool report_jets_flag  = false ;
     std::vector<int> report_jets_set = {} ;
-  //---------------------------------------------
+    //---------------------------------------------
 
     // Event print set
     std::vector<int> print_ev_set = {} ;
 
    // File options:
-    std::string File_LHE  = "" ;
-    std::string LHE_Path  = "" ;
+    std::string file_LHE  = "" ;
+    std::string LHE_path  = "" ;
 
     /* Breaks the event loop if some conditions are met,
      and continues to the next event */
@@ -160,15 +155,16 @@ class Pheno
     // fastjet options:
     std::vector< std::vector<std::string> >   fastjet_commands ;
     
-    void runGenJet(EV& ev, char*) ;
+    void RunGenJet(ExEvent& ev, char*) ;
+
     // some random high value so by default fastjet is not run
-    size_t GenJetIdx = 50; 
+    size_t gen_jet_idx = 50; 
 
     // Initializes the binner instances with the given options
-    void initBinner() ;
+    void InitBinner() ;
 
     // bins the event
-    void binner(EV& ev, char*);
+    void BinEvents(ExEvent& ev, char*);
 
     // Lis of binning classes and their options
     std::vector<std::vector<std::string> > bin_list ;
@@ -183,12 +179,8 @@ class Pheno
     // std::vector<std::vector<std::vector<double> > > bin_set = std::vector<std::vector<std::vector<double> > >(10, std::vector<std::vector<double> >(3, std::vector<double>(5)) ) ;
 
     // Total number of events
-    int Tot_Num_Events = 0 ;
-
+    int tot_num_events = 0 ;
 };
-
-//=============================================================
-// void run(Pheno phen) ;
 
 //=============================================================
 

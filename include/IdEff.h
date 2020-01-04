@@ -1,13 +1,7 @@
 #ifndef IdEff_H
 #define IdEff_H
 
-// #include <vector>
-// #include "Pythia8/Pythia.h"
-// #include "Basics.h"
 #include "Cut.h"
-
-// using    std::vector ;
-// using    namespace Pythia8 ;
 
 //==============================================================
 class IdEff : public Cut
@@ -17,11 +11,10 @@ class IdEff : public Cut
 friend class Pheno ;   
 
 //--------------------------------------------------------------
-
 public:
 
   // Constructor
-  IdEff(EV &) ;
+  IdEff(ExEvent &) ;
 
   // // Finds the ID_eff of p in ev
   // void find_id_eff(ExParticle& p) ;   
@@ -34,11 +27,10 @@ public:
 
 
 //--------------------------------------------------------------
-
 private:
 
   // Virtual method from cut class
-  void cut_cond(std::vector<ExParticle>&) ;    
+  void CutCond(std::vector<ExParticle>&) override ;    
 
   // // Value of the ID_Eff
   // double ID_Eff_Val ;    
@@ -46,8 +38,7 @@ private:
   // // Value of the whole event ID_Eff
   // double ID_Eff_Event ;    
 
-
-  void input(std::string) ;
+  void Input(std::string) override ;
 
   /* Whether drop a particle which fails efficiency test,
    or keep it but weigh the event number so 

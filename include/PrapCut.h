@@ -1,11 +1,7 @@
 #ifndef PrapCut_H
 #define PrapCut_H
 
-// #include <vector>
-// #include "Pythia8/Pythia.h"
 #include "Cut.h"
-
-// using namespace Pythia8 ;
 
 //==============================================================
 class PrapCut : public Cut
@@ -18,20 +14,19 @@ class PrapCut : public Cut
   public:
 
     // Constructor takes a reference to the event
-      PrapCut(EV&) ;
+      PrapCut(ExEvent&) ;
     
   //--------------------------------------------------------------
   private:
   
     // Virtual method from cut class
-    void cut_cond(std::vector<ExParticle>&) ;   
-    void input(std::string) ;  
+    void CutCond(std::vector<ExParticle>&) override ;   
+    void Input(std::string) override ;  
 
     // Pseudorapidity cut values
     double e_prap_cut   = 1000 ;
     double mu_prap_cut  = 1000 ;
     double tau_prap_cut = 1000 ;
-
 };
 
 //==============================================================

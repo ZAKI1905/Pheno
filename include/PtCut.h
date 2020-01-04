@@ -1,11 +1,7 @@
 #ifndef PtCut_H
 #define PtCut_H
 
-// #include <vector>
-// #include "Pythia8/Pythia.h"
 #include "Cut.h"
-
-// using    namespace Pythia8 ;
 
 //==============================================================
 class PtCut : public Cut
@@ -17,7 +13,7 @@ class PtCut : public Cut
   public:
 
     // Constructor takes a reference to the event
-    PtCut(EV&) ;
+    PtCut(ExEvent&) ;
 
     // Overloading ()
     bool operator() (const ExParticle&,const ExParticle&) ;  
@@ -26,21 +22,20 @@ class PtCut : public Cut
   private:
 
     // Virtual method from cut class
-    void cut_cond(std::vector<ExParticle>&) ;   
-    void input(std::string) ; 
+    void CutCond(std::vector<ExParticle>&) override ;   
+    void Input(std::string) override ; 
 
-    bool comp_pT_value(const ExParticle&, const ExParticle& ) ;
-    std::vector<ExParticle> pT_sorter(std::vector<ExParticle>& ) ;
+    bool Comp_pT_Value(const ExParticle&, const ExParticle& ) ;
+    std::vector<ExParticle> pT_Sorter(std::vector<ExParticle>& ) ;
 
     // dictionary for the pT cut values
-    float pt_cut_val(size_t , ExParticle& ) ; 
+    float pT_CutVal(size_t , ExParticle& ) ; 
 
 
     float leading_pT_cut     = 20.0 ;
     float sub_leading_pT_cut = 10.0 ;
     float extra_pT_cut       = 10.0 ;
     float had_tau_pT_cut     = 20.0 ;
-
 };
 
 //==============================================================

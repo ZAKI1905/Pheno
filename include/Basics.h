@@ -6,13 +6,9 @@ extern const int  ID_ELECTRON  ;
 extern const int  ID_MUON      ; 
 extern const int  ID_TAU       ;  
 
-// #include <vector>
-// #include <Pythia8/Pythia.h>
-
 #include "Logger.h"
+#include "Instrumentor.h"
 #include "ExParticle.h"
-
-// using namespace Pythia8 ;
 
 extern const std::vector<int> lept_id_list ;
 
@@ -118,11 +114,6 @@ void saveVec(std::vector<T>, std::string) ;
 
 template <class T> 
 void saveVec(std::vector<rec_var<T> >) ;
-
-// void saveVec(vector<int>, std::string) ;
-// void saveVec(vector<float>, std::string) ;
-// void saveVec(vector<double>, std::string) ;
-// void saveVec(vector<std::string>, std::string) ;
 //==============================================================
 
 #endif /*Basics_H*/

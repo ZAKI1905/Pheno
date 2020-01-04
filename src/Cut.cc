@@ -8,20 +8,15 @@
 // "algorithm" for "remove" and "remove_if"
 #include <algorithm>
 #include <iostream>
-// #include <vector>
-// #include "../include/Basics.h"
-// #include "../include/EV.h"
-#include "../include/Cut.h"
 
-// using std::vector ;
+#include "../include/Cut.h"
 
 //==============================================================
 
 //--------------------------------------------------------------
 // Constructor
 // Constructor takes a reference to an event.
-
-Cut::Cut(EV& ev):ev_ref(ev) {
+Cut::Cut(ExEvent& ev) : ev_ref(ev) {
   // // Adding the pointer to this cut to the event
   //   ev.addCutPtr(this);
    }
@@ -34,7 +29,7 @@ Cut::~Cut() { }
 /*
   Reports the details of the cut into a text file.
 */
-void Cut::report()
+void Cut::Report() const
 {
 
   bool no_part_selected = false ;
@@ -74,7 +69,7 @@ void Cut::report()
     else{no_part_selected = true; fprintf(pCUT_REPORT_FILE,
     "\n No particle was selected for this cut.");}
 
-    ev_ref.print_table<ExParticle>(pCUT_REPORT_FILE, in_parts_cpy) ;
+    ev_ref.PrintTable<ExParticle>(pCUT_REPORT_FILE, in_parts_cpy) ;
 
   // --------------------------------------
   // Special message from the cut
@@ -92,7 +87,7 @@ void Cut::report()
      {
       fprintf(pCUT_REPORT_FILE,
       "  %s\n |  Particles passing this cut   |",pr(31,'_').c_str()) ;
-      ev_ref.print_table<ExParticle>(pCUT_REPORT_FILE, out_parts_cpy) ;
+      ev_ref.PrintTable<ExParticle>(pCUT_REPORT_FILE, out_parts_cpy) ;
      }
   // If none passed
     else if( out_parts_cpy.size() == 0 )
@@ -110,7 +105,7 @@ void Cut::report()
 }
 
 //--------------------------------------------------------------
-void Cut::input(std::string property)
+void Cut::Input(std::string property)
 {
   // Parsing the command
   std::vector<std::string> inp = pars(property, ":") ;
@@ -133,14 +128,14 @@ void Cut::input(std::string property)
 
 //--------------------------------------------------------------
 // Applies the cut on in_parlst
-void Cut::apply(std::vector<ExParticle>& in_parlst)
+void Cut::Apply(std::vector<ExParticle>& in_parlst)
 {
 
   // Copying in_parlst for report()
     in_parts_cpy = in_parlst ;
 
   // Adds those not passing cuts to rm_list
-    cut_cond(in_parlst) ;
+    CutCond(in_parlst) ;
 
   // Removes the elements in in_parlst based on rm_list
     rm_elem(in_parlst, rm_list) ;
@@ -152,9 +147,8 @@ void Cut::apply(std::vector<ExParticle>& in_parlst)
     out_parts_cpy = in_parlst ;
 
   // Reports cut
-    if(report_cut) report() ;
+    if(report_cut) Report() ;
 
 }
-
 //--------------------------------------------------------------
 //==============================================================

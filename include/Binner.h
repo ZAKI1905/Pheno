@@ -1,11 +1,7 @@
 #ifndef Binner_H
 #define Binner_H
 
-// #include <vector>
-// #include <Pythia8/Pythia.h>
-
-#include "EV.h"
-// using namespace Pythia8 ;
+#include "ExEvent.h"
 
 //==============================================================
 class Binner
@@ -20,25 +16,24 @@ public:
     virtual ~Binner() ;
 
   // For inputting properties
-    virtual void input(std::string) = 0 ;
+    virtual void Input(std::string) = 0 ;
   
   // For inputting event
-    virtual void input(EV&) = 0 ;
+    virtual void Input(ExEvent&) = 0 ;
 
   // bins the event and adds to cut report if "true"
-    virtual void bin_it(bool cut_report, std::string) = 0 ;
+    virtual void BinIt(bool cut_report, std::string) = 0 ;
 
   // bins the event and adds to cut report if "true"
-    virtual void report(std::string) = 0 ;
+    virtual void Report(std::string) const = 0 ;
 
 //--------------------------------------------------------------
 protected:
 
   // Pointer to the event 
-    EV* evp = NULL ;
+    ExEvent* evp = NULL ;
   
 };
-
 
 //==============================================================
 

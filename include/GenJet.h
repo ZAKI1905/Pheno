@@ -1,14 +1,7 @@
 #ifndef  GenJet_H
 #define  GenJet_H
 
-// #include <vector>
-// #include <Pythia8/Pythia.h>
-// #include <fastjet/ClusterSequence.hh>
-// #include <fastjet/Selector.hh>
-
-#include "EV.h"
-
-// using    std::vector ;
+#include "ExEvent.h"
 
 //=============================================================
 class STBinner ;
@@ -32,43 +25,49 @@ class GenJet
   public:
 
     // Basic constructor
-    GenJet(EV&) ;  
+    GenJet(ExEvent&) ;  
+
+    // Assignment operator
+    GenJet& operator=(const GenJet&) ;
+
+    // Set Event reference
+    void SetEventRef(ExEvent&) ; 
 
     // Generates jets
-    void gen() ;  
+    void GenerateJets() ;  
 
     // Saves jet details
-    void report() ;  
+    void Report() ;  
 
     // Returns the inclusive jets after cuts
-    std::vector<fastjet::PseudoJet> inclusive_after() ;
+    std::vector<fastjet::PseudoJet> InclusiveJetsAfter() ;
 
   //--------------------------------------------------------------
 
   private:
 
     // Ref. to the event
-    EV& ev_ref ;  
+    ExEvent& ev_ref ;  
 
     // // Takes fastjet commands
     // void input(string , bool) ;  
 
     // Takes fastjet commands
-    void input(std::vector<std::string> )  ;
+    void Input(std::vector<std::string> )  ;
 
 
   // ............. Definition options ..............
     // Sets jet definition options
-    void setJetDef(std::vector<std::string>) ;
+    void SetJetDef(std::vector<std::string>) ;
 
       // Sets jet algorithm
-      void setJetAlg(std::string) ;
+      void SetJetAlg(std::string) ;
 
       // Sets recombination scheme
-      void setRecScheme(std::string) ;
+      void SetRecScheme(std::string) ;
 
       // Sets the Strategy
-      void setStrategy(std::string) ;
+      void SetStrategy(std::string) ;
 
     /*
       This could be one of
@@ -92,13 +91,13 @@ class GenJet
   fastjet::Selector jet_selector = fastjet::SelectorIdentity() ;
 
     // Sets the Selector options
-    void setSelector(std::vector<std::string>) ;
+    void SetSelector(std::vector<std::string>) ;
     
       // PtMin cut value
-      double SelPtMin  = 30 ;   
+      double sel_pT_min  = 30 ;   
 
       // AbsEtaMAx cut value
-      double SelEtaMax = 2.5 ;   
+      double sel_eta_max = 2.5 ;   
 
   // .............................................
     
@@ -111,17 +110,17 @@ class GenJet
 
 
     // Finds the distance between the pseudo jet and a particle
-    double distance(fastjet::PseudoJet&, ExParticle&) ; 
+    double Distance(fastjet::PseudoJet&, ExParticle&) ; 
 
     // Removes jets close to isoalted leptons
-    void  isolate() ;    
+    void  Isolate() ;    
 
     // Isolation condition assuming jets are faking taus
-    void fake_isolate();
+    void FakeTauIsolate();
 
   // ............. Report options ..............
     // report jets or not
-    bool report_jet = false ;    
+    bool report_jet_flag = false ;    
 
     char jet_rep_char[100] ;
 
@@ -129,11 +128,10 @@ class GenJet
     std::string isolate_message  = "" ;   
 
     // prints table of jets
-    template <class T> void print_jettable(std::FILE *,
+    template <class T> void PrintJetTable(std::FILE *,
      std::vector<T> list, char* description, const char* title, int iEv) ;
   // .............................................
 };
-
 
 //=============================================================
 

@@ -5,25 +5,16 @@
 
 */
 
-// #define PBSTR "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
-// #define PBWIDTH 60
-
 extern const int  ID_ELECTRON  = 11 ;
 extern const int  ID_MUON      = 13 ;
 extern const int  ID_TAU       = 15 ;
 
 #include <algorithm>
-// #include <vector>
 #include <random>
 #include <chrono>
 #include <ctime>
-// #include "Pythia8/Pythia.h"
-// #include "fastjet/ClusterSequence.hh"
-// #include "fastjet/Selector.hh"
 
 #include "../include/Basics.h"
-
-// using    namespace Pythia8 ;
 
 extern const std::vector<int> lept_id_list { ID_ELECTRON, -ID_ELECTRON,
                                 ID_MUON, -ID_MUON, ID_TAU, -ID_TAU } ;
@@ -276,7 +267,7 @@ double invM(std::vector<ExParticle>& prt_lst)
   Pythia8::Vec4 tmp_4Mom = 0.0 ;
 
   for( size_t i=0 ; i < prt_lst.size() ; ++i ) 
-    tmp_4Mom += prt_lst[i].visMom() ;
+    tmp_4Mom += prt_lst[i].GetVisMom() ;
 
   return tmp_4Mom.mCalc() ;
 }
@@ -333,8 +324,8 @@ int OSOF(std::vector<ExParticle>& ev)
 // Returns the distance between two particles
 double R(ExParticle& p1, ExParticle& p2)
 {
-  return pow((pow((p1.visMom().eta() - p2.visMom().eta()), 2) 
-          + pow((p1.visMom().phi() - p2.visMom().phi()),2)),0.5) ;
+  return pow((pow((p1.GetVisMom().eta() - p2.GetVisMom().eta()), 2) 
+          + pow((p1.GetVisMom().phi() - p2.GetVisMom().phi()),2)),0.5) ;
 }
 
 //==============================================================
@@ -475,7 +466,6 @@ void saveVec<int>(std::vector<rec_var<int> > list)
 
 // contains
 template bool contains<int>(std::vector<int>&, int) ;
-// template bool contains<ExParticle>(std::vector<ExParticle>&, ExParticle) ;
 template bool contains<std::string>(std::vector<std::string>&, std::string) ;
 //--------------------------------
 
@@ -492,14 +482,8 @@ template void rm_elem<fastjet::PseudoJet>(std::vector<fastjet::PseudoJet>&,
 //--------------------------------
 
 // SaveVec
-// template void saveVec<int>(std::vector<int>, std::string) ;
 template void saveVec<float>(std::vector<float>, std::string) ;
 template void saveVec<double>(std::vector<double>, std::string) ;
-// template void saveVec<std::string>(std::vector<std::string>, std::string) ;
-
 template void saveVec<double>(std::vector<rec_var<double> >) ;
-// template void saveVec<std::vector<double> >(std::vector<rec_var<std::vector<double> > >) ;
-// template void saveVec<int>(std::vector<rec_var<int> >) ;
-// template void saveVec<float>(std::vector<rec_var<float> >) ;
 
 //==============================================================

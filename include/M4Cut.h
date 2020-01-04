@@ -1,11 +1,7 @@
 #ifndef M4Cut_H
 #define M4Cut_H
 
-// #include <vector>
-// #include "Pythia8/Pythia.h"
 #include "Cut.h"
-
-// using namespace Pythia8 ;
 
 //==============================================================
 class M4Cut : public Cut
@@ -17,14 +13,14 @@ class M4Cut : public Cut
   //--------------------------------------------------------------
   public:
     // Constructor takes a reference to the event
-    M4Cut(EV&) ;
+    M4Cut(ExEvent&) ;
    
   //--------------------------------------------------------------
   private:
 
     // Virtual method from cut class
-    void cut_cond(std::vector<ExParticle>&) ;   
-    void input(std::string) ; 
+    void CutCond(std::vector<ExParticle>&) override;   
+    void Input(std::string) override; 
 
     // The minimum of m4l
     float M4_cut_min = 0 ;   
@@ -33,7 +29,7 @@ class M4Cut : public Cut
     float M4_cut_max = 10000 ;   
 
     // Sorts particles based on pT
-    void pT_sort(std::vector<ExParticle>&) ;
+    void pT_Sort(std::vector<ExParticle>&) ;
 };
 
 //==============================================================

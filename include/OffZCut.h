@@ -1,11 +1,7 @@
 #ifndef OffZCut_H
 #define OffZCut_H
 
-// #include <vector>
-// #include "Pythia8/Pythia.h"
 #include "Cut.h"
-
-// using namespace Pythia8 ;
 
 //==============================================================
 class OffZCut : public Cut
@@ -15,27 +11,23 @@ class OffZCut : public Cut
   friend class Pheno ;   
 
   //--------------------------------------------------------------
-
   public:
 
     // Constructor takes a reference to the event
-    OffZCut(EV&) ;
-   
+    OffZCut(ExEvent&) ;
 
   //--------------------------------------------------------------
-
   private:
 
     // Virtual method from cut class
-    void cut_cond(std::vector<ExParticle>&) ;   
-    void input(std::string) ; 
+    void CutCond(std::vector<ExParticle>&) override;   
+    void Input(std::string) override; 
 
     // The minimum of OffZ cut
     float OffZ_cut_min = 75 ;   
 
     // The maximum of OffZ cut
     float OffZ_cut_max = 105 ;   
-
 };
 
 //==============================================================

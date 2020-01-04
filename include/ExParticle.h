@@ -1,29 +1,28 @@
 #ifndef ExParticle_H
 #define ExParticle_H
 
-// #include <vector>
 #include <Pythia8/Pythia.h>
 #include <fastjet/ClusterSequence.hh>
 #include <fastjet/Selector.hh>
 
-// using std::vector ;
-// using namespace Pythia8 ;
-
 //==============================================================
 // Forward declaration
-class EV ;
+class ExEvent ;
 
 class ExParticle : public Pythia8::Particle
 {
 
-  friend class EV ;
+  friend class ExEvent ;
   // friend class pheno ;  // For debugging, remove it later!
   //--------------------------------------------------------------
 
   public:
     // Constructor
     ExParticle() ; 
-    ExParticle(const Particle&) ; 
+    ExParticle(const Particle&) ;
+
+    // Copy constructor 
+    // ExParticle(const ExParticle&) ; 
 
     ExParticle& operator=(const ExParticle& pt) {
       if (this != &pt) 
@@ -36,9 +35,10 @@ class ExParticle : public Pythia8::Particle
         hasVertexSave = pt.hasVertexSave; vProdSave = pt.vProdSave;
         tauSave = pt.tauSave; pdePtr = pt.pdePtr; evtPtr = pt.evtPtr; 
         
-        DecaysToHad = pt.DecaysToHad; HadDecisSet = pt.HadDecisSet;
-        visibleMom =pt.visibleMom; visMomisSet = pt.visMomisSet;
-        ptMom = pt.ptMom; EVPtr = pt.EVPtr; 
+        decays_to_had = pt.decays_to_had; set_had_dec_flag = pt.set_had_dec_flag;
+        visible_mom =pt.visible_mom; set_vis_mom_flag = pt.set_vis_mom_flag;
+        detected_mom = pt.detected_mom; event_ptr = pt.event_ptr;
+        id_eff_val = pt.id_eff_val; set_id_eff_flag = pt.set_id_eff_flag ;
       }
 
       return *this; }
@@ -46,66 +46,67 @@ class ExParticle : public Pythia8::Particle
     bool operator==(const ExParticle& right) ;
 
     // Returns the IdEff of particle
-    double idEff() ;
+    double GetIdEff() ;
 
     // returns Mom
-    Pythia8::Vec4 mom() ;                  
+    Pythia8::Vec4 GetMom() ;                  
 
     // returns DecaysToHad
-    bool isHadDec() ;
+    bool IsHadDec() ;
 
     // returns visible momentum ("visibleMom")
-    Pythia8::Vec4 visMom() ;   
+    Pythia8::Vec4 GetVisMom() ;   
 
-    // Pointer to the EV to which the particle belongs 
-    EV* EVPtr=NULL ;
+    // Pointer to the ExEvent to which the particle belongs 
+    ExEvent* event_ptr=NULL ;
   //--------------------------------------------------------------
 
   private:
 
     // Setting the IdEff of particle
-    void setIdEff() ;
+    void SetIdEff() ;
 
+    // Member function to set the Event pointer.
+    void SetEventPtr(ExEvent*) ;
+
+    // Sets DecaysToHad
+    void SetHadDec() ;
+    
+    // Sets the visible momentum for a decaying particle
+    void SetVisMom() ;
+        
+    // Sets ptMom
+    void SetMom() ; 
+
+    // Muon mom resolution
+    float MuonMomRes() ; 
+
+    // Electron mom resolution
+    float ElectronMomRes() ; 
+    
+    // ....................................
+    // Flags
     // If the idEff is set
-    bool idEffisSet = false ;
+    bool set_id_eff_flag = false ;
+
+    // it's true if decays hadronically
+    bool decays_to_had = false ;
+
+    // Checks if DecaysToHad is set by ExEvent
+    bool set_had_dec_flag = false ;
+
+    // Checks if visibleMom is set
+    bool set_vis_mom_flag = false ; 
+    // ....................................
 
     // The idEff value
     double id_eff_val = 1 ;
 
-    // Member function to set the Event pointer.
-    void setEVPtr(EV*) ;
-
-    // Sets DecaysToHad
-    void setHadDec() ;
-
-    // it's true if decays hadronically
-    bool DecaysToHad = false ;
-
-    // Checks if DecaysToHad is set by EV
-    bool HadDecisSet = false ;
-
-
-    // Sets the visible momentum for a decaying particle
-    void setVisMom() ;
-
     // Visible momentum
-    Pythia8::Vec4 visibleMom ;
-
-    // Checks if visibleMom is set
-    bool visMomisSet = false ; 
+    Pythia8::Vec4 visible_mom ;
 
     // The measured 4-mom by detectors
-    Pythia8::Vec4 ptMom ; 
-
-    // Muon mom resolution
-    float muonMomRes() ; 
-
-    // Electron mom resolution
-    float elecMomRes() ; 
-    
-    // Sets ptMom
-    void setMom() ; 
-  
+    Pythia8::Vec4 detected_mom ;
 };
 
 //==============================================================

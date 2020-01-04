@@ -1,11 +1,7 @@
 #ifndef M2Cut_H
 #define M2Cut_H
 
-// #include <vector>
-// #include "Pythia8/Pythia.h"
 #include "Cut.h"
-
-// using namespace Pythia8 ;
 
 //==============================================================
 class M2Cut : public Cut
@@ -18,18 +14,17 @@ class M2Cut : public Cut
   public:
 
     // Constructor takes a reference to the event
-    M2Cut(EV&) ;
+    M2Cut(ExEvent&) ;
    
   //--------------------------------------------------------------
   private:
 
     // Virtual method from cut class
-    void cut_cond(std::vector<ExParticle>&) ;   
-    void input(std::string) ; 
+    void CutCond(std::vector<ExParticle>&) override ;   
+    void Input(std::string) override ; 
     
     // The cut on m2
     float M2_Cut_Value = 0 ;   
-
 };
 
 //==============================================================

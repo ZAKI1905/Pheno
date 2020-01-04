@@ -1,17 +1,12 @@
 #ifndef STBinner_H
 #define STBinner_H
 
-// #include <vector>
-// #include "Pythia8/Pythia.h"
-#include "EV.h"
+#include "ExEvent.h"
 #include "Binner.h"
-
-// using namespace Pythia8 ;
 
 //==============================================================
 class STBinner : public Binner
 {
-
   // Gives access to input, etc.
   friend class Pheno ;   
 
@@ -20,22 +15,21 @@ class STBinner : public Binner
 
     // Constructor takes a reference to the event
     STBinner() ;
-    
 
   //--------------------------------------------------------------
   private:
 
     // Reporting the bin information (virtual method from Binner)
-    void report(std::string) ;
+    void Report(std::string) const override ;
     
     // Input for string commands
-    void input(std::string) ;
+    void Input(std::string) override ;
 
     // Adding the event
-    void input(EV&) ;
+    void Input(ExEvent&) override ;
 
     // bins the event (virtual method from base class "binner")
-    void bin_it(bool cut_report, std::string cut_file) ; 
+    void BinIt(bool cut_report, std::string cut_file) override ; 
 
     // The bin set
     std::vector<std::vector<std::vector<double> > > bin_set = 
@@ -54,7 +48,7 @@ class STBinner : public Binner
     std::vector<float> st_limit ;
     
     // Sets the on-off-Z status of the event
-    void on_off_Z() ;
+    void OnOffZ() ;
     
     /* on-off-Z status of the event
         - 0 :            m_{l+l-} < 75 GeV
@@ -64,13 +58,10 @@ class STBinner : public Binner
     int on_z = -1 ;
 
     // checks the lepton number conditions
-    std::vector<int> lep_num_check() ;
+    std::vector<int> LepNumCheck() ;
 
     float one_event = 1.0 ;
-
 };
-
-
 //==============================================================
 
 #endif /*STBinner_H*/

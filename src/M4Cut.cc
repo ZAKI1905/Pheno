@@ -5,26 +5,17 @@
 
 */
 
-// #include <iostream>
-// #include <vector>
-// #include "Pythia8/Pythia.h"
-
-// #include "../inc/EV.h"
 #include "../include/M4Cut.h"
-// #include "../inc/Basics.h"
-// #include "../inc/Cut.h"
-
-// using namespace Pythia8 ;
 
 //==============================================================
 
 //--------------------------------------------------------------
 // Constructor
-M4Cut::M4Cut(EV& ev) : Cut(ev) {logger.SetUnit("M4Cut");}
+M4Cut::M4Cut(ExEvent& ev) : Cut(ev) {logger.SetUnit("M4Cut");}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void M4Cut::input(std::string property)
+void M4Cut::Input(std::string property)
 {
   // Parsing the command
   std::vector<std::string> inp = pars(property, "=") ;
@@ -44,7 +35,7 @@ void M4Cut::input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void M4Cut::cut_cond(std::vector<ExParticle>& in_parlst)
+void M4Cut::CutCond(std::vector<ExParticle>& in_parlst)
 {
 
   //************************************************************
@@ -134,11 +125,11 @@ void M4Cut::cut_cond(std::vector<ExParticle>& in_parlst)
 
 //--------------------------------------------------------------
 // Sorts particles according to pT
-void M4Cut::pT_sort(std::vector<ExParticle>& in_list)
+void M4Cut::pT_Sort(std::vector<ExParticle>& in_list)
 {
   std::sort(in_list.begin(), in_list.end(),
             [](ExParticle& a, ExParticle& b) 
-            {return a.mom().pT() > b.mom().pT() ; } ) ;
+            {return a.GetMom().pT() > b.GetMom().pT() ; } ) ;
 }
 
 //==============================================================
