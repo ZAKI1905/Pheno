@@ -12,9 +12,11 @@ class PrapCut : public Cut
 
   //--------------------------------------------------------------
   public:
+    // Default constructor
+    PrapCut() ;
 
-    // Constructor takes a reference to the event
-      PrapCut(ExEvent&) ;
+    // Constructor takes a pointer to the event
+    PrapCut(ExEvent*) ;
     
   //--------------------------------------------------------------
   private:
@@ -22,6 +24,7 @@ class PrapCut : public Cut
     // Virtual method from cut class
     void CutCond(std::vector<ExParticle>&) override ;   
     void Input(std::string) override ;  
+    Cut* Clone() override; 
 
     // Pseudorapidity cut values
     double e_prap_cut   = 1000 ;

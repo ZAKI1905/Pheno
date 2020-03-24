@@ -1,8 +1,30 @@
 # ----------------------------------
 # Targets
+# LINK_TARGET	:= cms_8TeV
+# MAIN 	:= cms_8TeV
 
-LINK_TARGET	:= cms_8TeV
-MAIN 	:= cms_8TeV
+# LINK_TARGET	:= faketaus
+# MAIN 	:= faketaus
+
+# LINK_TARGET	:= search_LFV_1
+# MAIN 	:= search_LFV_1
+
+# LINK_TARGET	:= search_LFV_2_1
+# MAIN 	:= search_LFV_2_1
+
+# LINK_TARGET	:= search_LFV_2_2
+# MAIN 	:= search_LFV_2_2
+
+# LINK_TARGET	:= search_LFV_3
+# MAIN 	:= search_LFV_3
+
+# LINK_TARGET	:= search_LFV_4
+# MAIN 	:= search_LFV_4
+
+LINK_TARGET	:= user_cuts
+MAIN 	:= user_cuts
+
+
 
 # ----------------------------------
 # Compiler and Linker

@@ -9,8 +9,19 @@
 
 //==============================================================
 //--------------------------------------------------------------
+// Default Constructor
+IdEff::IdEff()
+{
+  logger.SetUnit("IdEff");
+  SetName("IdEff") ;
+}
+
 // Constructor
-IdEff::IdEff(ExEvent& ev) : Cut(ev) {logger.SetUnit("IdEff");}
+IdEff::IdEff(ExEvent* ev) : Cut(ev)
+{
+  logger.SetUnit("IdEff");
+  SetName("IdEff") ;
+}
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
@@ -21,19 +32,21 @@ ID_eff_check: Takes an event and checks if the detector missed an
 */
 {
 
+  PROFILE_SCOPE("IdEff::CutCond");
+
   for(size_t i = 0 ; i < in_parlst.size() ; ++i)
   {
     // find_id_eff( in_parlst[i] ) ;
     // if(ID_Eff_Val!= 0)   ID_Eff_Event *= ID_Eff_Val ;
 
     if( in_parlst[i].GetIdEff()==0 || 
-        (ev_ref.drop_low_eff && in_parlst[i].GetIdEff() <rand01()) )
+        (evPtr->drop_low_eff && in_parlst[i].GetIdEff() <rand01()) )
 
       add_elem(rm_list, (int)i ) ;
   }
 
   // // Setting the event weight
-  // if( !drop_low_eff ) ev_ref.weight = ID_Eff_Event ;
+  // if( !drop_low_eff ) evPtr->weight = ID_Eff_Event ;
 
 }
 
@@ -75,11 +88,16 @@ void IdEff::Input(std::string property)
   if(inp[0] == "drop_low_eff")
   {
     if( inp[1] == "false" )
-      ev_ref.drop_low_eff = false ;
+      evPtr->drop_low_eff = false ;
   }
 
 }
 
 //--------------------------------------------------------------
+// Overriding the clone method
+Cut* IdEff::Clone() 
+{
+  return new IdEff(*this) ;
+}
 
 //==============================================================

@@ -12,9 +12,11 @@ class M2Cut : public Cut
 
   //--------------------------------------------------------------
   public:
-
-    // Constructor takes a reference to the event
-    M2Cut(ExEvent&) ;
+    // Default constructor
+    M2Cut() ;
+    
+    // Constructor takes a pointer to the event
+    M2Cut(ExEvent*) ;
    
   //--------------------------------------------------------------
   private:
@@ -22,6 +24,7 @@ class M2Cut : public Cut
     // Virtual method from cut class
     void CutCond(std::vector<ExParticle>&) override ;   
     void Input(std::string) override ; 
+    Cut* Clone() override; 
     
     // The cut on m2
     float M2_Cut_Value = 0 ;   

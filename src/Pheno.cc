@@ -11,13 +11,13 @@
 #include <thread>
 
 #include "../include/Pheno.h"
-#include "../include/IdEff.h"
-#include "../include/Isolation.h"
-#include "../include/M2Cut.h"
-#include "../include/M4Cut.h"
-#include "../include/PtCut.h"
-#include "../include/PrapCut.h"
-#include "../include/OffZCut.h"
+// #include "../include/IdEff.h"
+// #include "../include/Isolation.h"
+// #include "../include/M2Cut.h"
+// #include "../include/M4Cut.h"
+// #include "../include/PtCut.h"
+// #include "../include/PrapCut.h"
+// #include "../include/OffZCut.h"
 #include "../include/STBinner.h"
 
 //==============================================================
@@ -104,23 +104,23 @@ void Pheno::Input(std::string command, bool strip_space)
     StateDict(tmp_req_lst) ;
   }
 
-  if(prop == "cuts")
-  {
-    std::vector<std::string> tmp_cut_lst = {pars(inp[1], ":")[0]} ;
-    stolst( tmp_cut_lst, pars(inp[1], ":")[1] )  ;
-    cut_list.push_back(tmp_cut_lst) ;
+  // if(prop == "cuts")
+  // {
+  //   std::vector<std::string> tmp_cut_lst = {pars(inp[1], ":")[0]} ;
+  //   stolst( tmp_cut_lst, pars(inp[1], ":")[1] )  ;
+  //   cut_list.push_back(tmp_cut_lst) ;
 
-    //................Recording funcs & vars................
-    func_int.funcs.push_back({}) ;
-    func_double.funcs.push_back({}) ;
-    func_vec_double.funcs.push_back({}) ;
+  //   //................Recording funcs & vars................
+  //   func_int.funcs.push_back({}) ;
+  //   func_double.funcs.push_back({}) ;
+  //   func_vec_double.funcs.push_back({}) ;
 
-    rec_int.vars.push_back({}) ;
-    rec_double.vars.push_back({}) ;
-    rec_vec_double.vars.push_back({}) ;
+  //   rec_int.vars.push_back({}) ;
+  //   rec_double.vars.push_back({}) ;
+  //   rec_vec_double.vars.push_back({}) ;
     
-    //......................................................
-  }
+  //   //......................................................
+  // }
 
   if ( prop == "fastjet" )
   {
@@ -385,15 +385,19 @@ void Pheno::RunPythia(int pr_id)
   {
     PROFILE_SCOPE("Event Loop") ;
 
-    // Generate events, and check whether generation failed.
-    if (!pythia.next())
     {
-      // If failure because reached end of file then exit event loop.
-      if (pythia.info.atEndOfFile()) break ;
+      PROFILE_SCOPE("Pythia.next") ;
+      // Generate events, and check whether generation failed.
+      if (!pythia.next())
+      {
+        // If failure because reached end of file then exit event loop.
+        if (pythia.info.atEndOfFile()) break ;
 
-      // First few failures write off as "acceptable" errors, then quit.
-      if (++iAbort < nAbort) continue ;
-      break ;
+        // First few failures write off as "acceptable" errors, then quit.
+        if (++iAbort < nAbort) continue ;
+        break ;
+      }
+
     }
     // ------------------------------Event info--------------------------
     int num_proc = req_threads ;
@@ -510,18 +514,19 @@ bool Pheno::break_ev_loop(std::vector<ExParticle>& prt_lst)
 //-------------------------------------------------------
 // Cuts
 int Pheno::RunCuts(ExEvent& ev, std::vector<ExParticle>& part_lst,
- std::vector<std::vector<std::string> > cut_list, char* shared_file_char)
+ std::vector<CutOptions> cut_list, char* shared_file_char)
 {
-  PROFILE_FUNCTION() ;
+  PROFILE_SCOPE("Run Cuts") ;
+
   //------Setting the cut report filename--------
   std::string cut_file_str(shared_file_char) ;
   cut_file_str = "Pythia_Cut_Report_" + cut_file_str + ".txt" ;
 
-  std::string cut_name ;
+  // std::string cut_name ;
   std::string cut_rep_title = "Report_Cut:" ;
 
   // Number of cuts that are passed by the event
-    int cut_count = 0 ;
+  int cut_count = 0 ;
 
   // N_l cut: It checks how many of the input events pass
   // the required final state conditions
@@ -534,10 +539,12 @@ int Pheno::RunCuts(ExEvent& ev, std::vector<ExParticle>& part_lst,
   for( size_t i=0 ; i<cut_list.size() ; ++i)
   {
     // the cut name:
-    cut_name = cut_list[i][0] ;
-    cut_rep_title += cut_name ;
+    // cut_name = cut_list[i][0] ;
+    cut_rep_title += cut_list[i].cut->GetName() ;
 
-    std::shared_ptr<Cut> c1 = CutDict(ev, cut_name) ;
+    // std::shared_ptr<Cut> c1 = CutDict(&ev, cut_name) ;
+    cut_list[i].cut->SetEventPtr(&ev) ;
+    std::shared_ptr<Cut> c1(cut_list[i].cut->Clone()) ;
 
     // Checking if c1 is NULL pointer
     if ( !c1 )
@@ -553,16 +560,16 @@ int Pheno::RunCuts(ExEvent& ev, std::vector<ExParticle>& part_lst,
     ev.AddCutPtr(c1) ;
 
     // Saving the name of the cut in the cut instance
-    c1->Cut::Input("Name:"+cut_name) ;
+    // c1->Cut::Input("Name:"+cut_name) ;
 
     bool cut_report_bool = ( report_cuts_flag || contains( report_cuts_set, ev.i() ) ) ;
     if(cut_report_bool) c1->Cut::Input(cut_rep_title+ ":" + cut_file_str) ;
 
-    // Read the input for each cut
-    for( size_t j=1 ; j<cut_list[i].size() ; ++j)
-    {
-      c1->Input(cut_list[i][j]) ;
-    }
+    // // Read the input for each cut
+    // for( size_t j=1 ; j<cut_list[i].size() ; ++j)
+    // {
+    //   c1->Input(cut_list[i][j]) ;
+    // }
 
     // Applying cuts
     c1->Apply(part_lst) ;
@@ -588,22 +595,22 @@ int Pheno::RunCuts(ExEvent& ev, std::vector<ExParticle>& part_lst,
 
 //-------------------------------------------------------
 // Cut dictionary
-std::shared_ptr<Cut> Pheno::CutDict(ExEvent& ev, std::string input)
-{
+// std::shared_ptr<Cut> Pheno::CutDict(ExEvent* ev, std::string input)
+// {
 
-  std::shared_ptr<Cut> pCut ;
+//   std::shared_ptr<Cut> pCut ;
 
-        if (input == "ID_Eff"  ) { pCut.reset( new IdEff(ev) )   ; }
-  else  if (input == "M2"      ) { pCut.reset( new M2Cut(ev) )   ; }
-  else  if (input == "PT"      ) { pCut.reset( new PtCut(ev) )   ; }
-  else  if (input == "PRap"    ) { pCut.reset( new PrapCut(ev))  ; }
-  else  if (input == "ISO"     ) { pCut.reset( new Isolation(ev)); }
-  else  if (input == "M4"      ) { pCut.reset( new M4Cut(ev) )   ; }
-  else  if (input == "OffZ"    ) { pCut.reset( new OffZCut(ev) ) ; }
+//         if (input == "ID_Eff"  ) { pCut.reset( new IdEff(ev) )   ; }
+//   else  if (input == "M2"      ) { pCut.reset( new M2Cut(ev) )   ; }
+//   else  if (input == "PT"      ) { pCut.reset( new PtCut(ev) )   ; }
+//   else  if (input == "PRap"    ) { pCut.reset( new PrapCut(ev))  ; }
+//   else  if (input == "ISO"     ) { pCut.reset( new Isolation(ev)); }
+//   else  if (input == "M4"      ) { pCut.reset( new M4Cut(ev) )   ; }
+//   else  if (input == "OffZ"    ) { pCut.reset( new OffZCut(ev) ) ; }
 
-  return pCut ;
+//   return pCut ;
 
-}
+// }
 
 //-------------------------------------------------------
 // Runs fastjet and saves a list of jets, and reports if Report_Jets is true.
@@ -705,6 +712,7 @@ void Pheno::InitBinner()
 // Has to be within critical statement in parallel region!
 void Pheno::BinEvents(ExEvent& ev, char* shared_file_char)
 {
+  PROFILE_FUNCTION() ;
 
   std::string cut_file_str(shared_file_char) ;
   cut_file_str = "Pythia_Cut_Report_" + cut_file_str + ".txt" ;
@@ -767,6 +775,28 @@ void Pheno::FinalReport()
   for( size_t i=0 ; i<binner_ptr_lst.size() ; ++i)
    { binner_ptr_lst[i]->Report(file_LHE) ; }
 }
+
+//-------------------------------------------------------
+// Adding user defined cuts
+void Pheno::Input(CutOptions in_options) 
+{
+  // Saving the command in a list
+  input_list.push_back(in_options.GetStrForm()) ;
+
+  cut_list.push_back(in_options) ;
+
+  //................Recording funcs & vars................
+  func_int.funcs.push_back({}) ;
+  func_double.funcs.push_back({}) ;
+  func_vec_double.funcs.push_back({}) ;
+
+  rec_int.vars.push_back({}) ;
+  rec_double.vars.push_back({}) ;
+  rec_vec_double.vars.push_back({}) ;
+  //......................................................
+
+}
+
 //==============================================================
 
 //==============================================================

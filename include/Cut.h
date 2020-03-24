@@ -14,15 +14,18 @@ class Cut
 {
   // Gives access to input, etc.
   friend class Pheno ;   
-
+  friend struct CutOptions ;
   //--------------------------------------------------------------
   protected:
     Logger logger ;
   //--------------------------------------------------------------
   public:
 
-    // Constructor takes a reference to an event
-    Cut(ExEvent &) ;
+    // Default constructor
+    Cut() ;
+
+    // Constructor takes a pointer to an event
+    Cut(ExEvent*) ;
 
     // Virtual destructor
     virtual ~Cut() ;
@@ -38,15 +41,27 @@ class Cut
     // void apply(std::vector<Particle>&, std::vector<Particle>& )    ;  
     // //----------------------------------
 
+    // Getting the cut label
+    std::string GetName() const ;
+  
   //--------------------------------------------------------------
 
   protected:
 
+    // Setting the cut label
+    void SetName(const char*) ;
+
     // Cut label
     std::string name = "unnamed_cut" ;
 
-    // Ref. to the event
-    ExEvent& ev_ref ;  
+    // Setting pointer to an event
+    void SetEventPtr(ExEvent*) ;
+
+    // Getting pointer to an event
+    ExEvent* GetEventPtr() const ;
+
+    // Pointer to the event
+    ExEvent* evPtr = NULL ;  
 
     // cut_cond checks cut and adds those not passing it to rm_list 
     virtual void CutCond(std::vector<ExParticle>&) = 0 ;   
@@ -77,6 +92,8 @@ class Cut
 
     // Copy of output particles for reporting
     std::vector<ExParticle> out_parts_cpy ;   
+
+    virtual Cut* Clone() = 0 ;
 
 };
 

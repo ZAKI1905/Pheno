@@ -10,8 +10,19 @@
 //==============================================================
 
 //--------------------------------------------------------------
+// Default Constructor
+M4Cut::M4Cut()
+{
+  logger.SetUnit("M4Cut");
+  SetName("M4Cut") ;
+}
+
 // Constructor
-M4Cut::M4Cut(ExEvent& ev) : Cut(ev) {logger.SetUnit("M4Cut");}
+M4Cut::M4Cut(ExEvent* ev) : Cut(ev) 
+{
+  logger.SetUnit("M4Cut");
+  SetName("M4Cut") ;
+}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
@@ -37,6 +48,8 @@ void M4Cut::Input(std::string property)
 // Virtual method from cut class:
 void M4Cut::CutCond(std::vector<ExParticle>& in_parlst)
 {
+
+  PROFILE_SCOPE("M4Cut::CutCond") ;
 
   //************************************************************
   //           Special Colinear Approximation 
@@ -130,6 +143,13 @@ void M4Cut::pT_Sort(std::vector<ExParticle>& in_list)
   std::sort(in_list.begin(), in_list.end(),
             [](ExParticle& a, ExParticle& b) 
             {return a.GetMom().pT() > b.GetMom().pT() ; } ) ;
+}
+
+//--------------------------------------------------------------
+// Overriding the clone method
+Cut* M4Cut::Clone() 
+{
+  return new M4Cut(*this) ;
 }
 
 //==============================================================

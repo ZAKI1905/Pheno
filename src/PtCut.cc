@@ -10,8 +10,19 @@
 //==============================================================
 
 //--------------------------------------------------------------
+// Default Constructor
+PtCut::PtCut()
+{
+  logger.SetUnit("PtCut");
+  SetName("PtCut") ;
+}
+
 // Constructor
-PtCut::PtCut(ExEvent& ev) : Cut(ev) {logger.SetUnit("PtCut");}
+PtCut::PtCut(ExEvent* ev) : Cut(ev) 
+{
+  logger.SetUnit("PtCut");
+  SetName("PtCut") ;
+}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
@@ -47,6 +58,7 @@ void PtCut::Input(std::string property)
 // Virtual method from cut class:
 void PtCut::CutCond(std::vector<ExParticle>& in_parlst)
 {
+  PROFILE_SCOPE("PtCut::CutCond") ;
 
   pT_Sorter(in_parlst)                    ;
   size_t emu_fail_idx = in_parlst.size()  ;
@@ -172,5 +184,10 @@ float PtCut::pT_CutVal(size_t rank, ExParticle& p)
   return return_val ;
 }
 //--------------------------------------------------------------
+// Overriding the clone method
+Cut* PtCut::Clone() 
+{
+  return new PtCut(*this) ;
+}
 
 //==============================================================

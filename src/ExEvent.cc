@@ -116,16 +116,16 @@ void ExEvent::Input(std::string property, bool value)
 // Finding the hadronically decaying taus
 void ExEvent::FindHadTaus(std::string filename)
 {
+  PROFILE_FUNCTION() ;
+  std::FILE * pTAU_REPORT_FILE ;
+  // char pTAU_REPORT_CHAR[50];
+  // sprintf(pTAU_REPORT_CHAR, "Tau_Report.txt");
+  if (tau_report_flag) pTAU_REPORT_FILE = fopen(filename.c_str(), "a") ;
 
-std::FILE * pTAU_REPORT_FILE ;
-// char pTAU_REPORT_CHAR[50];
-// sprintf(pTAU_REPORT_CHAR, "Tau_Report.txt");
-if (tau_report_flag) pTAU_REPORT_FILE = fopen(filename.c_str(), "a") ;
+  for(size_t i=0 ; i < full_event.size() ; ++i)
+  {
 
-for(size_t i=0 ; i < full_event.size() ; ++i)
-{
-
-  if ( full_event[i].idAbs()!=ID_TAU ) continue ;
+    if ( full_event[i].idAbs()!=ID_TAU ) continue ;
 
   if(full_event[i].daughter2()>=full_event[i].daughter1() && tau_report_flag)
   {
@@ -160,12 +160,12 @@ for(size_t i=0 ; i < full_event.size() ; ++i)
     PrintTable<ExParticle>(pTAU_REPORT_FILE, Daughter_Range) ;
   }
 
-  full_event[i].SetHadDec() ;
+    full_event[i].SetHadDec() ;
 
-  if( HadronicDecay(full_event[i]) ) had_taus.push_back(full_event[i]) ;
+    if( HadronicDecay(full_event[i]) ) had_taus.push_back(full_event[i]) ;
 
-}
-if(tau_report_flag) fclose(pTAU_REPORT_FILE) ;
+  }
+  if(tau_report_flag) fclose(pTAU_REPORT_FILE) ;
 
 }
 

@@ -13,8 +13,11 @@ friend class Pheno ;
 //--------------------------------------------------------------
 public:
 
+  // Default Constructor
+  IdEff() ;
+
   // Constructor
-  IdEff(ExEvent &) ;
+  IdEff(ExEvent*) ;
 
   // // Finds the ID_eff of p in ev
   // void find_id_eff(ExParticle& p) ;   
@@ -31,7 +34,7 @@ private:
 
   // Virtual method from cut class
   void CutCond(std::vector<ExParticle>&) override ;    
-
+  Cut* Clone() override ;
   // // Value of the ID_Eff
   // double ID_Eff_Val ;    
 

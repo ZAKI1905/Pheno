@@ -17,14 +17,26 @@ satisfy the cut condition.
 */
 
 //--------------------------------------------------------------
+// Default Constructor
+Isolation::Isolation()
+{
+  logger.SetUnit("Isolation");
+  SetName("Isolation") ;
+}
+
 // Constructor
-Isolation::Isolation(ExEvent& ev) : Cut(ev) {logger.SetUnit("Isolation");}
+Isolation::Isolation(ExEvent* ev) : Cut(ev) 
+{
+  logger.SetUnit("Isolation");
+  SetName("Isolation") ;
+}
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
 void Isolation::CutCond(std::vector<ExParticle>& in_parlst)
 {
-  
+  PROFILE_SCOPE("Isolation::CutCond") ;
+
   for(size_t i=0 ; i < in_parlst.size() ; ++i )
   {
     sum_ET_value     = 0.0 ;
@@ -32,9 +44,9 @@ void Isolation::CutCond(std::vector<ExParticle>& in_parlst)
 
     ExParticle prt_i =  in_parlst[i];
 
-    for(size_t j=0 ; j < ev_ref.size() ; ++j )
+    for(size_t j=0 ; j < evPtr->size() ; ++j )
     {
-      ExParticle prt_j =  ev_ref.FullEvent()[j] ;
+      ExParticle prt_j =  evPtr->FullEvent()[j] ;
 
         /* 
           Checking if part_j is final state, and not the same as
@@ -77,6 +89,13 @@ void Isolation::CutCond(std::vector<ExParticle>& in_parlst)
     }
   }
 
+}
+
+//--------------------------------------------------------------
+// Overriding the clone method
+Cut* Isolation::Clone() 
+{
+  return new Isolation(*this) ;
 }
 
 //==============================================================

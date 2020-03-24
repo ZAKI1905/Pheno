@@ -14,6 +14,13 @@
 #include <omp.h>
 
 #include "../include/Pheno.h"
+#include "../include/IdEff.h"
+#include "../include/Isolation.h"
+#include "../include/M2Cut.h"
+#include "../include/M4Cut.h"
+#include "../include/PtCut.h"
+#include "../include/PrapCut.h"
+#include "../include/OffZCut.h"
 
 std::vector<double> InvMeMu(std::vector<ExParticle>& parts);
 std::vector<double> scaleFTauE(std::vector<ExParticle>&);
@@ -120,25 +127,30 @@ int main(int argc,char *argv[])
   // in included header files can be used.
 
   // ID_Eff cut
-  phen.Input( "cuts= ID_Eff: drop_low_eff=true" ) ;
+  IdEff id_eff;
+  phen.Input( {&id_eff, "drop_low_eff=true"}) ;
 
   // Cut on M_l+l-
-  phen.Input( "cuts= M2: M2_Cut_Value=12" ) ;
+  M2Cut m2_cut;
+  phen.Input({&m2_cut, "M2_Cut_Value=12"}) ;
 
   /*  p_T Cut Conditions:
         e & mu: pt>= 7 GeV  (at least 1 > 20 GeV)
         t_h: pt>= 20 GeV
   */
-  phen.Input( "cuts= PT: lead=20, sub_lead=7, extra=7, had_tau=20" ) ;
+  PtCut pt_cut;
+  phen.Input( {&pt_cut, "lead=20, sub_lead=7, extra=7, had_tau=20"}) ;
 
   /*  prap Cut Conditions:
         e & mu: |eta| < 2.4
         t_h: |eta| < 2.3
   */
-  phen.Input( "cuts= PRap: e=2.4, mu=2.4, had_tau=2.3" ) ;
+  PrapCut prap_cut;
+  phen.Input({&prap_cut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
 
   // Isolation cut
-  phen.Input( "cuts=ISO" ) ;
+  Isolation iso;
+  phen.Input(&iso) ;
 
   //-------------------------
   // fastjet options
@@ -151,7 +163,8 @@ int main(int argc,char *argv[])
   //-------------------------
 
   // Demanding  m(l+l-) <= 75 GeV or 105 GeV <= m(l+l-)
-  phen.Input( "cuts=OffZ: OffZ_Cut_Min=75, OffZ_Cut_Max=105" ) ;
+  OffZCut offzcut;
+  phen.Input({&offzcut, "OffZ_Cut_Min=75, OffZ_Cut_Max=105"}) ;
 
   // -------------------------------------------------------------------------
 

@@ -6,6 +6,60 @@
 #include "Binner.h"
 
 //==============================================================
+// Cut options includes a cut and its options
+struct CutOptions
+{
+  Cut* cut ;
+  std::vector<std::string> options ;
+
+  //--------------------------------------------------------------
+  // Constructor
+  CutOptions(Cut* in_cut, std::string command="")
+  {
+    cut = in_cut ;
+
+    // stripping spaces from command
+    command = strip(command, ' ') ;
+
+    stolst( options, command )  ;
+
+    InputOptions() ;
+  }
+
+  //--------------------------------------------------------------
+  // Getting the string form
+  std::string GetStrForm()
+  {
+    std::string out_str = "Cut Name: '" + cut->GetName() 
+                          + "' \nOptions: " ;
+    for(size_t i=0 ; i< options.size(); i++)
+    {
+      out_str += options[i] ;
+
+      // if its the last element 
+      // no need for an extra comma
+      if ( i == options.size()-1)
+        break;
+      
+      out_str += ", " ; 
+    }
+    return out_str ;
+  }
+
+  //--------------------------------------------------------------
+  // Set the input for each cut
+  void InputOptions()
+  {
+    for( size_t i=0 ; i<options.size() ; ++i)
+    {
+      cut->Input(options[i]) ;
+    }
+  }
+  //--------------------------------------------------------------
+
+};
+
+//==============================================================
 class Pheno
 {
   //--------------------------------------------------------------
@@ -19,6 +73,10 @@ class Pheno
 
   // Destructor
   ~Pheno() ;
+
+  // Adding user defined cuts (bool is for stripping the spaces)
+  // void Input(Cut*, std::string="", bool=true) ;
+  void Input(CutOptions) ;
 
   // Inputing the parameters (bool is for stripping the spaces)
   void Input(std::string, bool=true) ;
@@ -110,13 +168,13 @@ class Pheno
 
     // Run cuts (returns the number of cuts passed)
     int RunCuts(ExEvent&, std::vector<ExParticle>&,
-     std::vector<std::vector<std::string> >, char*)  ;
+     std::vector<CutOptions>, char*)  ;
 
     // Cut dictionary
-    std::shared_ptr<Cut>  CutDict(ExEvent&, std::string) ;
+    // std::shared_ptr<Cut>  CutDict(ExEvent*, std::string) ;
 
     // List of cuts to be applied
-    std::vector<std::vector<std::string> > cut_list ;
+    std::vector<CutOptions> cut_list ;
 
     // List of cut pointers
     std::vector<std::shared_ptr<Cut> > cut_ptr_list ;

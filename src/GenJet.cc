@@ -341,6 +341,7 @@ void GenJet::SetStrategy(std::string strat)
 // Isolation condition assuming jets are faking taus
 void GenJet::FakeTauIsolate()
 {
+  PROFILE_FUNCTION();
   std::vector<int> remove_jet ;
   char isolate_message_char[200] ;
 
@@ -395,6 +396,7 @@ void GenJet::FakeTauIsolate()
 //--------------------------------------------------------------
 void GenJet::Isolate()
 {
+  PROFILE_FUNCTION();
   std::vector<int> remove_jet ;
   double  d ;
   char isolate_message_char[200] ;

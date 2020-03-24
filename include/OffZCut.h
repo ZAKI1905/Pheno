@@ -12,9 +12,11 @@ class OffZCut : public Cut
 
   //--------------------------------------------------------------
   public:
+    // Default constructor
+    OffZCut() ;
 
-    // Constructor takes a reference to the event
-    OffZCut(ExEvent&) ;
+    // Constructor takes a pointer to the event
+    OffZCut(ExEvent*) ;
 
   //--------------------------------------------------------------
   private:
@@ -22,6 +24,7 @@ class OffZCut : public Cut
     // Virtual method from cut class
     void CutCond(std::vector<ExParticle>&) override;   
     void Input(std::string) override; 
+    Cut* Clone() override; 
 
     // The minimum of OffZ cut
     float OffZ_cut_min = 75 ;   

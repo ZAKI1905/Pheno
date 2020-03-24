@@ -15,11 +15,42 @@
 
 //--------------------------------------------------------------
 // Constructor
+// Default Constructor
+Cut::Cut() { }
+
 // Constructor takes a reference to an event.
-Cut::Cut(ExEvent& ev) : ev_ref(ev) {
+Cut::Cut(ExEvent* ev) : evPtr(ev) {
   // // Adding the pointer to this cut to the event
   //   ev.addCutPtr(this);
-   }
+}
+
+//--------------------------------------------------------------
+// Setting pointer to an event
+void Cut::SetEventPtr(ExEvent* in_ev) 
+{
+  evPtr = in_ev ;
+}
+
+//--------------------------------------------------------------
+// Setting the cut label
+void Cut::SetName(const char* in_name) 
+{
+  name = in_name ;
+}
+
+//--------------------------------------------------------------
+// Setting the cut label
+std::string Cut::GetName() const 
+{
+  return name;
+}
+
+//--------------------------------------------------------------
+// Getting pointer to an event
+ExEvent* Cut::GetEventPtr() const
+{
+  return evPtr;
+}
 
 //--------------------------------------------------------------
 // Virtual destructor
@@ -45,9 +76,9 @@ void Cut::Report() const
   // --------------------------------------
   // Adding the event number header
   // --------------------------------------
-    if( same_iEv != ev_ref.i() )
+    if( same_iEv != evPtr->i() )
     {
-      same_iEv = ev_ref.i() ;
+      same_iEv = evPtr->i() ;
       fprintf(pCUT_REPORT_FILE,"\n %s Event %5d %s\n", pr(50,'*').c_str(),
        same_iEv, pr(50,'*').c_str()) ;
 
@@ -69,7 +100,7 @@ void Cut::Report() const
     else{no_part_selected = true; fprintf(pCUT_REPORT_FILE,
     "\n No particle was selected for this cut.");}
 
-    ev_ref.PrintTable<ExParticle>(pCUT_REPORT_FILE, in_parts_cpy) ;
+    evPtr->PrintTable<ExParticle>(pCUT_REPORT_FILE, in_parts_cpy) ;
 
   // --------------------------------------
   // Special message from the cut
@@ -87,7 +118,7 @@ void Cut::Report() const
      {
       fprintf(pCUT_REPORT_FILE,
       "  %s\n |  Particles passing this cut   |",pr(31,'_').c_str()) ;
-      ev_ref.PrintTable<ExParticle>(pCUT_REPORT_FILE, out_parts_cpy) ;
+      evPtr->PrintTable<ExParticle>(pCUT_REPORT_FILE, out_parts_cpy) ;
      }
   // If none passed
     else if( out_parts_cpy.size() == 0 )
@@ -141,7 +172,7 @@ void Cut::Apply(std::vector<ExParticle>& in_parlst)
     rm_elem(in_parlst, rm_list) ;
 
   // Adding the pointer to this cut to the event
-    // ev_ref.addCutPtr(this) ;
+    // evPtr->addCutPtr(this) ;
 
   // Copying in_parlst for report()
     out_parts_cpy = in_parlst ;

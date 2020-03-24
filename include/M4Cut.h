@@ -12,8 +12,11 @@ class M4Cut : public Cut
 
   //--------------------------------------------------------------
   public:
-    // Constructor takes a reference to the event
-    M4Cut(ExEvent&) ;
+    // Default constructor
+    M4Cut() ;
+
+    // Constructor takes a pointer to the event
+    M4Cut(ExEvent*) ;
    
   //--------------------------------------------------------------
   private:
@@ -21,6 +24,7 @@ class M4Cut : public Cut
     // Virtual method from cut class
     void CutCond(std::vector<ExParticle>&) override;   
     void Input(std::string) override; 
+    Cut* Clone() override; 
 
     // The minimum of m4l
     float M4_cut_min = 0 ;   

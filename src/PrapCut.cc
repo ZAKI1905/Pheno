@@ -10,8 +10,19 @@
 //==============================================================
 
 //--------------------------------------------------------------
+// Default Constructor
+PrapCut::PrapCut()
+{
+  logger.SetUnit("PrapCut");
+  SetName("PrapCut") ;
+}
+
 // Constructor
-PrapCut::PrapCut(ExEvent& ev) : Cut(ev) {logger.SetUnit("PrapCut");}
+PrapCut::PrapCut(ExEvent* ev) : Cut(ev) 
+{
+  logger.SetUnit("PrapCut");
+  SetName("PrapCut") ;
+}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
@@ -44,6 +55,8 @@ void PrapCut::Input(std::string property)
 // Virtual method from cut class:
 void PrapCut::CutCond(std::vector<ExParticle>& in_parlst)
 {
+  PROFILE_SCOPE("PrapCut::CutCond") ;
+
     for(size_t i=0 ; i< in_parlst.size() ; ++i)
     {   
         // eta_e < e_prap_cut
@@ -74,5 +87,10 @@ void PrapCut::CutCond(std::vector<ExParticle>& in_parlst)
 }
 
 //--------------------------------------------------------------
+// Overriding the clone method
+Cut* PrapCut::Clone() 
+{
+  return new PrapCut(*this) ;
+}
 
 //==============================================================

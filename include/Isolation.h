@@ -9,15 +9,18 @@ class Isolation : public Cut
 {
   //--------------------------------------------------------------
   public:
+    // Default Constructor
+    Isolation() ;
 
-    // Constructor takes a reference to the event
-    Isolation(ExEvent&) ;
+    // Constructor takes a pointer to the event
+    Isolation(ExEvent*) ;
 
   //--------------------------------------------------------------
   private:
 
     // Virtual method from cut class
-    void CutCond(std::vector<ExParticle>&) override;   
+    void CutCond(std::vector<ExParticle>&) override;  
+    Cut* Clone() override; 
 
     // These values have to be reset for each particle!
     

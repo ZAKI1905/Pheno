@@ -12,8 +12,19 @@
 //==============================================================
 
 //--------------------------------------------------------------
+// Default Constructor
+M2Cut::M2Cut()
+{
+  logger.SetUnit("M2Cut");
+  SetName("M2Cut") ;
+}
+
 // Constructor
-M2Cut::M2Cut(ExEvent& ev) : Cut(ev) {logger.SetUnit("M2Cut");}
+M2Cut::M2Cut(ExEvent* ev) : Cut(ev) 
+{
+  logger.SetUnit("M2Cut");
+  SetName("M2Cut") ;
+}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
@@ -35,6 +46,8 @@ void M2Cut::Input(std::string property)
 // Virtual method from cut class:
 void M2Cut::CutCond(std::vector<ExParticle>& in_parlst)
 {
+  PROFILE_SCOPE("M2Cut::CutCond") ;
+
   char special_message_char[100] ;
   bool special_message_on = false ;
 
@@ -80,6 +93,12 @@ void M2Cut::CutCond(std::vector<ExParticle>& in_parlst)
   }
 
 }
+
 //--------------------------------------------------------------
+// Overriding the clone method
+Cut* M2Cut::Clone() 
+{
+  return new M2Cut(*this) ;
+}
 
 //==============================================================

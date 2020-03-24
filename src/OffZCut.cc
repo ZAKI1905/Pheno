@@ -10,8 +10,19 @@
 //==============================================================
 
 //--------------------------------------------------------------
+// Default Constructor
+OffZCut::OffZCut()
+{
+  logger.SetUnit("OffZCut");
+  SetName("OffZCut") ;
+}
+
 // Constructor
-OffZCut::OffZCut(ExEvent& ev) : Cut(ev) { logger.SetUnit("OffZCut"); }
+OffZCut::OffZCut(ExEvent* ev) : Cut(ev) 
+{
+  logger.SetUnit("OffZCut");
+  SetName("OffZCut") ;
+}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
@@ -37,6 +48,8 @@ void OffZCut::Input(std::string property)
 // Virtual method from cut class:
 void OffZCut::CutCond(std::vector<ExParticle>& in_parlst)
 {
+  PROFILE_SCOPE("OffZCut::CutCond") ;
+
   char special_message_char[100] ;
   bool special_message_on = false ;
 
@@ -84,5 +97,10 @@ void OffZCut::CutCond(std::vector<ExParticle>& in_parlst)
 }
 
 //--------------------------------------------------------------
+// Overriding the clone method
+Cut* OffZCut::Clone() 
+{
+  return new OffZCut(*this) ;
+}
 
 //==============================================================
