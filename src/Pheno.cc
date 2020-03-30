@@ -186,7 +186,7 @@ void Pheno::Input(std::string command, bool strip_space)
 
 //--------------------------------------------------------------
 template<class T>
-void Pheno::Input(std::string input, T (*func)(std::vector<ExParticle>& parts) )
+void Pheno::Input(std::string input, T (*func)(ParticleLST& parts) )
 {
   // Parsing the command
   std::vector<std::string> inp = pars(input, "=") ;
@@ -204,7 +204,7 @@ void Pheno::Input(std::string input, T (*func)(std::vector<ExParticle>& parts) )
 //--------------------------------------------------------------
 // Specialization for int instances
 template<>
-void Pheno::Input<int>(std::string input, int (*func)(std::vector<ExParticle>& parts) )
+void Pheno::Input<int>(std::string input, int (*func)(ParticleLST& parts) )
 {
   // Parsing the command
   std::vector<std::string> inp = pars(input, "=") ;
@@ -222,7 +222,7 @@ void Pheno::Input<int>(std::string input, int (*func)(std::vector<ExParticle>& p
 //--------------------------------------------------------------
 // Specialization for double vectors instances
 template<>
-void Pheno::Input<std::vector<double> >(std::string input, std::vector<double> (*func)(std::vector<ExParticle>& parts) )
+void Pheno::Input<std::vector<double> >(std::string input, std::vector<double> (*func)(ParticleLST& parts) )
 {
   // Parsing the command
   std::vector<std::string> inp = pars(input, "=") ;
@@ -432,7 +432,7 @@ void Pheno::RunPythia(int pr_id)
     ev.FindHadTaus(tau_rep_str) ;
 
     // Leptons are the only particles to loop over.
-    std::vector<ExParticle> PartList = ev(lept_id_list) ;
+    ParticleLST PartList = ev(lept_id_list) ;
 
     // //---------------------Setting the cut report filename------------------
     // std::string cut_file_str(shared_file_char) ;
@@ -478,7 +478,7 @@ void Pheno::RunPythia(int pr_id)
 // loop to the next iteration, i.e. cut is not passed.
 // So the conditions here are the logical negation of :
 //       {">=", "<=", ">", "<", "=", "!="}
-bool Pheno::break_ev_loop(std::vector<ExParticle>& prt_lst)
+bool Pheno::break_ev_loop(ParticleLST& prt_lst)
 {
 
   for ( size_t i=0 ; i < req_states.size() ; ++i)
@@ -513,7 +513,7 @@ bool Pheno::break_ev_loop(std::vector<ExParticle>& prt_lst)
 
 //-------------------------------------------------------
 // Cuts
-int Pheno::RunCuts(ExEvent& ev, std::vector<ExParticle>& part_lst,
+int Pheno::RunCuts(ExEvent& ev, ParticleLST& part_lst,
  std::vector<CutOptions> cut_list, char* shared_file_char)
 {
   PROFILE_SCOPE("Run Cuts") ;
@@ -630,7 +630,7 @@ void Pheno::RunGenJet(ExEvent& ev, char* shared_file_char)
   
 //-------------------------------------------------------
 // Recording Values
-void Pheno::Record(size_t cut_idx, std::vector<ExParticle>& part_lst)
+void Pheno::Record(size_t cut_idx, ParticleLST& part_lst)
 {
   PROFILE_FUNCTION() ;
   // #pragma omp single
@@ -802,6 +802,6 @@ void Pheno::Input(CutOptions in_options)
 //==============================================================
 //                    explicit instantiations
 //==============================================================
-template void Pheno::Input<double>(std::string, double (*func)(std::vector<ExParticle>&) ) ;
+template void Pheno::Input<double>(std::string, double (*func)(ParticleLST&) ) ;
 
 //==============================================================

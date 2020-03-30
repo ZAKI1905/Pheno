@@ -29,6 +29,8 @@ class ExEvent
   //--------------------------------------------------------------
   public:
 
+    typedef std::vector<ExParticle> ParticleLST;
+
     // Constructor
     ExEvent(int, Pythia8::Event&) ; 
     // Destructor
@@ -47,19 +49,19 @@ class ExEvent
     void  FindHadTaus(std::string filename) ;
 
     // removing the taus not passing cuts
-    void  UpdateHadTaus(std::vector<ExParticle>) ; 
+    void  UpdateHadTaus(ParticleLST) ; 
 
     // returns a reference to full event
-    std::vector<ExParticle>& FullEvent() ; 
+    ParticleLST& FullEvent() ; 
 
     // returns the size of an event
     size_t  size() const ; 
 
     // Overloading ()
-    std::vector<ExParticle>  operator() (std::vector<int>) ; 
+    ParticleLST  operator() (std::vector<int>) ; 
 
     // returns the hadronic taus
-    std::vector<ExParticle>& HadronicTaus() ; 
+    ParticleLST& HadronicTaus() ; 
 
     // returns the event_number
     int i() const ; 
@@ -72,7 +74,7 @@ class ExEvent
     std::vector<fastjet::PseudoJet>& GetPseudoJets() ; 
 
     // returns a reference to the lep_jts
-    std::vector<ExParticle>& GetLeptonJets() ; 
+    ParticleLST& GetLeptonJets() ; 
 
     // Updates the ps_jet set based on the cuts
     void  UpdatePseudoJet() ; 
@@ -80,8 +82,8 @@ class ExEvent
 
     //-----------------------CUTS--------------------
     // returns a reference to leptons that passed all the cuts
-    std::vector<ExParticle>& PassedLeptons() ; 
-    void  UpdatePassedLepts(std::vector<ExParticle> ) ;
+    ParticleLST& PassedLeptons() ; 
+    void  UpdatePassedLepts(ParticleLST ) ;
     //-----------------------------------------------
 
     // Prints the full event given the file name
@@ -136,23 +138,23 @@ class ExEvent
     bool  tau_report_flag = false ; 
 
     // The hadronically decaying taus
-    std::vector<ExParticle>  had_taus ; 
+    ParticleLST  had_taus ; 
 
     // The full event
-    std::vector<ExParticle>  full_event ; 
+    ParticleLST  full_event ; 
 
     // A list of Cut pointers that have been applied to the event
     std::vector<std::shared_ptr<Cut> > cut_ptr ;
     
     // Leptons that passed all the cuts 
-    std::vector<ExParticle>  isolated_leptons ;   
+    ParticleLST  isolated_leptons ;   
 
     //------------------FASTJET----------------------
     // Pseudojets as an input to fastjet
     std::vector<fastjet::PseudoJet>  pseudo_jet_set ; 
 
     // Leptons as an input to fastjet
-    std::vector<ExParticle>  lepton_jets ; 
+    ParticleLST  lepton_jets ; 
     //-----------------------------------------------
 
     // .....................................................

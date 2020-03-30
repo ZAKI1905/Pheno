@@ -72,6 +72,8 @@
         "unordered_map": "cpp",
         "utility": "cpp",
         "valarray": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "__functional_03": "cpp",
+        "memory_resource": "cpp"
     }
 }

@@ -44,7 +44,7 @@ void M2Cut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void M2Cut::CutCond(std::vector<ExParticle>& in_parlst)
+void M2Cut::CutCond(ParticleLST& in_parlst)
 {
   PROFILE_SCOPE("M2Cut::CutCond") ;
 
@@ -55,7 +55,7 @@ void M2Cut::CutCond(std::vector<ExParticle>& in_parlst)
     {
       for(size_t j=i ; j < in_parlst.size() ; ++j)
       {
-        std::vector<ExParticle> tmp_lst = {in_parlst[i],in_parlst[j]} ;
+        ParticleLST tmp_lst = {in_parlst[i],in_parlst[j]} ;
 
           if(in_parlst[i].id()==-in_parlst[j].id() && 
              invM(tmp_lst) < M2_Cut_Value)

@@ -33,7 +33,7 @@ public:
 private:
 
   // Virtual method from cut class
-  void CutCond(std::vector<ExParticle>&) override ;    
+  void CutCond(ParticleLST&) override ;    
   Cut* Clone() override ;
   // // Value of the ID_Eff
   // double ID_Eff_Val ;    

@@ -46,7 +46,7 @@ void OffZCut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void OffZCut::CutCond(std::vector<ExParticle>& in_parlst)
+void OffZCut::CutCond(ParticleLST& in_parlst)
 {
   PROFILE_SCOPE("OffZCut::CutCond") ;
 
@@ -57,7 +57,7 @@ void OffZCut::CutCond(std::vector<ExParticle>& in_parlst)
   {
     for(size_t j=i ; j < in_parlst.size() ; ++j)
     {
-      std::vector<ExParticle> tmp_lst = {in_parlst[i],in_parlst[j]} ;
+      ParticleLST tmp_lst = {in_parlst[i],in_parlst[j]} ;
 
         if(in_parlst[i].id()==-in_parlst[j].id() && 
             OffZ_cut_min < invM(tmp_lst) && invM(tmp_lst) < OffZ_cut_max)

@@ -24,12 +24,12 @@ class PtCut : public Cut
   private:
 
     // Virtual method from cut class
-    void CutCond(std::vector<ExParticle>&) override ;   
+    void CutCond(ParticleLST&) override ;   
     void Input(std::string) override ; 
     Cut* Clone() override; 
 
     bool Comp_pT_Value(const ExParticle&, const ExParticle& ) ;
-    std::vector<ExParticle> pT_Sorter(std::vector<ExParticle>& ) ;
+    ParticleLST pT_Sorter(ParticleLST& ) ;
 
     // dictionary for the pT cut values
     float pT_CutVal(size_t , ExParticle& ) ; 

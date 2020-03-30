@@ -68,6 +68,7 @@ class Pheno
   //--------------------------------------------------------------
   public:
 
+  typedef std::vector<ExParticle> ParticleLST ;
   // Constructor
   Pheno() ;
 
@@ -82,13 +83,13 @@ class Pheno
   void Input(std::string, bool=true) ;
 
   template<class T>
-  void Input(std::string, T (*func)(std::vector<ExParticle>&) ) ;
+  void Input(std::string, T (*func)(ParticleLST&) ) ;
   
   // List of input parameters
   std::vector<std::string> input_list;
 
   // records variables
-  void Record(size_t cut_idx, std::vector<ExParticle>& ) ;
+  void Record(size_t cut_idx, ParticleLST& ) ;
 
 
 //................UNDER CONSTRUCTION................
@@ -96,13 +97,13 @@ class Pheno
   struct rec_fun 
   {
    std::string name = "";
-   T (*f)(std::vector<ExParticle>& parts) ;
+   T (*f)(ParticleLST& parts) ;
   };
   
   // Record functions
   // ( initilized to have 0-th element to record
   //   before any cuts have been applied )
-  // std::vector< std::vector<double (*)(std::vector<ExParticle>& parts)> > rec_funcs = { {} };
+  // std::vector< std::vector<double (*)(ParticleLST& parts)> > rec_funcs = { {} };
   // std::vector<std::vector<rec_fun> > rec_funcs = { {} } ;/
 
   template<typename T>
@@ -167,7 +168,7 @@ class Pheno
     void StateDict(std::vector<std::string>) ;
 
     // Run cuts (returns the number of cuts passed)
-    int RunCuts(ExEvent&, std::vector<ExParticle>&,
+    int RunCuts(ExEvent&, ParticleLST&,
      std::vector<CutOptions>, char*)  ;
 
     // Cut dictionary
@@ -201,7 +202,7 @@ class Pheno
 
     /* Breaks the event loop if some conditions are met,
      and continues to the next event */
-    bool break_ev_loop(std::vector<ExParticle>& ) ;
+    bool break_ev_loop(ParticleLST& ) ;
 
     /*
     Pythia options are saved in a list

@@ -129,11 +129,11 @@ void ExEvent::FindHadTaus(std::string filename)
 
   if(full_event[i].daughter2()>=full_event[i].daughter1() && tau_report_flag)
   {
-    std::vector<ExParticle>::const_iterator first = full_event.begin() +
+    ParticleLST::const_iterator first = full_event.begin() +
      full_event[i].daughter1() ;
-    std::vector<ExParticle>::const_iterator last = full_event.begin() +
+    ParticleLST::const_iterator last = full_event.begin() +
      full_event[i].daughter2() + 1 ;
-    std::vector<ExParticle> Daughter_Range(first, last) ;
+    ParticleLST Daughter_Range(first, last) ;
 
     // Actual, Visible
     std::vector<Pythia8::Vec4> Tau_Mom{full_event[i].p(), full_event[i].GetVisMom() } ;
@@ -209,8 +209,7 @@ int ExEvent::i() const
 
 //--------------------------------------------------------------
 //Returns a reference to the full event
-
-std::vector<ExParticle>& ExEvent::FullEvent()
+ExEvent::ParticleLST& ExEvent::FullEvent()
 {
   return full_event ;
 }
@@ -248,8 +247,7 @@ bool ExEvent::HadronicDecay(ExParticle& p)
 
 //--------------------------------------------------------------
 // Returns the hadronically decaying taus.
-
-std::vector<ExParticle>& ExEvent::HadronicTaus()
+ExEvent::ParticleLST& ExEvent::HadronicTaus()
 {
   return had_taus ;
 }
@@ -262,7 +260,7 @@ Pythia8::Vec4 ExEvent::VisMom(ExParticle& p)
   if ( p.isFinal() ) return p.GetMom() ;
 
   Pythia8::Vec4           four_mom(0) ;
-  std::vector<ExParticle>  Temp_Parts ;
+  ParticleLST  Temp_Parts ;
   Temp_Parts.push_back(p) ;
 
 
@@ -294,10 +292,10 @@ Pythia8::Vec4 ExEvent::VisMom(ExParticle& p)
 // Overloading "()":
 // ev({11,-11}) returns a list of particles with id's 11 and -11.
 
-std::vector<ExParticle> ExEvent::operator() (std::vector<int> sel_id)
+ExEvent::ParticleLST ExEvent::operator() (std::vector<int> sel_id)
 {
 
-  std::vector<ExParticle> particle_set ;
+  ParticleLST particle_set ;
 
   for(size_t     i  = 0 ; i < full_event.size() ; ++i)
   {
@@ -350,28 +348,28 @@ std::vector<fastjet::PseudoJet>& ExEvent::GetPseudoJets()
 
 //--------------------------------------------------------------
 // Returns a reference to the lep_pseudo_jets stored in the event
-std::vector<ExParticle>& ExEvent::GetLeptonJets()
+ExEvent::ParticleLST& ExEvent::GetLeptonJets()
 {
   return lepton_jets ;
 }
 
 //--------------------------------------------------------------
 // Returns a reference to the leptons that passed all the cuts
-std::vector<ExParticle>& ExEvent::PassedLeptons()
+ExEvent::ParticleLST& ExEvent::PassedLeptons()
 {
   return isolated_leptons ;
 }
 
 //--------------------------------------------------------------
 // Updates the list of leptons that passed the cuts
-void ExEvent::UpdatePassedLepts(std::vector<ExParticle> input)
+void ExEvent::UpdatePassedLepts(ParticleLST input)
 {
   isolated_leptons = input ;
 }
 
 //--------------------------------------------------------------
 // Updating hadronic tau list for binning
-void ExEvent::UpdateHadTaus( std::vector<ExParticle> pass_cuts )
+void ExEvent::UpdateHadTaus( ParticleLST pass_cuts )
 {
   std::vector<int> tmp_rm_lst ;
 
@@ -451,7 +449,7 @@ void ExEvent::Print(std::string filename)
 //                    explicit instantiations
 //==============================================================
 // print_table
-template void ExEvent::PrintTable<ExParticle>(std::FILE * file, std::vector<ExParticle>) ;
+template void ExEvent::PrintTable<ExParticle>(std::FILE * file, ParticleLST) ;
 template void ExEvent::PrintTable<Pythia8::Particle>(std::FILE * file, std::vector<Pythia8::Particle>) ;
 
 //==============================================================

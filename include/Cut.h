@@ -21,6 +21,8 @@ class Cut
   //--------------------------------------------------------------
   public:
 
+    typedef std::vector<ExParticle> ParticleLST ;
+
     // Default constructor
     Cut() ;
 
@@ -33,7 +35,7 @@ class Cut
     //-------- Applying Cut ------------
     // Usual definition for when we want to modify the 
     // input particle list
-    void Apply(std::vector<ExParticle>&) ; 
+    void Apply(ParticleLST&) ; 
 
     // /* Overloaded definiton, if we want to save the 
     //   particles passing the cut in another list instead.
@@ -64,7 +66,7 @@ class Cut
     ExEvent* evPtr = NULL ;  
 
     // cut_cond checks cut and adds those not passing it to rm_list 
-    virtual void CutCond(std::vector<ExParticle>&) = 0 ;   
+    virtual void CutCond(ParticleLST&) = 0 ;   
     
     // inputing the cut options
     virtual void  Input(std::string) ;  
@@ -88,11 +90,11 @@ class Cut
     char  cut_report_char[100] ;  
     
     // Copy of input particles for reporting
-    std::vector<ExParticle>  in_parts_cpy ;  
+    ParticleLST  in_parts_cpy ;  
 
     // Copy of output particles for reporting
-    std::vector<ExParticle> out_parts_cpy ;   
-
+    ParticleLST out_parts_cpy ;   
+   
     virtual Cut* Clone() = 0 ;
 
 };

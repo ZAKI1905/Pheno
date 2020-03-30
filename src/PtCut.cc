@@ -56,7 +56,7 @@ void PtCut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void PtCut::CutCond(std::vector<ExParticle>& in_parlst)
+void PtCut::CutCond(ParticleLST& in_parlst)
 {
   PROFILE_SCOPE("PtCut::CutCond") ;
 
@@ -148,7 +148,7 @@ bool PtCut::operator()(const ExParticle& p1, const ExParticle& p2)
 
 //--------------------------------------------------------------
 // Sorts a list of particles based on the "func" comparison
-std::vector<ExParticle> PtCut::pT_Sorter(std::vector<ExParticle>& partlist)
+PtCut::ParticleLST PtCut::pT_Sorter(ParticleLST& partlist)
 { // Particle Sorter: Sorts a vector containing particle instances by their pT.
 
   std::sort(partlist.begin(), partlist.end(), *this ) ;

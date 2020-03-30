@@ -46,7 +46,7 @@ void M4Cut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void M4Cut::CutCond(std::vector<ExParticle>& in_parlst)
+void M4Cut::CutCond(ParticleLST& in_parlst)
 {
 
   PROFILE_SCOPE("M4Cut::CutCond") ;
@@ -138,7 +138,7 @@ void M4Cut::CutCond(std::vector<ExParticle>& in_parlst)
 
 //--------------------------------------------------------------
 // Sorts particles according to pT
-void M4Cut::pT_Sort(std::vector<ExParticle>& in_list)
+void M4Cut::pT_Sort(ParticleLST& in_list)
 {
   std::sort(in_list.begin(), in_list.end(),
             [](ExParticle& a, ExParticle& b) 

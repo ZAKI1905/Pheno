@@ -53,7 +53,7 @@ void PrapCut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void PrapCut::CutCond(std::vector<ExParticle>& in_parlst)
+void PrapCut::CutCond(ParticleLST& in_parlst)
 {
   PROFILE_SCOPE("PrapCut::CutCond") ;
 

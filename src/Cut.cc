@@ -159,7 +159,7 @@ void Cut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Applies the cut on in_parlst
-void Cut::Apply(std::vector<ExParticle>& in_parlst)
+void Cut::Apply(ParticleLST& in_parlst)
 {
 
   // Copying in_parlst for report()

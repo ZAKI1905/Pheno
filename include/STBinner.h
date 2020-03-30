@@ -12,6 +12,7 @@ class STBinner : public Binner
 
   //--------------------------------------------------------------
   public:
+    typedef std::vector<ExParticle> ParticleLST;
 
     // Constructor takes a reference to the event
     STBinner() ;
@@ -36,7 +37,7 @@ class STBinner : public Binner
     std::vector<std::vector<std::vector<double> > >(10, std::vector<std::vector<double> >(3, std::vector<double>(5)) ) ;
 
     // The set of charged leptons that passed the cuts
-    std::vector<ExParticle> charged_lept ;
+    ParticleLST charged_lept ;
 
     // The set of jets
     std::vector<fastjet::PseudoJet> jet_set ;

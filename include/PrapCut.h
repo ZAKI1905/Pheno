@@ -22,7 +22,7 @@ class PrapCut : public Cut
   private:
   
     // Virtual method from cut class
-    void CutCond(std::vector<ExParticle>&) override ;   
+    void CutCond(ParticleLST&) override ;   
     void Input(std::string) override ;  
     Cut* Clone() override; 
 

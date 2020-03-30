@@ -25,7 +25,7 @@ IdEff::IdEff(ExEvent* ev) : Cut(ev)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void IdEff::CutCond(std::vector<ExParticle>& in_parlst)
+void IdEff::CutCond(ParticleLST& in_parlst)
 /*
 ID_eff_check: Takes an event and checks if the detector missed an
  electron or muon.

@@ -185,7 +185,7 @@ void STBinner::OnOffZ()
       // OSSF condition
       if( charged_lept[i].id() == -charged_lept[j].id() )
       {
-        std::vector<ExParticle> tmp_lst = {charged_lept[i], charged_lept[j]} ;
+        ParticleLST tmp_lst = {charged_lept[i], charged_lept[j]} ;
         // if it's in the second bin
         if( 75 < invM(tmp_lst) 
            && invM(tmp_lst) < 105)

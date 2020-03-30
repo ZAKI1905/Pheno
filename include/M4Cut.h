@@ -22,7 +22,7 @@ class M4Cut : public Cut
   private:
 
     // Virtual method from cut class
-    void CutCond(std::vector<ExParticle>&) override;   
+    void CutCond(ParticleLST&) override;   
     void Input(std::string) override; 
     Cut* Clone() override; 
 
@@ -33,7 +33,7 @@ class M4Cut : public Cut
     float M4_cut_max = 10000 ;   
 
     // Sorts particles based on pT
-    void pT_Sort(std::vector<ExParticle>&) ;
+    void pT_Sort(ParticleLST&) ;
 };
 
 //==============================================================

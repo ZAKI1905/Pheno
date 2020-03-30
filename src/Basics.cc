@@ -100,7 +100,7 @@ int count( std::vector<ExParticle>& Vec, std::vector<int> id_list )
 // List as an argument
 template <class T>
 void add_elem(std::vector<T>& lst, T ele)
-// Add an int elements to a vector of ints, 
+// Add an element to a vector, 
 // only if it doesn't already exist.
 {
     if(!contains(lst, ele))  lst.push_back(ele) ;

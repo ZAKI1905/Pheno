@@ -33,7 +33,7 @@ Isolation::Isolation(ExEvent* ev) : Cut(ev)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void Isolation::CutCond(std::vector<ExParticle>& in_parlst)
+void Isolation::CutCond(ParticleLST& in_parlst)
 {
   PROFILE_SCOPE("Isolation::CutCond") ;
 
