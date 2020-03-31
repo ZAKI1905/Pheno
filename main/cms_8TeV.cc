@@ -7,7 +7,7 @@
     states with 0-4 leptons,” Phys. Rev. D94 (2016)
     no. 11, 112009, arXiv:1606.08076 [hep-ex].'
 
-  - Last Updated by Zaki on August 29, 2019
+  - Last Updated by Zaki on Mar 31, 2020
 */
 
 #include <iostream>
@@ -19,13 +19,18 @@
 #include <omp.h>
 
 #include "../include/Pheno.h"
-#include "../include/IdEff.h"
-#include "../include/Isolation.h"
+
+// Cut classes header files
+#include "../include/IdEffCut.h"
+#include "../include/IsolationCut.h"
 #include "../include/M2Cut.h"
 #include "../include/M4Cut.h"
 #include "../include/PtCut.h"
 #include "../include/PrapCut.h"
 #include "../include/OffZCut.h"
+
+// Binner classes header files
+#include "../include/STBinner.h"
 
 double ftest(std::vector<ExParticle>&);
 
@@ -136,32 +141,27 @@ int main(int argc,char *argv[])
   // phen.Input("record=invMass_0", ftest);
   
   // ID_Eff cut
-  IdEff id_eff;
-  phen.Input({&id_eff, "drop_low_eff=true"}) ;
+  phen.Input({new IdEffCut, "drop_low_eff=true"}) ;
 
   // Cut on M_l+l- 
-  M2Cut m2_cut;
-  phen.Input({&m2_cut, "M2_Cut_Value=12"}) ;
+  phen.Input({new M2Cut, "M2_Cut_Value=12"}) ;
 
   /*  p_T Cut Conditions:
         e & mu: pt>= 10 GeV  (at least 1 > 20 GeV)
         t_h: pt>= 20 GeV
   */
- PtCut pt_cut;
-  phen.Input({&pt_cut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
+  phen.Input({new PtCut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
 
   /*  prap Cut Conditions:
         e & mu: |eta| < 2.4
         t_h: |eta| < 2.3
   */
- PrapCut prap_cut;
-  phen.Input( {&prap_cut, "e=2.4, mu=2.4, had_tau=2.3"} ) ;
+  phen.Input({new PrapCut, "e=2.4, mu=2.4, had_tau=2.3"} ) ;
 
   phen.Input("record=test_after_Prap", ftest);
   
   // Isolation cut
-  Isolation iso_cut ; 
-  phen.Input(&iso_cut) ;
+  phen.Input(new IsolationCut) ;
 
   //-------------------------
   // fastjet options
@@ -174,7 +174,7 @@ int main(int argc,char *argv[])
   //------------------------------------------------------
 
   // Binning  
-  phen.Input( "Bin=STBinner:ST_Bins=0-300-600-1000-1500" ) ;
+  phen.Input({new STBinner, "ST_Bins=0-300-600-1000-1500"}) ;
 
   phen.Run() ;
 

@@ -2,7 +2,7 @@
 
   This file is for analysing the jets faking taus.
 
-  - Last Updated by Zaki on August 29, 2019
+  - Last Updated by Zaki on Mar 31, 2020
 */
 
 #include <iostream>
@@ -14,8 +14,10 @@
 #include <omp.h>
 
 #include "../include/Pheno.h"
-#include "../include/IdEff.h"
-#include "../include/Isolation.h"
+
+// Cut classes header files
+#include "../include/IdEffCut.h"
+#include "../include/IsolationCut.h"
 #include "../include/M2Cut.h"
 #include "../include/M4Cut.h"
 #include "../include/PtCut.h"
@@ -127,30 +129,25 @@ int main(int argc,char *argv[])
   // in included header files can be used.
 
   // ID_Eff cut
-  IdEff id_eff;
-  phen.Input( {&id_eff, "drop_low_eff=true"}) ;
+  phen.Input({new IdEffCut, "drop_low_eff=true"}) ;
 
   // Cut on M_l+l-
-  M2Cut m2_cut;
-  phen.Input({&m2_cut, "M2_Cut_Value=12"}) ;
+  phen.Input({new M2Cut, "M2_Cut_Value=12"}) ;
 
   /*  p_T Cut Conditions:
         e & mu: pt>= 7 GeV  (at least 1 > 20 GeV)
         t_h: pt>= 20 GeV
   */
-  PtCut pt_cut;
-  phen.Input( {&pt_cut, "lead=20, sub_lead=7, extra=7, had_tau=20"}) ;
+  phen.Input({new PtCut, "lead=20, sub_lead=7, extra=7, had_tau=20"}) ;
 
   /*  prap Cut Conditions:
         e & mu: |eta| < 2.4
         t_h: |eta| < 2.3
   */
-  PrapCut prap_cut;
-  phen.Input({&prap_cut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
+  phen.Input({new PrapCut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
 
   // Isolation cut
-  Isolation iso;
-  phen.Input(&iso) ;
+  phen.Input(new IsolationCut) ;
 
   //-------------------------
   // fastjet options
@@ -163,8 +160,7 @@ int main(int argc,char *argv[])
   //-------------------------
 
   // Demanding  m(l+l-) <= 75 GeV or 105 GeV <= m(l+l-)
-  OffZCut offzcut;
-  phen.Input({&offzcut, "OffZ_Cut_Min=75, OffZ_Cut_Max=105"}) ;
+  phen.Input({new OffZCut, "OffZ_Cut_Min=75, OffZ_Cut_Max=105"}) ;
 
   // -------------------------------------------------------------------------
 

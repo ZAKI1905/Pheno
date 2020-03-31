@@ -18,13 +18,16 @@ class PrapCut : public Cut
     // Constructor takes a pointer to the event
     PrapCut(ExEvent*) ;
     
+    // Copy Constructor
+    PrapCut(const PrapCut&) ;
+
   //--------------------------------------------------------------
   private:
   
     // Virtual method from cut class
     void CutCond(ParticleLST&) override ;   
     void Input(std::string) override ;  
-    Cut* Clone() override; 
+    std::shared_ptr<Cut> Clone() override; 
 
     // Pseudorapidity cut values
     double e_prap_cut   = 1000 ;

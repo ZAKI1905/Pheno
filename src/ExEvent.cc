@@ -71,7 +71,8 @@ void ExEvent::SetEventPtr(ExParticle& pt)
 
 //--------------------------------------------------------------
 // Member function to set the Cut pointer.
-void ExEvent::AddCutPtr(std::shared_ptr<Cut>cutPtrIn) 
+void ExEvent::AddCutPtr(std::shared_ptr<Cut>cutPtrIn)
+// void ExEvent::AddCutPtr(Cut* cutPtrIn) 
 { 
   cut_ptr.push_back(cutPtrIn) ;
 }

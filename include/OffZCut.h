@@ -18,13 +18,16 @@ class OffZCut : public Cut
     // Constructor takes a pointer to the event
     OffZCut(ExEvent*) ;
 
+    // Copy Constructor
+    OffZCut(const OffZCut&) ;
+
   //--------------------------------------------------------------
   private:
 
     // Virtual method from cut class
     void CutCond(ParticleLST&) override;   
     void Input(std::string) override; 
-    Cut* Clone() override; 
+    std::shared_ptr<Cut> Clone() override; 
 
     // The minimum of OffZ cut
     float OffZ_cut_min = 75 ;   

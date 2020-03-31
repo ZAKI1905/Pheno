@@ -27,6 +27,14 @@ M2Cut::M2Cut(ExEvent* ev) : Cut(ev)
 }
 
 //--------------------------------------------------------------
+// Copy Constructor
+M2Cut::M2Cut(const M2Cut& old_obj)
+  : M2_Cut_Value(old_obj.M2_Cut_Value)
+{
+  name = old_obj.name ;
+}
+
+//--------------------------------------------------------------
 // Overriding the input method from base class "cut".
 void M2Cut::Input(std::string property)
 {
@@ -96,9 +104,9 @@ void M2Cut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-Cut* M2Cut::Clone() 
+std::shared_ptr<Cut> M2Cut::Clone() 
 {
-  return new M2Cut(*this) ;
+  return std::shared_ptr<M2Cut>(new M2Cut(*this)) ;
 }
 
 //==============================================================

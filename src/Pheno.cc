@@ -24,18 +24,34 @@
 
 //--------------------------------------------------------------
 // Constructor
-Pheno::Pheno(){ start_time = omp_get_wtime() ; logger.SetUnit("Pheno"); }
-
-// Destructor
-Pheno::~Pheno()
+Pheno::Pheno()
 {
-  printf("\nNumber of threads used: %2d, Processing Time:  %.2f s.\n",
-   threads, omp_get_wtime()-start_time) ;
+  start_time = omp_get_wtime() ; 
+  logger.SetUnit("Pheno"); 
+  
+  auto t_1 = std::chrono::system_clock::now();
+  std::time_t start_t = std::chrono::system_clock::to_time_t(t_1);
+  char tmp[150];
+  std::strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", std::gmtime(&start_t)) ;
+
+  input_list.push_back("#------------------------------------------------------------------");
+  input_list.push_back("#               Input Command List (" + std::string(tmp) + ")");
+  input_list.push_back("#------------------------------------------------------------------");
 
 }
 
 //--------------------------------------------------------------
+// Destructor
+Pheno::~Pheno()
+{
+  char tmp[100];
+  sprintf(tmp, "Number of threads used: %2d,  Processing Time:  %.2f s.",
+          threads, omp_get_wtime()-start_time) ;
+  LOG_INFO(tmp) ;
 
+}
+
+//--------------------------------------------------------------
 void Pheno::Input(std::string command, bool strip_space)
 /*
   Input method that initializes the Pheno class:
@@ -142,12 +158,12 @@ void Pheno::Input(std::string command, bool strip_space)
 
 
 
-  if(prop == "Bin")
-  {
-    std::vector<std::string> tmp_bin_lst = {pars(inp[1], ":")[0]} ;
-    stolst( tmp_bin_lst, pars(inp[1], ":")[1] ) ;
-    bin_list.push_back(tmp_bin_lst) ;
-  }
+  // if(prop == "Bin")
+  // {
+  //   std::vector<std::string> tmp_bin_lst = {pars(inp[1], ":")[0]} ;
+  //   stolst( tmp_bin_lst, pars(inp[1], ":")[1] ) ;
+  //   bin_list.push_back(tmp_bin_lst) ;
+  // }
 
   if( prop == "Events") { tot_num_events = std::stoi(inp[1]) ; }
 
@@ -304,7 +320,7 @@ void Pheno::StateDict( std::vector<std::string> lst_in)
       tmp_lst.push_back({ID_TAU}) ;
 
   else
-    printf("\n No matching definition for %s.", name_str[0].c_str()) ;
+    LOG_ERROR(("No matching definition for '" + name_str[0] + "' !").c_str()) ;
 
   req_states.push_back(tmp_lst) ;
   }
@@ -321,9 +337,9 @@ void Pheno::Run()
   num_cuts_passed.resize(tot_num_events) ;
   
   // Initializing the binner classes
-  InitBinner() ;
+  // InitBinner() ;
 
-  #pragma omp parallel for firstprivate(show_pythia_banner, cut_list, report_cuts_flag, report_taus_flag, report_jets_flag, print_ev_set, file_LHE, pythia_commands, fastjet_commands) shared(binner_ptr_lst)
+  #pragma omp parallel for firstprivate(show_pythia_banner, cut_list, report_cuts_flag, report_taus_flag, report_jets_flag, print_ev_set, file_LHE, pythia_commands, fastjet_commands) shared(bin_list)
   for (int j=0 ; j<req_threads ; ++j)
   {
     // Asking one of the threads to save the available threads
@@ -514,7 +530,7 @@ bool Pheno::break_ev_loop(ParticleLST& prt_lst)
 //-------------------------------------------------------
 // Cuts
 int Pheno::RunCuts(ExEvent& ev, ParticleLST& part_lst,
- std::vector<CutOptions> cut_list, char* shared_file_char)
+ std::vector<CutOptions> cut_lst, char* shared_file_char)
 {
   PROFILE_SCOPE("Run Cuts") ;
 
@@ -536,18 +552,20 @@ int Pheno::RunCuts(ExEvent& ev, ParticleLST& part_lst,
   // Recording var's before any cuts
   Record(-1, part_lst) ;
 
-  for( size_t i=0 ; i<cut_list.size() ; ++i)
+  for( size_t i=0 ; i<cut_lst.size() ; ++i)
   {
     // the cut name:
-    // cut_name = cut_list[i][0] ;
-    cut_rep_title += cut_list[i].cut->GetName() ;
+    // cut_name = cut_lst[i][0] ;
+    cut_rep_title += cut_lst[i].cutPtr->GetName() ;
 
     // std::shared_ptr<Cut> c1 = CutDict(&ev, cut_name) ;
-    cut_list[i].cut->SetEventPtr(&ev) ;
-    std::shared_ptr<Cut> c1(cut_list[i].cut->Clone()) ;
+    cut_lst[i].cutPtr->SetEventPtr(&ev) ;
+    // std::shared_ptr<Cut> c1(cut_lst[i].cut->Clone()) ;
+    // std::shared_ptr<Cut> c1(cut_lst[i].cut) ;
+
 
     // Checking if c1 is NULL pointer
-    if ( !c1 )
+    if ( !cut_lst[i].cutPtr )
     {
       if ( ev.i() == 1 )
         std::cerr<<"\n\n WARNING: Invalid cut input ignored! \n"<<std::flush ;
@@ -557,22 +575,22 @@ int Pheno::RunCuts(ExEvent& ev, ParticleLST& part_lst,
     }
 
     // Saving the pointer to current cut to the event
-    ev.AddCutPtr(c1) ;
+    ev.AddCutPtr(cut_lst[i].cutPtr) ;
 
     // Saving the name of the cut in the cut instance
     // c1->Cut::Input("Name:"+cut_name) ;
 
     bool cut_report_bool = ( report_cuts_flag || contains( report_cuts_set, ev.i() ) ) ;
-    if(cut_report_bool) c1->Cut::Input(cut_rep_title+ ":" + cut_file_str) ;
+    if(cut_report_bool) cut_lst[i].cutPtr->Cut::Input(cut_rep_title+ ":" + cut_file_str) ;
 
     // // Read the input for each cut
-    // for( size_t j=1 ; j<cut_list[i].size() ; ++j)
+    // for( size_t j=1 ; j<cut_lst[i].size() ; ++j)
     // {
-    //   c1->Input(cut_list[i][j]) ;
+    //   c1->Input(cut_lst[i][j]) ;
     // }
 
     // Applying cuts
-    c1->Apply(part_lst) ;
+    cut_lst[i].cutPtr->Apply(part_lst) ;
 
     cut_rep_title += " > " ;
 
@@ -675,37 +693,37 @@ void Pheno::Record(size_t cut_idx, ParticleLST& part_lst)
 
 //-------------------------------------------------------
 // Binner dictionary
-std::shared_ptr<Binner> Pheno::bin_dict(std::string input)
-{
-  std::shared_ptr<Binner> pBinner ;
+// std::shared_ptr<Binner> Pheno::bin_dict(std::string input)
+// {
+//   std::shared_ptr<Binner> pBinner ;
 
-    if (input == "STBinner"  ) { pBinner.reset( new STBinner() ) ; }
+//     if (input == "STBinner"  ) { pBinner.reset( new STBinner() ) ; }
 
-  return pBinner ;
+//   return pBinner ;
 
-}
+// }
 
 //-------------------------------------------------------
 // Initializing the binner classes
-void Pheno::InitBinner()
-{
+// void Pheno::InitBinner()
+// {
 
-  for( size_t i=0 ; i<bin_list.size() ; ++i)
-  {
-    // the binner name:
-    std::string binner_name = bin_list[i][0] ;
+//   for( size_t i=0 ; i<bin_list.size() ; ++i)
+//   {
+//     // the binner name:
+//     std::string binner_name = bin_list[i][0] ;
 
-    std::shared_ptr<Binner> bi = bin_dict(binner_name) ;
+//     std::shared_ptr<Binner> bi = bin_dict(binner_name) ;
 
-    // Read the input for each binner
-    for( size_t j=1 ; j<bin_list[i].size() ; ++j)
-    {
-      bi->Input(bin_list[i][j]) ;
-    }
+//     // Read the input for each binner
+//     for( size_t j=1 ; j<bin_list[i].size() ; ++j)
+//     {
+//       bi->Input(bin_list[i][j]) ;
+//     }
 
-    binner_ptr_lst.push_back(bi) ;
-  }
-}
+//     binner_ptr_lst.push_back(bi) ;
+//   }
+// }
 
 //-------------------------------------------------------
 // Binning the event
@@ -720,10 +738,10 @@ void Pheno::BinEvents(ExEvent& ev, char* shared_file_char)
   bool cut_report_bool = ( report_cuts_flag || contains( report_cuts_set, ev.i() ) ) ;
 
  // Read the input for each binner
-  for( size_t i=0 ; i<binner_ptr_lst.size() ; ++i)
+  for( size_t i=0 ; i<bin_list.size() ; ++i)
   {
-    binner_ptr_lst[i]->Input(ev) ;
-    binner_ptr_lst[i]->BinIt(cut_report_bool, cut_file_str) ;
+    bin_list[i].binnerPtr->Input(ev) ;
+    bin_list[i].binnerPtr->BinIt(cut_report_bool, cut_file_str) ;
   }
 
   num_ev_passed += ev.Weight() ;
@@ -767,13 +785,17 @@ void Pheno::FinalReport()
   }
   // .....................................
 
+  if(rep_num_cut_flag)
+    saveVec(num_cuts_passed, "_rec_Num_Cuts_" + file_LHE);
 
-  saveVec(num_cuts_passed, "_rec_Num_Cuts_" + file_LHE);
-  saveVec(input_list,  "_main_inputs_" + file_LHE);
+
+  input_list.push_back("#------------------------------------------------------------------");
+  if(rep_input_commands_flag)
+    saveVec(input_list,  "_main_inputs_" + file_LHE);
 
   // Output for each binner
-  for( size_t i=0 ; i<binner_ptr_lst.size() ; ++i)
-   { binner_ptr_lst[i]->Report(file_LHE) ; }
+  for( size_t i=0 ; i<bin_list.size() ; ++i)
+   { bin_list[i].binnerPtr->Report(file_LHE) ; }
 }
 
 //-------------------------------------------------------
@@ -794,7 +816,16 @@ void Pheno::Input(CutOptions in_options)
   rec_double.vars.push_back({}) ;
   rec_vec_double.vars.push_back({}) ;
   //......................................................
+}
 
+//-------------------------------------------------------
+// Adding user defined binners
+void Pheno::Input(BinnerOptions in_options) 
+{
+  // Saving the command in a list
+  input_list.push_back(in_options.GetStrForm()) ;
+
+  bin_list.push_back(in_options) ;
 }
 
 //==============================================================

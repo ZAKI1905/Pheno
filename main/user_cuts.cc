@@ -14,24 +14,60 @@
 #include <omp.h>
 
 #include "../include/Pheno.h"
-#include "../include/IdEff.h"
-#include "../include/Isolation.h"
+
+// Cut classes header files
+#include "../include/IdEffCut.h"
+#include "../include/IsolationCut.h"
 #include "../include/M2Cut.h"
 #include "../include/M4Cut.h"
 #include "../include/PtCut.h"
 #include "../include/PrapCut.h"
 #include "../include/OffZCut.h"
 
-double ftest(std::vector<ExParticle>&);
+// Binner classes header files
+#include "../include/STBinner.h"
 
+double ftest(std::vector<ExParticle>&);
 //==============================================================
+// .............................................................
+//                          CUTS
+// .............................................................
+//  Defining Cuts:
 // User defined cut sub-classes should contain two overriden
 // methods from the Cut class, namely:
 // 'CutCond' & 'Clone'
+// ..............................
+//       * IMPORTANT *
+//  The objects MUST be heap allocated (use 'new'), 
+//   & they SHOULD'NT be deleted by user (don't write 'delete')
+// ..............................
+// Options: 
 // It can optionally have 'Input(std::string)' method
 // with this method, the options can be input
 // directly into Pheno object, as a string and
 // separated by commas.
+// .............................................................
+//                          BINNERS
+// .............................................................
+//  Defining Binners:
+// Binner class similarly needs:
+
+//    For inputting event:
+// (1) 'void Input(ExEvent&)'
+//
+//    For inputting properties:
+// (2) 'void Input(std::string)'
+//
+//    For deep-copying the object
+// (3) 'std::shared_ptr<Binner> Clone()'
+//
+//    For binning the event, & adding to cut report if "true"
+// (4) 'void BinIt(bool cut_report, std::string)'
+//
+//    For reporting the binning results
+// (5) 'void Report(std::string) const'
+// .............................................................
+
 class MyCut : public Cut
 {
 
@@ -50,9 +86,9 @@ class MyCut : public Cut
 
     } 
 
-    Cut* Clone() override
+    std::shared_ptr<Cut> Clone() override
     {
-      return new MyCut(*this);
+      return std::shared_ptr<MyCut>(new MyCut(*this));
     }
 
 };
@@ -170,51 +206,52 @@ int main(int argc,char *argv[])
   // the cut prior to it. The functions defined here or
   // in included header files can be used.
   // phen.Input("record=invMass_0", ftest);
-  
+
   // ID_Eff cut
-  // phen.Input( "cuts=ID_Eff:drop_low_eff=true" ) ;
-  IdEff id_eff ;
-  phen.Input({&id_eff, "drop_low_eff=true"}) ;
+  // IdEffCut* id_eff = new IdEffCut  ;
+  phen.Input({new IdEffCut, "drop_low_eff=true"}) ;
 
-  M2Cut m2_cut ;
   // Cut on M_l+l- 
-  phen.Input({&m2_cut ,"M2_Cut_Value=12"}) ;
+  // M2Cut* m2_cut = new M2Cut ;
+  phen.Input({new M2Cut ,"M2_Cut_Value=12"}) ;
 
-  /*  p_T Cut Conditions:
-        e & mu: pt>= 10 GeV  (at least 1 > 20 GeV)
-        t_h: pt>= 20 GeV
-  */
-  PtCut pt_cut ;
-  phen.Input({&pt_cut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
+  // /*  p_T Cut Conditions:
+  //       e & mu: pt>= 10 GeV  (at least 1 > 20 GeV)
+  //       t_h: pt>= 20 GeV
+  // */
+  // PtCut* pt_cut = new PtCut ;
+  phen.Input({new PtCut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
 
-  /*  prap Cut Conditions:
-        e & mu: |eta| < 2.4
-        t_h: |eta| < 2.3
-  */
-  PrapCut prap_cut;
-  phen.Input({&prap_cut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
+  // /*  prap Cut Conditions:
+  //       e & mu: |eta| < 2.4
+  //       t_h: |eta| < 2.3
+  // */
+  // PrapCut* prap_cut = new PrapCut;
+  phen.Input({new PrapCut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
 
   // phen.Input("record=test_after_Prap", ftest);
   
-  MyCut my_cut ;
-  phen.Input(&my_cut) ;
+  // MyCut* my_cut = new  MyCut;
+  phen.Input(new  MyCut) ;
 
   // Isolation cut
-  Isolation iso_cut ; 
-  phen.Input(&iso_cut) ;
+  // IsolationCut* iso_cut = new  IsolationCut; 
+  phen.Input(new  IsolationCut) ;
 
   //-------------------------
   // fastjet options
-  phen.Input("fastjet=Def:Algorithm=antikt_algorithm, R=0.5") ;
-  phen.Input("fastjet=Selector:EtaMax=2.5") ;
-  phen.Input("fastjet=Selector:PtMin=30") ;
+  // phen.Input("fastjet=Def:Algorithm=antikt_algorithm, R=0.5") ;
+  // phen.Input("fastjet=Selector:EtaMax=2.5") ;
+  // phen.Input("fastjet=Selector:PtMin=30") ;
 
   // running fastjet
-  phen.Input("fastjet=run") ;
+  // phen.Input("fastjet=run") ;
   //------------------------------------------------------
 
   // Binning  
-  phen.Input( "Bin=STBinner:ST_Bins=0-300-600-1000-1500" ) ;
+  // phen.Input( "Bin=STBinner:ST_Bins=0-300-600-1000-1500" ) ;
+  phen.Input({new STBinner, "ST_Bins=0-300-600-1000-1500"}) ;
+
 
   phen.Run() ;
 }

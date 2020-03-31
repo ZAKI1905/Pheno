@@ -40,6 +40,7 @@ MAIN_DIR	:= main
 OBJ_DIR		:= obj
 BIN_DIR		:= bin
 INC_DIR		:= include
+BACKUP_DIR	:= ../Backup
 
 # Flags, Libraries and Includes
 DEP_INC		:= -Idependencies/include 
@@ -98,6 +99,35 @@ mk_lib_dirs:
 	@echo "Creating directories..."
 	@mkdir -p $(OBJ_DIR)
 	@mkdir -p $(OUT_LIB_DIR)
+
+# .......................................................................
+
+backup:	
+	@echo "Backing up..."
+	@mkdir -p $(BACKUP_DIR)/$(BACK_SUB_DIR)
+	@cp -r $(SRC_DIR) $(BACKUP_DIR)/$(BACK_SUB_DIR)
+	@cp -r $(INC_DIR) $(BACKUP_DIR)/$(BACK_SUB_DIR)
+	@cp Makefile $(BACKUP_DIR)/$(BACK_SUB_DIR)
+	@cp -r $(MAIN_DIR) $(BACKUP_DIR)/$(BACK_SUB_DIR)
+	# @zip -r $(BACKUP_DIR)/$(BACK_SUB_DIR).zip $(BACKUP_DIR)/$(BACK_SUB_DIR)
+	# @$(RM) -rf $(BACKUP_DIR)/$(BACK_SUB_DIR)
+	@echo "Backed up in:" $(BACKUP_DIR)/$(BACK_SUB_DIR)
+
+# .......................................................................
+
+help:
+	@echo "\n * -------------------------------------------------------- * "
+	@echo "		***  Welcome to Pheno!		*** "
+	@echo " * -------------------------------------------------------- * "
+	@echo "  Available Commands: \n"
+	@echo "  - Use 'make help' to show this message."
+	@echo "  - Use 'make' to compile the main cc target."
+	@echo "  - Use 'make genlib' to generate a static library."
+	@echo "  - Use 'make BACK_SUB_DIR=XXX backup' to back up the code,\n    inside '../Backup/XXX'."
+	@echo "  - Use 'make clean' to clean the objects."
+	@echo "  - Use 'make cleaner' to clean the objects & the binaries."
+	@echo " * -------------------------------------------------------- * \n"
+
 
 # .......................................................................
 

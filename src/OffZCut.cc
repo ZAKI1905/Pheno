@@ -25,6 +25,14 @@ OffZCut::OffZCut(ExEvent* ev) : Cut(ev)
 }
 
 //--------------------------------------------------------------
+// Copy Constructor
+OffZCut::OffZCut(const OffZCut& old_obj)
+  : OffZ_cut_min(old_obj.OffZ_cut_min), OffZ_cut_max(old_obj.OffZ_cut_max)
+{
+  name = old_obj.name ;
+}
+
+//--------------------------------------------------------------
 // Overriding the input method from base class "cut".
 void OffZCut::Input(std::string property)
 {
@@ -98,9 +106,9 @@ void OffZCut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-Cut* OffZCut::Clone() 
+std::shared_ptr<Cut> OffZCut::Clone() 
 {
-  return new OffZCut(*this) ;
+  return std::shared_ptr<OffZCut>(new OffZCut(*this)) ;
 }
 
 //==============================================================

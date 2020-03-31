@@ -6,17 +6,18 @@
 #include "Binner.h"
 
 //==============================================================
-// Cut options includes a cut and its options
-struct CutOptions
+// Binner options includes a binner and its options
+struct BinnerOptions
 {
-  Cut* cut ;
+  std::shared_ptr<Binner> binnerPtr ;
   std::vector<std::string> options ;
 
   //--------------------------------------------------------------
   // Constructor
-  CutOptions(Cut* in_cut, std::string command="")
+  BinnerOptions(Binner* in_cut, std::string command="")
   {
-    cut = in_cut ;
+    // binnerPtr = in_cut->Clone() ;
+    binnerPtr.reset(in_cut) ;
 
     // stripping spaces from command
     command = strip(command, ' ') ;
@@ -27,11 +28,26 @@ struct CutOptions
   }
 
   //--------------------------------------------------------------
+  // Copy Constructor
+  BinnerOptions(const BinnerOptions& old_obj)
+  {
+    binnerPtr = old_obj.binnerPtr->Clone() ;
+
+    options = old_obj.options ;
+  }
+
+  ~BinnerOptions(){}
+  //--------------------------------------------------------------
   // Getting the string form
   std::string GetStrForm()
   {
-    std::string out_str = "Cut Name: '" + cut->GetName() 
-                          + "' \nOptions: " ;
+    std::string out_str = "Binner Name: '" + binnerPtr->GetName() + "'";
+
+    if (options[0] == "" )
+      return out_str ;
+
+    out_str += "\n - Options: " ;
+
     for(size_t i=0 ; i< options.size(); i++)
     {
       out_str += options[i] ;
@@ -52,7 +68,78 @@ struct CutOptions
   {
     for( size_t i=0 ; i<options.size() ; ++i)
     {
-      cut->Input(options[i]) ;
+      binnerPtr->Input(options[i]) ;
+    }
+  }
+  //--------------------------------------------------------------
+
+};
+
+//==============================================================
+// Cut options includes a cut and its options
+struct CutOptions
+{
+  std::shared_ptr<Cut> cutPtr ;
+  // Cut* cut ;
+  std::vector<std::string> options ;
+
+  //--------------------------------------------------------------
+  // Constructor
+  CutOptions(Cut* in_cut, std::string command="")
+  {
+    cutPtr.reset(in_cut) ;
+
+    // stripping spaces from command
+    command = strip(command, ' ') ;
+
+    stolst( options, command )  ;
+
+    InputOptions() ;
+  }
+
+  //--------------------------------------------------------------
+  // Copy Constructor
+  CutOptions(const CutOptions& old_obj)
+  {
+    cutPtr = old_obj.cutPtr->Clone() ;
+
+    options = old_obj.options ;
+  }
+
+  ~CutOptions() {}
+  //--------------------------------------------------------------
+  // Getting the string form
+  std::string GetStrForm()
+  {
+    std::string out_str = "Cut Name: '" + cutPtr->GetName() + "'";
+
+    // if (options.size() == 0 )
+    if (options[0] == "" )
+      return out_str ;
+
+    out_str += "\n - Options: " ;
+
+    for(size_t i=0 ; i< options.size(); i++)
+    {
+      out_str += options[i] ;
+
+      // if its the last element 
+      // no need for an extra comma
+      if ( i == options.size()-1)
+        break;
+      
+      out_str += ", " ; 
+    }
+    return out_str ;
+  }
+
+  //--------------------------------------------------------------
+  // Set the input for each cut
+  void InputOptions()
+  {
+    for( size_t i=0 ; i<options.size() ; ++i)
+    {
+      cutPtr->Input(options[i]) ;
     }
   }
   //--------------------------------------------------------------
@@ -75,9 +162,11 @@ class Pheno
   // Destructor
   ~Pheno() ;
 
-  // Adding user defined cuts (bool is for stripping the spaces)
-  // void Input(Cut*, std::string="", bool=true) ;
+  // Adding user defined cuts
   void Input(CutOptions) ;
+
+  // Adding binner classes & their options
+  void Input(BinnerOptions) ;
 
   // Inputing the parameters (bool is for stripping the spaces)
   void Input(std::string, bool=true) ;
@@ -182,6 +271,8 @@ class Pheno
 
     //---------------------------------------------
     // Report options:
+    bool rep_num_cut_flag = false  ;
+    bool rep_input_commands_flag = false ;
     bool report_cuts_flag  = false ;
     // Special set of events for reporting cuts
     std::vector<int> report_cuts_set = {} ;  
@@ -220,19 +311,20 @@ class Pheno
     size_t gen_jet_idx = 50; 
 
     // Initializes the binner instances with the given options
-    void InitBinner() ;
+    // void InitBinner() ;
 
     // bins the event
     void BinEvents(ExEvent& ev, char*);
 
     // Lis of binning classes and their options
-    std::vector<std::vector<std::string> > bin_list ;
+    // std::vector<std::vector<std::string> > bin_list ;
+    std::vector<BinnerOptions> bin_list ;
 
     // Binner dictionary
-    std::shared_ptr<Binner> bin_dict(std::string) ;
+    // std::shared_ptr<Binner> bin_dict(std::string) ;
 
     // A list of binner pointers
-    std::vector<std::shared_ptr<Binner> > binner_ptr_lst ;
+    // std::vector<std::shared_ptr<Binner> > binner_ptr_lst ;
 
     // The bin set
     // std::vector<std::vector<std::vector<double> > > bin_set = std::vector<std::vector<std::vector<double> > >(10, std::vector<std::vector<double> >(3, std::vector<double>(5)) ) ;

@@ -18,6 +18,10 @@ class Cut
   //--------------------------------------------------------------
   protected:
     Logger logger ;
+    
+    // // Protected Constructor for use in derived
+    // // copy constructors
+    // Cut(std::string name) ;
   //--------------------------------------------------------------
   public:
 
@@ -28,6 +32,9 @@ class Cut
 
     // Constructor takes a pointer to an event
     Cut(ExEvent*) ;
+
+    // // Copy Constructor
+    // Cut(const Cut&) ;
 
     // Virtual destructor
     virtual ~Cut() ;
@@ -50,35 +57,48 @@ class Cut
 
   protected:
 
+    //.......................
+    // Setters
+    //.......................
     // Setting the cut label
     void SetName(const char*) ;
-
-    // Cut label
-    std::string name = "unnamed_cut" ;
 
     // Setting pointer to an event
     void SetEventPtr(ExEvent*) ;
 
+    // inputing the cut options
+    virtual void Input(std::string) ;  
+
+    //.......................
+    // Getters
+    //.......................
     // Getting pointer to an event
     ExEvent* GetEventPtr() const ;
 
-    // Pointer to the event
-    ExEvent* evPtr = NULL ;  
+    virtual std::shared_ptr<Cut> Clone() = 0 ;
 
-    // cut_cond checks cut and adds those not passing it to rm_list 
-    virtual void CutCond(ParticleLST&) = 0 ;   
-    
-    // inputing the cut options
-    virtual void  Input(std::string) ;  
-
+    //.......................
     // Saves cut details in a .txt file
     void Report() const ;    
+    // cut_cond checks cut and adds those not passing it to rm_list 
+    virtual void CutCond(ParticleLST&) = 0 ;   
+    //.......................
+
+
+    //.......................
+    //  Protected Vars
+    //.......................
+    // Cut label
+    std::string name = "unnamed_cut" ;
+
+    // Pointer to the event
+    ExEvent* evPtr = NULL ;  
 
     // The removal list
     std::vector<int> rm_list ;  
 
     // Report cut or not
-    bool  report_cut = false ;  
+    bool report_cut = false ;  
 
     // The title used to identify various cuts
     std::string report_title = "cut" ;  
@@ -94,9 +114,6 @@ class Cut
 
     // Copy of output particles for reporting
     ParticleLST out_parts_cpy ;   
-   
-    virtual Cut* Clone() = 0 ;
-
 };
 
 //=============================================================

@@ -11,7 +11,24 @@
 //==============================================================
 
 // Constructor
-STBinner::STBinner() {}
+STBinner::STBinner() 
+{ 
+  logger.SetUnit("STBinner");
+  SetName("STBinner") ; 
+}
+
+//--------------------------------------------------------------
+// Copy Constructor
+STBinner::STBinner(const STBinner& old_obj)
+  : st_limit(old_obj.st_limit)
+{
+  // Explicitly writing this to show 
+  // why cpy constructor is needed:
+  evp = NULL ;
+  
+  name = old_obj.name ;
+}
+
 //--------------------------------------------------------------
 // Adding the event
 void STBinner::Input(ExEvent& evIn)
@@ -368,6 +385,13 @@ void STBinner::Report(std::string File_LHE) const
     fclose(FINAL_REPORT) ;
 }
 
-//--------------------------------------------------------------------------
+//--------------------------------------------------------------
+// Overriding the clone method
+std::shared_ptr<Binner> STBinner::Clone() 
+{
+  return std::shared_ptr<STBinner>(new STBinner(*this)) ;
+}
+
+//---------------------------------------------------------------
 
 //==============================================================

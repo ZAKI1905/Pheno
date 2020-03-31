@@ -25,6 +25,16 @@ PrapCut::PrapCut(ExEvent* ev) : Cut(ev)
 }
 
 //--------------------------------------------------------------
+// Copy Constructor
+PrapCut::PrapCut(const PrapCut& old_obj)
+  : e_prap_cut(old_obj.e_prap_cut), 
+    mu_prap_cut(old_obj.mu_prap_cut),
+    tau_prap_cut(old_obj.tau_prap_cut)
+{
+  name = old_obj.name ;
+}
+
+//--------------------------------------------------------------
 // Overriding the input method from base class "cut".
 void PrapCut::Input(std::string property)
 {
@@ -88,9 +98,9 @@ void PrapCut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-Cut* PrapCut::Clone() 
+std::shared_ptr<Cut> PrapCut::Clone() 
 {
-  return new PrapCut(*this) ;
+  return std::shared_ptr<PrapCut>(new PrapCut(*this)) ;
 }
 
 //==============================================================

@@ -25,6 +25,17 @@ PtCut::PtCut(ExEvent* ev) : Cut(ev)
 }
 
 //--------------------------------------------------------------
+// Copy Constructor
+PtCut::PtCut(const PtCut& old_obj)
+  : leading_pT_cut(old_obj.leading_pT_cut), 
+    sub_leading_pT_cut(old_obj.sub_leading_pT_cut),
+    extra_pT_cut(old_obj.extra_pT_cut),
+    had_tau_pT_cut(old_obj.had_tau_pT_cut)
+{
+  name = old_obj.name ;
+}
+
+//--------------------------------------------------------------
 // Overriding the input method from base class "cut".
 void PtCut::Input(std::string property)
 {
@@ -185,9 +196,9 @@ float PtCut::pT_CutVal(size_t rank, ExParticle& p)
 }
 //--------------------------------------------------------------
 // Overriding the clone method
-Cut* PtCut::Clone() 
+std::shared_ptr<Cut> PtCut::Clone() 
 {
-  return new PtCut(*this) ;
+  return std::shared_ptr<PtCut>(new PtCut(*this)) ;
 }
 
 //==============================================================

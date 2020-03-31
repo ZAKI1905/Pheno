@@ -18,13 +18,16 @@ class M2Cut : public Cut
     // Constructor takes a pointer to the event
     M2Cut(ExEvent*) ;
    
+    // Copy Constructor
+    M2Cut(const M2Cut&) ;
+
   //--------------------------------------------------------------
   private:
 
     // Virtual method from cut class
     void CutCond(ParticleLST&) override ;   
     void Input(std::string) override ; 
-    Cut* Clone() override; 
+    std::shared_ptr<Cut> Clone() override; 
     
     // The cut on m2
     float M2_Cut_Value = 0 ;   

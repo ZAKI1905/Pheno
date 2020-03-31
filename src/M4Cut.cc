@@ -25,6 +25,14 @@ M4Cut::M4Cut(ExEvent* ev) : Cut(ev)
 }
 
 //--------------------------------------------------------------
+// Copy Constructor
+M4Cut::M4Cut(const M4Cut& old_obj)
+  : M4_cut_min(old_obj.M4_cut_min), M4_cut_max(old_obj.M4_cut_max)
+{
+  name = old_obj.name ;
+}
+
+//--------------------------------------------------------------
 // Overriding the input method from base class "cut".
 void M4Cut::Input(std::string property)
 {
@@ -147,9 +155,9 @@ void M4Cut::pT_Sort(ParticleLST& in_list)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-Cut* M4Cut::Clone() 
+std::shared_ptr<Cut> M4Cut::Clone() 
 {
-  return new M4Cut(*this) ;
+  return std::shared_ptr<M4Cut>(new M4Cut(*this)) ;
 }
 
 //==============================================================

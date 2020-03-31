@@ -39,26 +39,28 @@ class ExEvent
     // Copy constructor
     ExEvent(const ExEvent& ) ;
 
+
+    //.......................
+    // Setters
+    //.......................
     // Sets the ExEvent pointer for Exparticle
     void  SetEventPtr(ExParticle &) ;
 
+
+    //.......................
+    // Getters
+    //.......................
     // Returns the event weight
     double Weight() ;
-
-    // Finds the hadronic taus saves into filename
-    void  FindHadTaus(std::string filename) ;
-
-    // removing the taus not passing cuts
-    void  UpdateHadTaus(ParticleLST) ; 
 
     // returns a reference to full event
     ParticleLST& FullEvent() ; 
 
     // returns the size of an event
-    size_t  size() const ; 
+    size_t size() const ; 
 
     // Overloading ()
-    ParticleLST  operator() (std::vector<int>) ; 
+    ParticleLST operator() (std::vector<int>) ; 
 
     // returns the hadronic taus
     ParticleLST& HadronicTaus() ; 
@@ -68,6 +70,21 @@ class ExEvent
 
     // returns the visible 4-momentum
     Pythia8::Vec4  VisMom(ExParticle& p) ; 
+
+
+    //.......................
+    // Finds the hadronic taus saves into filename
+    void FindHadTaus(std::string filename) ;
+
+    // removing the taus not passing cuts
+    void UpdateHadTaus(ParticleLST) ; 
+
+    // Prints the full event given the file name
+    void  Print(std::string) ; 
+
+    template <class T>
+    void  PrintTable(std::FILE *, std::vector<T>) ;
+
 
     //------------------FASTJET----------------------
     // returns a reference to the ps_jts
@@ -86,13 +103,9 @@ class ExEvent
     void  UpdatePassedLepts(ParticleLST ) ;
     //-----------------------------------------------
 
-    // Prints the full event given the file name
-    void  Print(std::string) ; 
-
-    template <class T>
-    void  PrintTable(std::FILE *, std::vector<T>) ;
-
-
+    //.......................
+    // Public Vars
+    //.......................
     /* Whether drop a particle which fails efficiency test,
     or keep it but weigh the event number so 
     that it's counted as less than 1.  */
@@ -104,14 +117,14 @@ class ExEvent
 //--------------------------------------------------------------
   private:
 
+    //.......................
+    // Setters
+    //.......................
     // inputs options
-    void  Input(std::string, bool) ; 
+    void Input(std::string, bool) ; 
 
     // Sets event weight
     void SetEventWeight() ;
-
-    // True if p hadronically decays
-    bool  HadronicDecay(ExParticle &) ; 
 
     // Saves the Cut pointer
     void AddCutPtr(std::shared_ptr<Cut>) ;
@@ -119,12 +132,21 @@ class ExEvent
     // Adds GenJet pointer for STBinner
     void AddGenJetPtr(GenJet*) ;
 
-    // Saves psjets for fastjet
-    void  GenPseudoJets(ExParticle ) ; 
 
-    // .....................................................
-    // Member Variables
-    // .....................................................
+    //.......................
+    // Getters
+    //.......................
+    // True if p hadronically decays
+    bool HadronicDecay(ExParticle &) ; 
+
+
+    //.......................
+    // Saves psjets for fastjet
+    void GenPseudoJets(ExParticle ) ; 
+
+    //.......................
+    // Private Variables
+    //.......................
     // The event number
     int event_number ; 
 
@@ -135,7 +157,7 @@ class ExEvent
     bool set_event_weight_flag  = false ;
     
     // Reports the taus
-    bool  tau_report_flag = false ; 
+    bool tau_report_flag = false ; 
 
     // The hadronically decaying taus
     ParticleLST  had_taus ; 
@@ -144,7 +166,7 @@ class ExEvent
     ParticleLST  full_event ; 
 
     // A list of Cut pointers that have been applied to the event
-    std::vector<std::shared_ptr<Cut> > cut_ptr ;
+    std::vector<std::shared_ptr<Cut>> cut_ptr ;
     
     // Leptons that passed all the cuts 
     ParticleLST  isolated_leptons ;   
@@ -157,9 +179,8 @@ class ExEvent
     ParticleLST  lepton_jets ; 
     //-----------------------------------------------
 
-    // .....................................................
+// .....................................................
 
-  
 };
 
 //==============================================================

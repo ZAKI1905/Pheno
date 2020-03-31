@@ -17,6 +17,9 @@ class PtCut : public Cut
     // Constructor takes a pointer to the event
     PtCut(ExEvent*) ;
 
+    // Copy Constructor
+    PtCut(const PtCut&) ;
+
     // Overloading ()
     bool operator() (const ExParticle&,const ExParticle&) ;  
 
@@ -26,7 +29,7 @@ class PtCut : public Cut
     // Virtual method from cut class
     void CutCond(ParticleLST&) override ;   
     void Input(std::string) override ; 
-    Cut* Clone() override; 
+    std::shared_ptr<Cut> Clone() override; 
 
     bool Comp_pT_Value(const ExParticle&, const ExParticle& ) ;
     ParticleLST pT_Sorter(ParticleLST& ) ;

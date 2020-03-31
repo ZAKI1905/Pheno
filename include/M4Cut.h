@@ -17,14 +17,17 @@ class M4Cut : public Cut
 
     // Constructor takes a pointer to the event
     M4Cut(ExEvent*) ;
-   
+    
+    // Copy Constructor
+    M4Cut(const M4Cut&) ;
+    
   //--------------------------------------------------------------
   private:
 
     // Virtual method from cut class
     void CutCond(ParticleLST&) override;   
     void Input(std::string) override; 
-    Cut* Clone() override; 
+    std::shared_ptr<Cut> Clone() override; 
 
     // The minimum of m4l
     float M4_cut_min = 0 ;   

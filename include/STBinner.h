@@ -17,8 +17,12 @@ class STBinner : public Binner
     // Constructor takes a reference to the event
     STBinner() ;
 
+    // Copy Constructor
+    STBinner(const STBinner&) ;
   //--------------------------------------------------------------
   private:
+
+    std::shared_ptr<Binner> Clone() override; 
 
     // Reporting the bin information (virtual method from Binner)
     void Report(std::string) const override ;
