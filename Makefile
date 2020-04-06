@@ -25,10 +25,18 @@ LINK_TARGET	:= user_cuts
 MAIN 	:= user_cuts
 
 
-
 # ----------------------------------
-# Compiler and Linker
-CC          := clang++-mp-9.0
+# Compiler and Libraries
+ifeq ($(shell uname), Linux)
+	CC 			:= g++
+	ZAKI_LIB	:= dependencies/lib/zaki/linux 
+	OUT_LIB_DIR	:= lib/linux
+else
+	CC 			:= clang++-mp-9.0
+	ZAKI_LIB	:= dependencies/lib/zaki/darwin 
+	OUT_LIB_DIR	:= lib/darwin
+endif
+# ----------------------------------
 
 # Extensions
 SRC_EXT      := cc
@@ -46,17 +54,18 @@ BACKUP_DIR	:= ../Backup
 DEP_INC		:= -Idependencies/include 
 DEP_LIB_DIR	:= -Ldependencies/lib
 
+
 PYTH8_FLAG		:= $(DEP_LIB_DIR) -lpythia8 -lboost_iostreams -lz
 FASTJ_FLAG 		:=  -lfastjet
 CCFLAGS			:=  -std=c++11 -Wall -g -fopenmp -fPIC
+ZAKI_FLAG 		:= -L$(ZAKI_LIB) -lzaki 
 
 # Making library
 OUT_LIB		:= Pheno
-OUT_LIB_DIR	:= lib
 
 # Compile command
 COMPILE		:= $(CC) $(CCFLAGS) $(DEP_INC) -I$(INC_DIR) 
-COMPILE_FLAG:= $(PYTH8_FLAG) $(FASTJ_FLAG)
+COMPILE_FLAG:= $(PYTH8_FLAG) $(FASTJ_FLAG) $(ZAKI_FLAG)
 # ================================================================================
 
 SOURCES     := $(shell find $(SRC_DIR) -type f -name '*.$(SRC_EXT)')
@@ -76,7 +85,6 @@ $(BIN_DIR)/$(LINK_TARGET):	$(OBJECTS)  $(OBJ_DIR)/$(MAIN).$(OBJ_EXT)
 	$(COMPILE) $(COMPILE_FLAG) $^ -o $@
 
 $(OBJ_DIR)/%.$(OBJ_EXT) : $(SRC_DIR)/%.$(SRC_EXT) $(INC_DIR)/%.h
-	@echo "Compiling the dependencies..."
 	$(COMPILE) -c -o $@ $<
 
 $(OBJ_DIR)/$(MAIN).$(OBJ_EXT) : $(MAIN_DIR)/$(MAIN).$(SRC_EXT)
@@ -92,6 +100,7 @@ genlib: mk_lib_dirs complib
 
 complib: $(OBJECTS)
 	@echo "Creating static library..."
+	@rm -f $(OUT_LIB_DIR)/lib$(OUT_LIB).a
 	ar -cvq $(OUT_LIB_DIR)/lib$(OUT_LIB).a $^
 	# gcc -shared  $^ -o $(OUT_LIB_DIR)/lib$(OUT_LIB).so
 

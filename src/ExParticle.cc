@@ -16,7 +16,7 @@
 //--------------------------------------------------------------
 // Constructor
 // Takes a particle.
-ExParticle::ExParticle( const Particle& pt) : Particle(pt)
+PHENO::ExParticle::ExParticle( const Particle& pt) : Particle(pt)
 {
   // initializing the measured momentum
   SetMom() ;
@@ -24,7 +24,7 @@ ExParticle::ExParticle( const Particle& pt) : Particle(pt)
 
 //--------------------------------------------------------------
 // Copy Constructor
-// ExParticle::ExParticle( const ExParticle& other)
+// PHENO::ExParticle::ExParticle( const ExParticle& other)
 // {
 // idSave = other.idSave; statusSave = other.statusSave;
 // mother1Save = other.mother1Save; mother2Save = other.mother2Save;
@@ -43,7 +43,7 @@ ExParticle::ExParticle( const Particle& pt) : Particle(pt)
 
 //--------------------------------------------------------------
 // '==' comparison operator
-bool ExParticle::operator==(const ExParticle& right)
+bool PHENO::ExParticle::operator==(const ExParticle& right) const
 {
     if ( this == &right ) return true ;
     
@@ -54,12 +54,12 @@ bool ExParticle::operator==(const ExParticle& right)
 
 //--------------------------------------------------------------
 // Member function to set the Event pointer.
-void ExParticle::SetEventPtr(ExEvent* evPtrIn) { event_ptr = evPtrIn ;}
+void PHENO::ExParticle::SetEventPtr(ExEvent* evPtrIn) { event_ptr = evPtrIn ;}
 
 //--------------------------------------------------------------
 // Smears the momentum mesured in the detectors for electron
 // and muons
-void ExParticle::SetMom()
+void PHENO::ExParticle::SetMom()
 {
   // If visible, returns the true momentum, otherwise '0'.
   // ptMom = (this->isVisible()) ? this->p() : 0;
@@ -92,7 +92,7 @@ void ExParticle::SetMom()
   the true momentum's value.
   Reference: Fig. 11 of "1502.02701" 
 */
-float ExParticle::ElectronMomRes()
+float PHENO::ExParticle::ElectronMomRes()
 {
   float pt_res ;
 
@@ -187,7 +187,7 @@ float ExParticle::ElectronMomRes()
    "The resolution for muons with momenta up to approximately
    100 GeV is 1% in the barrel and 3% in the endcap."
 */
-float ExParticle::MuonMomRes()
+float PHENO::ExParticle::MuonMomRes()
 {
 
   float pt_res ;
@@ -213,14 +213,14 @@ float ExParticle::MuonMomRes()
 
 //--------------------------------------------------------------
 
-Pythia8::Vec4 ExParticle::GetMom()
+Pythia8::Vec4 PHENO::ExParticle::GetMom()
 {
   return detected_mom ;
 }
 
 //--------------------------------------------------------------
 // If it decays hadronically
-bool ExParticle::IsHadDec()
+bool PHENO::ExParticle::IsHadDec()
 {
   if( !set_had_dec_flag )
     SetHadDec() ;
@@ -230,7 +230,7 @@ bool ExParticle::IsHadDec()
 
 //--------------------------------------------------------------
 
-void ExParticle::SetHadDec()
+void PHENO::ExParticle::SetHadDec()
 {
   decays_to_had = event_ptr->HadronicDecay(*this) ;
   set_had_dec_flag = true ;
@@ -238,7 +238,7 @@ void ExParticle::SetHadDec()
 
 //--------------------------------------------------------------
 
-void ExParticle::SetVisMom()
+void PHENO::ExParticle::SetVisMom()
 {
   visible_mom  = event_ptr->VisMom(*this) ;
   set_vis_mom_flag = true ;
@@ -246,7 +246,7 @@ void ExParticle::SetVisMom()
 
 //--------------------------------------------------------------
 
-Pythia8::Vec4 ExParticle::GetVisMom()
+Pythia8::Vec4 PHENO::ExParticle::GetVisMom()
 {
   if( !set_vis_mom_flag )
     SetVisMom() ;
@@ -256,7 +256,7 @@ Pythia8::Vec4 ExParticle::GetVisMom()
 
 //--------------------------------------------------------------
 
-double ExParticle::GetIdEff()
+double PHENO::ExParticle::GetIdEff()
 {
   if( !set_id_eff_flag )
     SetIdEff() ;
@@ -265,7 +265,7 @@ double ExParticle::GetIdEff()
 }
 
 //--------------------------------------------------------------
-void ExParticle::SetIdEff()
+void PHENO::ExParticle::SetIdEff()
 /*
  Evaluates the efficiency of detectors 
  in detecting this particle.

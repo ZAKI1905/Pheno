@@ -4,15 +4,15 @@
   Last Updated by Zaki on July 6, 2019
 
 */
+// #include <zaki/Vector/Vector_Basic.h>
 
 #include "../include/IdEffCut.h"
 
 //==============================================================
 //--------------------------------------------------------------
 // Default Constructor
-IdEffCut::IdEffCut()
+PHENO::CUTS::IdEffCut::IdEffCut()
 {
-  logger.SetUnit("IdEffCut");
   SetName("IdEffCut") ;
 
   // char tmp[100];
@@ -21,22 +21,21 @@ IdEffCut::IdEffCut()
 }
 
 // Constructor
-IdEffCut::IdEffCut(ExEvent* ev) : Cut(ev)
+PHENO::CUTS::IdEffCut::IdEffCut(ExEvent* ev) : Cut(ev)
 {
-  logger.SetUnit("IdEffCut");
   SetName("IdEffCut") ;
 }
 
 //--------------------------------------------------------------
 // Copy Constructor
-IdEffCut::IdEffCut(const IdEffCut& old_obj)
+PHENO::CUTS::IdEffCut::IdEffCut(const IdEffCut& old_obj)
 {
   name = old_obj.name ;
 }
 
 //--------------------------------------------------------------
 // Copy Constructor
-IdEffCut::~IdEffCut()
+PHENO::CUTS::IdEffCut::~IdEffCut()
 {
   // char tmp[100];
   // sprintf(tmp, "--> %p  destructor!", (void*)this) ;
@@ -45,14 +44,14 @@ IdEffCut::~IdEffCut()
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void IdEffCut::CutCond(ParticleLST& in_parlst)
+void PHENO::CUTS::IdEffCut::CutCond(ParticleLST& in_parlst)
 /*
 ID_eff_check: Takes an event and checks if the detector missed an
  electron or muon.
 */
 {
 
-  PROFILE_SCOPE("IdEffCut::CutCond");
+  PROFILE_SCOPE("PHENO::CUTS::IdEffCut::CutCond");
 
   for(size_t i = 0 ; i < in_parlst.size() ; ++i)
   {
@@ -62,7 +61,7 @@ ID_eff_check: Takes an event and checks if the detector missed an
     if( in_parlst[i].GetIdEff()==0 || 
         (evPtr->drop_low_eff && in_parlst[i].GetIdEff() <rand01()) )
 
-      add_elem(rm_list, (int)i ) ;
+      Zaki::Vector::Add(rm_list, (int)i ) ;
   }
 
   // // Setting the event weight
@@ -71,7 +70,7 @@ ID_eff_check: Takes an event and checks if the detector missed an
 }
 
 //--------------------------------------------------------------
-// void IdEffCut::find_id_eff(ExParticle& p)
+// void PHENO::CUTS::IdEffCut::find_id_eff(ExParticle& p)
 // /*
 // IdEffCut(p): Takes a particle(p) and evaluates the efficiency of 
 //  detectors.
@@ -96,14 +95,14 @@ ID_eff_check: Takes an event and checks if the detector missed an
 // }
 
 // //--------------------------------------------------------------
-// void IdEffCut::print_id_eff() {printf("\nID_EFF is: %-4.3f\n",ID_Eff_Event) ;}
+// void PHENO::CUTS::IdEffCut::print_id_eff() {printf("\nID_EFF is: %-4.3f\n",ID_Eff_Event) ;}
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void IdEffCut::Input(std::string property)
+void PHENO::CUTS::IdEffCut::Input(std::string property)
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(property, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(property, "=") ;
 
   if(inp[0] == "drop_low_eff")
   {
@@ -115,7 +114,7 @@ void IdEffCut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<Cut> IdEffCut::Clone() 
+std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::IdEffCut::Clone() 
 {
   return std::shared_ptr<IdEffCut>(new IdEffCut(*this)) ;
 }

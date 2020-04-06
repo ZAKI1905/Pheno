@@ -11,22 +11,22 @@
 
 //--------------------------------------------------------------
 // Default Constructor
-OffZCut::OffZCut()
+PHENO::CUTS::OffZCut::OffZCut()
 {
-  logger.SetUnit("OffZCut");
+  // logger.SetUnit("OffZCut");
   SetName("OffZCut") ;
 }
 
 // Constructor
-OffZCut::OffZCut(ExEvent* ev) : Cut(ev) 
+PHENO::CUTS::OffZCut::OffZCut(ExEvent* ev) : Cut(ev) 
 {
-  logger.SetUnit("OffZCut");
+  // logger.SetUnit("OffZCut");
   SetName("OffZCut") ;
 }
 
 //--------------------------------------------------------------
 // Copy Constructor
-OffZCut::OffZCut(const OffZCut& old_obj)
+PHENO::CUTS::OffZCut::OffZCut(const OffZCut& old_obj)
   : OffZ_cut_min(old_obj.OffZ_cut_min), OffZ_cut_max(old_obj.OffZ_cut_max)
 {
   name = old_obj.name ;
@@ -34,10 +34,10 @@ OffZCut::OffZCut(const OffZCut& old_obj)
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void OffZCut::Input(std::string property)
+void PHENO::CUTS::OffZCut::Input(std::string property)
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(property, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(property, "=") ;
   
   if(inp[0] == "OffZ_Cut_Min")
   {
@@ -54,9 +54,9 @@ void OffZCut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void OffZCut::CutCond(ParticleLST& in_parlst)
+void PHENO::CUTS::OffZCut::CutCond(ParticleLST& in_parlst)
 {
-  PROFILE_SCOPE("OffZCut::CutCond") ;
+  PROFILE_SCOPE("PHENO::CUTS::OffZCut::CutCond") ;
 
   char special_message_char[100] ;
   bool special_message_on = false ;
@@ -70,8 +70,8 @@ void OffZCut::CutCond(ParticleLST& in_parlst)
         if(in_parlst[i].id()==-in_parlst[j].id() && 
             OffZ_cut_min < invM(tmp_lst) && invM(tmp_lst) < OffZ_cut_max)
         {
-          add_elem(rm_list, (int) i) ;
-          add_elem(rm_list, (int) j) ;
+          Zaki::Vector::Add(rm_list, (int) i) ;
+          Zaki::Vector::Add(rm_list, (int) j) ;
 
           if(report_cut)
           {
@@ -92,12 +92,12 @@ void OffZCut::CutCond(ParticleLST& in_parlst)
   if(special_message_on)
   {
     // Adding the top frame
-    sprintf(special_message_char," +%s+", pr(57, '-').c_str() ) ;
+    sprintf(special_message_char," +%s+", Zaki::String::Multiply('-', 57).c_str() ) ;
     std::string somestring(special_message_char) ;
     special_message = somestring + special_message ;
 
     // Adding the bottom frame
-    sprintf(special_message_char,"\n +%s+\n", pr(57, '-').c_str() ) ;
+    sprintf(special_message_char,"\n +%s+\n", Zaki::String::Multiply('-', 57).c_str() ) ;
     somestring = special_message_char ;
     special_message += somestring ;
   }
@@ -106,7 +106,7 @@ void OffZCut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<Cut> OffZCut::Clone() 
+std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::OffZCut::Clone() 
 {
   return std::shared_ptr<OffZCut>(new OffZCut(*this)) ;
 }

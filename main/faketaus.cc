@@ -24,16 +24,16 @@
 #include "../include/PrapCut.h"
 #include "../include/OffZCut.h"
 
-std::vector<double> InvMeMu(std::vector<ExParticle>& parts);
-std::vector<double> scaleFTauE(std::vector<ExParticle>&);
-double jettest(std::vector<ExParticle>&) ; 
+std::vector<double> InvMeMu(std::vector<PHENO::ExParticle>& parts);
+std::vector<double> scaleFTauE(std::vector<PHENO::ExParticle>&);
+double jettest(std::vector<PHENO::ExParticle>&) ; 
 
 ///////////////////////////////////////////////////
 ///////////////      main()     ///////////////////
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  Instrumentor::Get().BeginSession("Fake_Taus", "Profile_Fake_Taus.json");        // Begin session 
+  Zaki::Util::Instrumentor::BeginSession("Fake_Taus", "Profile_Fake_Taus.json");        // Begin session 
 
   std::string filename           = "" ;
   std::string Tot_Num_Events_str = "" ;
@@ -52,6 +52,8 @@ int main(int argc,char *argv[])
 
   // Seeding the random function for ID_eff "rand01()"
   srand(time(NULL)) ;
+
+  using namespace PHENO ;
 
   Pheno phen;
 
@@ -129,25 +131,25 @@ int main(int argc,char *argv[])
   // in included header files can be used.
 
   // ID_Eff cut
-  phen.Input({new IdEffCut, "drop_low_eff=true"}) ;
+  phen.Input({new CUTS::IdEffCut, "drop_low_eff=true"}) ;
 
   // Cut on M_l+l-
-  phen.Input({new M2Cut, "M2_Cut_Value=12"}) ;
+  phen.Input({new CUTS::M2Cut, "M2_Cut_Value=12"}) ;
 
   /*  p_T Cut Conditions:
         e & mu: pt>= 7 GeV  (at least 1 > 20 GeV)
         t_h: pt>= 20 GeV
   */
-  phen.Input({new PtCut, "lead=20, sub_lead=7, extra=7, had_tau=20"}) ;
+  phen.Input({new CUTS::PtCut, "lead=20, sub_lead=7, extra=7, had_tau=20"}) ;
 
   /*  prap Cut Conditions:
         e & mu: |eta| < 2.4
         t_h: |eta| < 2.3
   */
-  phen.Input({new PrapCut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
+  phen.Input({new CUTS::PrapCut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
 
   // Isolation cut
-  phen.Input(new IsolationCut) ;
+  phen.Input(new CUTS::IsolationCut) ;
 
   //-------------------------
   // fastjet options
@@ -160,7 +162,7 @@ int main(int argc,char *argv[])
   //-------------------------
 
   // Demanding  m(l+l-) <= 75 GeV or 105 GeV <= m(l+l-)
-  phen.Input({new OffZCut, "OffZ_Cut_Min=75, OffZ_Cut_Max=105"}) ;
+  phen.Input({new CUTS::OffZCut, "OffZ_Cut_Min=75, OffZ_Cut_Max=105"}) ;
 
   // -------------------------------------------------------------------------
 
@@ -174,14 +176,14 @@ int main(int argc,char *argv[])
 
   phen.Run() ;
 
-  Instrumentor::Get().EndSession();  // End Session
+  Zaki::Util::Instrumentor::EndSession();  // End Session
   return 0 ;
 }
 
 
 //==============================================================
 // Accessing the jets from particles
-double jettest(std::vector<ExParticle>& parts) 
+double jettest(std::vector<PHENO::ExParticle>& parts) 
 {
   size_t jet_set_size = parts[0].event_ptr->GenJetPtr->InclusiveJetsAfter().size() ;
   double output = jet_set_size*1.0 ;
@@ -191,12 +193,12 @@ double jettest(std::vector<ExParticle>& parts)
 
 //==============================================================
 // Invariant mass for (mu, e) pair (for LFV_1 )
-std::vector<double> InvMeMu(std::vector<ExParticle>& parts)
+std::vector<double> InvMeMu(std::vector<PHENO::ExParticle>& parts)
 {
   if (parts.size() != 4 )  return {-100, -100, -100};
 
-  std::vector<ExParticle> sel_EpMum ;
-  std::vector<ExParticle> sel_EmMup ;
+  std::vector<PHENO::ExParticle> sel_EpMum ;
+  std::vector<PHENO::ExParticle> sel_EmMup ;
 
   for (size_t i=0 ; i<parts.size() ; ++i)
   {
@@ -215,7 +217,7 @@ std::vector<double> InvMeMu(std::vector<ExParticle>& parts)
 
 //==============================================================
 // Electron & tau momentum scaling ( for LFV_3_1 )
-std::vector<double> scaleFTauE(std::vector<ExParticle>& parts)
+std::vector<double> scaleFTauE(std::vector<PHENO::ExParticle>& parts)
 {
   if ( parts.size() != 3 )  return { -1 } ;
 
@@ -231,8 +233,8 @@ std::vector<double> scaleFTauE(std::vector<ExParticle>& parts)
   for (size_t i=0 ; i<jet_set.size() ; ++i)
   {
 
-    std::vector<ExParticle> sel_emu ;
-    std::vector<ExParticle> Ftau_mu ;
+    std::vector<PHENO::ExParticle> sel_emu ;
+    std::vector<PHENO::ExParticle> Ftau_mu ;
 
     // Finding the total charge of each jet
     int j_charge = jet_set[i].user_index() ;

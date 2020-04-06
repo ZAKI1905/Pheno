@@ -13,22 +13,22 @@
 
 //--------------------------------------------------------------
 // Default Constructor
-M2Cut::M2Cut()
+PHENO::CUTS::M2Cut::M2Cut()
 {
-  logger.SetUnit("M2Cut");
+  // logger.SetUnit("M2Cut");
   SetName("M2Cut") ;
 }
 
 // Constructor
-M2Cut::M2Cut(ExEvent* ev) : Cut(ev) 
+PHENO::CUTS::M2Cut::M2Cut(PHENO::ExEvent* ev) : Cut(ev) 
 {
-  logger.SetUnit("M2Cut");
+  // logger.SetUnit("M2Cut");
   SetName("M2Cut") ;
 }
 
 //--------------------------------------------------------------
 // Copy Constructor
-M2Cut::M2Cut(const M2Cut& old_obj)
+PHENO::CUTS::M2Cut::M2Cut(const CUTS::M2Cut& old_obj)
   : M2_Cut_Value(old_obj.M2_Cut_Value)
 {
   name = old_obj.name ;
@@ -36,25 +36,25 @@ M2Cut::M2Cut(const M2Cut& old_obj)
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void M2Cut::Input(std::string property)
+void PHENO::CUTS::M2Cut::Input(std::string property)
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(property, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(property, "=") ;
   
   if(inp[0] == "M2_Cut_Value")
   {
     M2_Cut_Value = std::stof (inp[1]) ;
   }
   else
-  { LOG_ERROR((inp[0] + " is invalid option for M2 cut!").c_str()) ;
+  { Z_LOG_ERROR((inp[0] + " is invalid option for M2 cut!").c_str()) ;
   } 
 }
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void M2Cut::CutCond(ParticleLST& in_parlst)
+void PHENO::CUTS::M2Cut::CutCond(ParticleLST& in_parlst)
 {
-  PROFILE_SCOPE("M2Cut::CutCond") ;
+  PROFILE_SCOPE("PHENO::CUTS::M2Cut::CutCond") ;
 
   char special_message_char[100] ;
   bool special_message_on = false ;
@@ -68,8 +68,8 @@ void M2Cut::CutCond(ParticleLST& in_parlst)
           if(in_parlst[i].id()==-in_parlst[j].id() && 
              invM(tmp_lst) < M2_Cut_Value)
           {
-            add_elem(rm_list, (int) i) ;
-            add_elem(rm_list, (int) j) ;
+            Zaki::Vector::Add(rm_list, (int) i) ;
+            Zaki::Vector::Add(rm_list, (int) j) ;
 
             if(report_cut)
             {
@@ -90,12 +90,12 @@ void M2Cut::CutCond(ParticleLST& in_parlst)
   if(special_message_on)
   {
     // Adding the top frame
-    sprintf(special_message_char," +%s+", pr(57, '-').c_str() ) ;
+    sprintf(special_message_char," +%s+", Zaki::String::Multiply('-', 57).c_str() ) ;
     std::string somestring(special_message_char) ;
     special_message = somestring + special_message ;
 
     // Adding the bottom frame
-    sprintf(special_message_char,"\n +%s+\n", pr(57, '-').c_str() ) ;
+    sprintf(special_message_char,"\n +%s+\n", Zaki::String::Multiply('-', 57).c_str() ) ;
     somestring = special_message_char ;
     special_message += somestring ;
   }
@@ -104,7 +104,7 @@ void M2Cut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<Cut> M2Cut::Clone() 
+std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::M2Cut::Clone() 
 {
   return std::shared_ptr<M2Cut>(new M2Cut(*this)) ;
 }

@@ -18,31 +18,31 @@ satisfy the cut condition.
 
 //--------------------------------------------------------------
 // Default Constructor
-IsolationCut::IsolationCut()
+PHENO::CUTS::IsolationCut::IsolationCut()
 {
-  logger.SetUnit("IsolationCut");
+  // logger.SetUnit("IsolationCut");
   SetName("IsolationCut") ;
 }
 
 // Constructor
-IsolationCut::IsolationCut(ExEvent* ev) : Cut(ev) 
+PHENO::CUTS::IsolationCut::IsolationCut(PHENO::ExEvent* ev) : Cut(ev) 
 {
-  logger.SetUnit("IsolationCut");
+  // logger.SetUnit("IsolationCut");
   SetName("IsolationCut") ;
 }
 
 //--------------------------------------------------------------
 // Copy Constructor
-IsolationCut::IsolationCut(const IsolationCut& old_obj)
+PHENO::CUTS::IsolationCut::IsolationCut(const IsolationCut& old_obj)
 {
   name = old_obj.name ;
 }
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void IsolationCut::CutCond(ParticleLST& in_parlst)
+void PHENO::CUTS::IsolationCut::CutCond(ParticleLST& in_parlst)
 {
-  PROFILE_SCOPE("IsolationCut::CutCond") ;
+  PROFILE_SCOPE("PHENO::CUTS::IsolationCut::CutCond") ;
 
   for(size_t i=0 ; i < in_parlst.size() ; ++i )
   {
@@ -63,7 +63,7 @@ void IsolationCut::CutCond(ParticleLST& in_parlst)
             !( prt_j == prt_i  ) )
         {   
             // Checking if they are within 0.3 cone
-            if( R(prt_j, prt_i) < 0.3 )
+            if( PHENO::R(prt_j, prt_i) < 0.3 )
             {
 
                 /* 
@@ -85,14 +85,14 @@ void IsolationCut::CutCond(ParticleLST& in_parlst)
       prt_i.isFinal() && prt_i.GetMom().pT() != 0)
     {
       if((sum_ET_value /prt_i.GetMom().pT()) > 0.15)
-        add_elem(rm_list, (int) i) ;
+        Zaki::Vector::Add(rm_list, (int) i) ;
     }
 
     // Checking isolation cut for taus (both hadronic and leptonic)
     if(prt_i.idAbs()==ID_TAU)
     {
       if(sum_ET_tau_value  > 2)
-        add_elem(rm_list, (int) i) ;
+        Zaki::Vector::Add(rm_list, (int) i) ;
     }
   }
 
@@ -100,7 +100,7 @@ void IsolationCut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<Cut> IsolationCut::Clone() 
+std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::IsolationCut::Clone() 
 {
   return std::shared_ptr<IsolationCut>(new IsolationCut(*this)) ;
 }

@@ -11,22 +11,22 @@
 
 //--------------------------------------------------------------
 // Default Constructor
-M4Cut::M4Cut()
+PHENO::CUTS::M4Cut::M4Cut()
 {
-  logger.SetUnit("M4Cut");
+  // logger.SetUnit("M4Cut");
   SetName("M4Cut") ;
 }
 
 // Constructor
-M4Cut::M4Cut(ExEvent* ev) : Cut(ev) 
+PHENO::CUTS::M4Cut::M4Cut(PHENO::ExEvent* ev) : Cut(ev) 
 {
-  logger.SetUnit("M4Cut");
+  // logger.SetUnit("M4Cut");
   SetName("M4Cut") ;
 }
 
 //--------------------------------------------------------------
 // Copy Constructor
-M4Cut::M4Cut(const M4Cut& old_obj)
+PHENO::CUTS::M4Cut::M4Cut(const M4Cut& old_obj)
   : M4_cut_min(old_obj.M4_cut_min), M4_cut_max(old_obj.M4_cut_max)
 {
   name = old_obj.name ;
@@ -34,10 +34,10 @@ M4Cut::M4Cut(const M4Cut& old_obj)
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void M4Cut::Input(std::string property)
+void PHENO::CUTS::M4Cut::Input(std::string property)
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(property, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(property, "=") ;
   
   if(inp[0] == "M4_Cut_Min")
   {
@@ -54,10 +54,10 @@ void M4Cut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void M4Cut::CutCond(ParticleLST& in_parlst)
+void PHENO::CUTS::M4Cut::CutCond(ParticleLST& in_parlst)
 {
 
-  PROFILE_SCOPE("M4Cut::CutCond") ;
+  PROFILE_SCOPE("PHENO::CUTS::M4Cut::CutCond") ;
 
   //************************************************************
   //           Special Colinear Approximation 
@@ -117,7 +117,7 @@ void M4Cut::CutCond(ParticleLST& in_parlst)
   {
     for(size_t i=0 ; i < in_parlst.size() ; ++i )
     {
-      add_elem(rm_list, (int) i) ;
+      Zaki::Vector::Add(rm_list, (int) i) ;
     }
   } else return ;
 
@@ -132,12 +132,12 @@ void M4Cut::CutCond(ParticleLST& in_parlst)
     special_message += somestring ;
 
     // Adding the top frame
-    sprintf(special_message_char," +%s+", pr(62, '-').c_str() ) ;
+    sprintf(special_message_char," +%s+", Zaki::String::Multiply('-', 62).c_str() ) ;
     somestring = special_message_char ;
     special_message = somestring + special_message  ;
 
     // Adding the bottom frame
-    sprintf(special_message_char,"\n +%s+\n", pr(62, '-').c_str() ) ;
+    sprintf(special_message_char,"\n +%s+\n", Zaki::String::Multiply('-', 62).c_str() ) ;
     somestring = special_message_char ;
     special_message += somestring ;
   }
@@ -146,7 +146,7 @@ void M4Cut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Sorts particles according to pT
-void M4Cut::pT_Sort(ParticleLST& in_list)
+void PHENO::CUTS::M4Cut::pT_Sort(ParticleLST& in_list)
 {
   std::sort(in_list.begin(), in_list.end(),
             [](ExParticle& a, ExParticle& b) 
@@ -155,7 +155,7 @@ void M4Cut::pT_Sort(ParticleLST& in_list)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<Cut> M4Cut::Clone() 
+std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::M4Cut::Clone() 
 {
   return std::shared_ptr<M4Cut>(new M4Cut(*this)) ;
 }

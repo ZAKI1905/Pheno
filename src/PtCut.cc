@@ -11,22 +11,22 @@
 
 //--------------------------------------------------------------
 // Default Constructor
-PtCut::PtCut()
+PHENO::CUTS::PtCut::PtCut()
 {
-  logger.SetUnit("PtCut");
+  // logger.SetUnit("PtCut");
   SetName("PtCut") ;
 }
 
 // Constructor
-PtCut::PtCut(ExEvent* ev) : Cut(ev) 
+PHENO::CUTS::PtCut::PtCut(ExEvent* ev) : Cut(ev) 
 {
-  logger.SetUnit("PtCut");
+  // logger.SetUnit("PtCut");
   SetName("PtCut") ;
 }
 
 //--------------------------------------------------------------
 // Copy Constructor
-PtCut::PtCut(const PtCut& old_obj)
+PHENO::CUTS::PtCut::PtCut(const PtCut& old_obj)
   : leading_pT_cut(old_obj.leading_pT_cut), 
     sub_leading_pT_cut(old_obj.sub_leading_pT_cut),
     extra_pT_cut(old_obj.extra_pT_cut),
@@ -37,10 +37,10 @@ PtCut::PtCut(const PtCut& old_obj)
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void PtCut::Input(std::string property)
+void PHENO::CUTS::PtCut::Input(std::string property)
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(property, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(property, "=") ;
 
   if(inp[0] == "lead")
   {
@@ -60,16 +60,16 @@ void PtCut::Input(std::string property)
   }
   else
   {
-    LOG_ERROR((inp[0] + " is invalid option for pT cut!").c_str()) ;
+    Z_LOG_ERROR((inp[0] + " is invalid option for pT cut!").c_str()) ;
   } 
   
 }
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void PtCut::CutCond(ParticleLST& in_parlst)
+void PHENO::CUTS::PtCut::CutCond(ParticleLST& in_parlst)
 {
-  PROFILE_SCOPE("PtCut::CutCond") ;
+  PROFILE_SCOPE("PHENO::CUTS::PtCut::CutCond") ;
 
   pT_Sorter(in_parlst)                    ;
   size_t emu_fail_idx = in_parlst.size()  ;
@@ -116,7 +116,7 @@ void PtCut::CutCond(ParticleLST& in_parlst)
       2) and from the index where tau_h fails the pT cut onwards
       to the removal list
     */
-    add_elem(rm_list, (int) i) ;
+    Zaki::Vector::Add(rm_list, (int) i) ;
   } 
 
 }
@@ -124,7 +124,7 @@ void PtCut::CutCond(ParticleLST& in_parlst)
 //--------------------------------------------------------------
 // Comparison function for the p_T values
 // bool pT_cut::comp_pT_value(const Particle& p1, const Particle& p2)
-bool PtCut::operator()(const ExParticle& p1, const ExParticle& p2)
+bool PHENO::CUTS::PtCut::operator()(const ExParticle& p1, const ExParticle& p2)
 {
     bool comp_pT_value_bool = true ;
 
@@ -159,7 +159,7 @@ bool PtCut::operator()(const ExParticle& p1, const ExParticle& p2)
 
 //--------------------------------------------------------------
 // Sorts a list of particles based on the "func" comparison
-PtCut::ParticleLST PtCut::pT_Sorter(ParticleLST& partlist)
+PHENO::CUTS::PtCut::ParticleLST PHENO::CUTS::PtCut::pT_Sorter(ParticleLST& partlist)
 { // Particle Sorter: Sorts a vector containing particle instances by their pT.
 
   std::sort(partlist.begin(), partlist.end(), *this ) ;
@@ -168,7 +168,7 @@ PtCut::ParticleLST PtCut::pT_Sorter(ParticleLST& partlist)
 
 //--------------------------------------------------------------
 // dictionary for the pT cut values
-float PtCut::pT_CutVal(size_t rank, ExParticle& p)
+float PHENO::CUTS::PtCut::pT_CutVal(size_t rank, ExParticle& p)
 {
   float return_val = 0  ;
   // If electron or muon
@@ -196,7 +196,7 @@ float PtCut::pT_CutVal(size_t rank, ExParticle& p)
 }
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<Cut> PtCut::Clone() 
+std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::PtCut::Clone() 
 {
   return std::shared_ptr<PtCut>(new PtCut(*this)) ;
 }

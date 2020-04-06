@@ -15,7 +15,7 @@
 //--------------------------------------------------------------
 // Constructor
 // Takes event number and an event.
-ExEvent::ExEvent(int set_ev_num, Pythia8::Event& event) :
+PHENO::ExEvent::ExEvent(int set_ev_num, Pythia8::Event& event) :
  event_number(set_ev_num)
 {
   PROFILE_FUNCTION() ;
@@ -38,11 +38,11 @@ ExEvent::ExEvent(int set_ev_num, Pythia8::Event& event) :
 }
 
 //--------------------------------------------------------------
-ExEvent::~ExEvent() { }
+PHENO::ExEvent::~ExEvent() { }
 //--------------------------------------------------------------
 // Copy constructor
 // Resets the cut pointers!
-ExEvent::ExEvent(const ExEvent& other) : 
+PHENO::ExEvent::ExEvent(const ExEvent& other) : 
 drop_low_eff(other.drop_low_eff), event_number(other.event_number),
 weight_val(other.weight_val), set_event_weight_flag(other.set_event_weight_flag),
 tau_report_flag(other.tau_report_flag), had_taus(other.had_taus),
@@ -64,27 +64,27 @@ pseudo_jet_set(other.pseudo_jet_set), lepton_jets(other.lepton_jets)
 }
 //--------------------------------------------------------------
 // Member function to set the Event pointer.
-void ExEvent::SetEventPtr(ExParticle& pt)
+void PHENO::ExEvent::SetEventPtr(ExParticle& pt)
 {
   pt.SetEventPtr(this) ;
 }
 
 //--------------------------------------------------------------
 // Member function to set the Cut pointer.
-void ExEvent::AddCutPtr(std::shared_ptr<Cut>cutPtrIn)
-// void ExEvent::AddCutPtr(Cut* cutPtrIn) 
+void PHENO::ExEvent::AddCutPtr(std::shared_ptr<PHENO::CUTS::Cut>cutPtrIn)
+// void PHENO::ExEventAddCutPtr(Cut* cutPtrIn) 
 { 
   cut_ptr.push_back(cutPtrIn) ;
 }
 
 //--------------------------------------------------------------
 // Member function to set the GenJet pointer.
-void ExEvent::AddGenJetPtr(GenJet* genjetPtrIn) 
+void PHENO::ExEvent::AddGenJetPtr(GenJet* genjetPtrIn) 
 { GenJetPtr = genjetPtrIn ; }
 
 //--------------------------------------------------------------
 // Saves pseudojet lists for fastjet
-void ExEvent::GenPseudoJets(ExParticle p)
+void PHENO::ExEvent::GenPseudoJets(PHENO::ExParticle p)
 {
 
   if( p.isFinal() )
@@ -105,7 +105,7 @@ void ExEvent::GenPseudoJets(ExParticle p)
 
 //--------------------------------------------------------------
 // Inputing options
-void ExEvent::Input(std::string property, bool value)
+void PHENO::ExEvent::Input(std::string property, bool value)
 {
   if(property == "Report_Taus")
   {
@@ -115,8 +115,10 @@ void ExEvent::Input(std::string property, bool value)
 
 //--------------------------------------------------------------
 // Finding the hadronically decaying taus
-void ExEvent::FindHadTaus(std::string filename)
+void PHENO::ExEvent::FindHadTaus(std::string filename)
 {
+  using namespace Zaki::String ;
+
   PROFILE_FUNCTION() ;
   std::FILE * pTAU_REPORT_FILE ;
   // char pTAU_REPORT_CHAR[50];
@@ -139,15 +141,15 @@ void ExEvent::FindHadTaus(std::string filename)
     // Actual, Visible
     std::vector<Pythia8::Vec4> Tau_Mom{full_event[i].p(), full_event[i].GetVisMom() } ;
 
-    fprintf(pTAU_REPORT_FILE, "\n %s Event # %-5d %s", pr(25,'-').c_str()
-    ,event_number, pr(25,'-').c_str() ) ;
+    fprintf(pTAU_REPORT_FILE, "\n %s Event # %-5d %s", Multiply('-', 25).c_str()
+    ,event_number, Multiply('-', 25).c_str() ) ;
 
     fprintf(pTAU_REPORT_FILE, "\n  %s \n | %-6s(%3d) | %8s | %8s | %8s |\n",
-    pr(46,'=').c_str(), full_event[i].name().c_str(),full_event[i].status(),
+    Multiply('=', 46).c_str(), full_event[i].name().c_str(),full_event[i].status(),
      "Energy", "p_T", "p_Z") ;
 
     fprintf(pTAU_REPORT_FILE, " | %s |\n | %-11s | %8.2f | %8.2f | %8.2f |\n",
-    pr(44,'-').c_str(), "Actual",Tau_Mom[0].e(), Tau_Mom[0].pT(), Tau_Mom[0].pz()) ;
+    Multiply('-', 44).c_str(), "Actual",Tau_Mom[0].e(), Tau_Mom[0].pT(), Tau_Mom[0].pz()) ;
 
     fprintf(pTAU_REPORT_FILE, " | %-11s | %8.2f | %8.2f | %8.2f |\n",
     "Visible",Tau_Mom[1].e(), Tau_Mom[1].pT(), Tau_Mom[1].pz()) ;
@@ -156,7 +158,7 @@ void ExEvent::FindHadTaus(std::string filename)
     " | %-11s | %8.2f | %8.2f | %8.2f |\n  %s\n  %s\n | Daughters |",
     "Difference" , Tau_Mom[0].e()-Tau_Mom[1].e(),
     Tau_Mom[0].pT()-Tau_Mom[1].pT(), Tau_Mom[0].pz()-Tau_Mom[1].pz(),
-    pr(46,'=').c_str() ,pr(11,'_').c_str() ) ;
+    Multiply('=', 46).c_str() ,Multiply('_', 11).c_str() ) ;
 
     PrintTable<ExParticle>(pTAU_REPORT_FILE, Daughter_Range) ;
   }
@@ -173,8 +175,9 @@ void ExEvent::FindHadTaus(std::string filename)
 //--------------------------------------------------------------
 // Prints a table of particles in list with their info.
 template <class T>
-void ExEvent::PrintTable(std::FILE * file, std::vector<T> list)
+void PHENO::ExEvent::PrintTable(std::FILE * file, std::vector<T> list)
 {
+  using namespace Zaki::String ;
   // Double numbers' precision
   int prec = 5;
 
@@ -182,49 +185,49 @@ void ExEvent::PrintTable(std::FILE * file, std::vector<T> list)
   {
     // label the columns
     fprintf(file, "\n |%-s\n | %2s %8s %8s %13s %13s %13s %13s %6s %13s |\n",\
-      pr(99,'=').c_str(), "#", "Name", "Status", "E_Truth", "E",
+      Multiply('=', 99).c_str(), "#", "Name", "Status", "E_Truth", "E",
        "P_T", "P_Z", "P_Rap", "M_Vis") ;
-    fprintf(file, " | %s |\n",pr(97,'-').c_str() ) ;
+    fprintf(file, " | %s |\n",Multiply('-', 97).c_str() ) ;
 
     for(size_t j  = 0 ; j < list.size() ; j++)
     {
       ExParticle p  = list[j] ;
 
-      fprintf(file," | %zu %8s %+8d %13.*E %13.*E %13.*E %+13.*E %+6.1f %13.*E |\n",
+      fprintf(file," | %zu %8s %+8d %13.*E %13.*E %13.*E %+13.*E %+6.1f %13.*E  |\n",
        j+1, p.name().c_str(), p.status(),
        prec, p.e(), prec, p.GetVisMom().e(),
        prec, p.GetVisMom().pT(), prec, p.GetVisMom().pz(),
        p.GetVisMom().eta(), prec, p.GetVisMom().mCalc() ) ;
     }
-      fprintf(file,"  %s\n",pr(99,'=').c_str() ) ;
+      fprintf(file,"  %s\n",Multiply('=', 99).c_str() ) ;
     }
 }
 
 //--------------------------------------------------------------
 // Returns event number
 
-int ExEvent::i() const
+int PHENO::ExEvent::i() const
 {
   return event_number ;
 }
 
 //--------------------------------------------------------------
 //Returns a reference to the full event
-ExEvent::ParticleLST& ExEvent::FullEvent()
+PHENO::ExEvent::ParticleLST& PHENO::ExEvent::FullEvent()
 {
   return full_event ;
 }
 
 //--------------------------------------------------------------
 // Returns the size of the event
-size_t ExEvent::size() const
+size_t PHENO::ExEvent::size() const
 {
   return full_event.size() ;
 }
 
 
 //--------------------------------------------------------------
-bool ExEvent::HadronicDecay(ExParticle& p)
+bool PHENO::ExEvent::HadronicDecay(ExParticle& p)
 // If a particle decays hadronically
 {
     bool hadronic_decay = false ;
@@ -248,13 +251,13 @@ bool ExEvent::HadronicDecay(ExParticle& p)
 
 //--------------------------------------------------------------
 // Returns the hadronically decaying taus.
-ExEvent::ParticleLST& ExEvent::HadronicTaus()
+PHENO::ExEvent::ParticleLST& PHENO::ExEvent::HadronicTaus()
 {
   return had_taus ;
 }
 
 //--------------------------------------------------------------
-Pythia8::Vec4 ExEvent::VisMom(ExParticle& p)
+Pythia8::Vec4 PHENO::ExEvent::VisMom(ExParticle& p)
 // Returns the visible momentum of a particle
 {
 
@@ -293,7 +296,7 @@ Pythia8::Vec4 ExEvent::VisMom(ExParticle& p)
 // Overloading "()":
 // ev({11,-11}) returns a list of particles with id's 11 and -11.
 
-ExEvent::ParticleLST ExEvent::operator() (std::vector<int> sel_id)
+PHENO::ExEvent::ParticleLST PHENO::ExEvent::operator() (std::vector<int> sel_id)
 {
 
   ParticleLST particle_set ;
@@ -317,7 +320,7 @@ ExEvent::ParticleLST ExEvent::operator() (std::vector<int> sel_id)
 }
 
 //--------------------------------------------------------------
-double ExEvent::Weight()
+double PHENO::ExEvent::Weight()
 {
   if( !set_event_weight_flag && !drop_low_eff )
     SetEventWeight() ;
@@ -326,7 +329,7 @@ double ExEvent::Weight()
 }
 
 //--------------------------------------------------------------
-void ExEvent::SetEventWeight()
+void PHENO::ExEvent::SetEventWeight()
 {
 
   for (size_t i=0 ; i<isolated_leptons.size() ; ++i)
@@ -341,7 +344,7 @@ void ExEvent::SetEventWeight()
 
 //--------------------------------------------------------------
 // Returns a reference to the pseudo_jets stored in the event
-std::vector<fastjet::PseudoJet>& ExEvent::GetPseudoJets()
+std::vector<fastjet::PseudoJet>& PHENO::ExEvent::GetPseudoJets()
 {
   return pseudo_jet_set ;
 }
@@ -349,52 +352,52 @@ std::vector<fastjet::PseudoJet>& ExEvent::GetPseudoJets()
 
 //--------------------------------------------------------------
 // Returns a reference to the lep_pseudo_jets stored in the event
-ExEvent::ParticleLST& ExEvent::GetLeptonJets()
+PHENO::ExEvent::ParticleLST& PHENO::ExEvent::GetLeptonJets()
 {
   return lepton_jets ;
 }
 
 //--------------------------------------------------------------
 // Returns a reference to the leptons that passed all the cuts
-ExEvent::ParticleLST& ExEvent::PassedLeptons()
+PHENO::ExEvent::ParticleLST& PHENO::ExEvent::PassedLeptons()
 {
   return isolated_leptons ;
 }
 
 //--------------------------------------------------------------
 // Updates the list of leptons that passed the cuts
-void ExEvent::UpdatePassedLepts(ParticleLST input)
+void PHENO::ExEvent::UpdatePassedLepts(ParticleLST input)
 {
   isolated_leptons = input ;
 }
 
 //--------------------------------------------------------------
 // Updating hadronic tau list for binning
-void ExEvent::UpdateHadTaus( ParticleLST pass_cuts )
+void PHENO::ExEvent::UpdateHadTaus( ParticleLST pass_cuts )
 {
   std::vector<int> tmp_rm_lst ;
 
   for ( size_t i=0 ; i < had_taus.size() ; ++i)
   {
     // If the tau hasn't passed the cut
-    if( !contains( pass_cuts, had_taus[i]) )
+    if( !Zaki::Vector::Exists(had_taus[i],  pass_cuts) )
       // remove it
-      add_elem( tmp_rm_lst , (int) i) ;
+      Zaki::Vector::Add( tmp_rm_lst , (int) i) ;
   }
 
-  rm_elem(had_taus, tmp_rm_lst) ;
+  Zaki::Vector::Remove(had_taus, tmp_rm_lst) ;
 
 }
 
 //--------------------------------------------------------------
 //
-void ExEvent::UpdatePseudoJet()
+void PHENO::ExEvent::UpdatePseudoJet()
 {
   std::vector<int> tmp_rm_lst ;
 
   for(size_t i=0 ; i < lepton_jets.size() ; ++i )
   {
-    if( !contains( isolated_leptons , lepton_jets[i] ) )
+    if( !Zaki::Vector::Exists(lepton_jets[i], isolated_leptons) )
     {
       ExParticle p = lepton_jets[i] ;
       fastjet::PseudoJet particle(p.GetMom().px(),p.GetMom().py(),
@@ -408,8 +411,10 @@ void ExEvent::UpdatePseudoJet()
 }
 
 //--------------------------------------------------------------
-void ExEvent::Print(std::string filename)
+void PHENO::ExEvent::Print(std::string filename)
 {
+  using namespace Zaki::String ;
+
   // For saving the full event record in a text file:
   std::FILE * Event_report_file ;
   Event_report_file = fopen(filename.c_str(), "a") ;
@@ -425,12 +430,12 @@ void ExEvent::Print(std::string filename)
     if(i%40 ==0)
     {
     fprintf(Event_report_file, "\n %s\n %-4s %4s %-10s %-6s %2s %8s %5s",
-    pr(99,'=').c_str(),"#"," ","Name","Status"," ", "Energy"," ") ;
+    Multiply('=', 99).c_str(),"#"," ","Name","Status"," ", "Energy"," ") ;
 
     fprintf(Event_report_file, " %8s %5s %8s %10s","p_T"," ", "p_Z"," ") ;
 
     fprintf(Event_report_file, " %4s %5s %4s %5s\n %s\n","D_1"," ", "D_2"," ",
-    pr(99,'=').c_str()) ;
+    Multiply('=', 99).c_str()) ;
     }
 
     fprintf(Event_report_file, " %-4u %4s %-10s %1s %2d %3s %8.1f %5s",(int)i,
@@ -450,7 +455,7 @@ void ExEvent::Print(std::string filename)
 //                    explicit instantiations
 //==============================================================
 // print_table
-template void ExEvent::PrintTable<ExParticle>(std::FILE * file, ParticleLST) ;
-template void ExEvent::PrintTable<Pythia8::Particle>(std::FILE * file, std::vector<Pythia8::Particle>) ;
+template void PHENO::ExEvent::PrintTable<PHENO::ExParticle>(std::FILE * file, ParticleLST) ;
+template void PHENO::ExEvent::PrintTable<Pythia8::Particle>(std::FILE * file, std::vector<Pythia8::Particle>) ;
 
 //==============================================================

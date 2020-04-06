@@ -6,27 +6,19 @@ extern const int  ID_ELECTRON  ;
 extern const int  ID_MUON      ; 
 extern const int  ID_TAU       ;  
 
-#include "Logger.h"
-#include "Instrumentor.h"
+// #include <zaki/Util/Logger.h>
+// #include <zaki/Util/Instrumentor.h>
+// #include <zaki/Vector/Vector_Basic.h>
+
+// Local headers
 #include "ExParticle.h"
 
-extern const std::vector<int> lept_id_list ;
+//--------------------------------------------------------------
+namespace PHENO
+{
+//--------------------------------------------------------------
 
-//==============================================================
-//                    Profiling
-#define PROFILING 1
-#if PROFILING
-  #define PROFILE_SCOPE(name) InstrumentationTimer timer##__LINE__(name)
-  #define PROFILE_FUNCTION() PROFILE_SCOPE(__FUNCTION__)
-#else
-  #define PROFILE_SCOPE(name)
-  #define PROFILE_FUNCTION()
-#endif
-//                     Logging
-#define LOG_INFO(message)  logger.Info(message, __func__)
-#define LOG_ERROR(message)  logger.Error(message, __func__)
-#define LOG_WARNING(message)  logger.Warn(message, __func__)
-//==============================================================
+extern const std::vector<int> lept_id_list ;
 
 //==============================================================
 // Random function
@@ -34,26 +26,26 @@ double rand01() ;
 
 //==============================================================
 // Checks if a string ends in another string
-bool endswith (std::string const &fullString, std::string const &ending) ;
+// bool endswith (std::string const &fullString, std::string const &ending) ;
 
 //==============================================================
 // strips string from character c
-std::string strip(std::string str, char c) ;
+// std::string strip(std::string str, char c) ;
 
 //==============================================================
-// Checks if an element exists in the list.
-template <class T>
-bool contains(std::vector<T>& , T) ;
+// // Checks if an element exists in the list.
+// template <class T>
+// bool contains(std::vector<T>& , T) ;
 
-//==============================================================
-// Adds element to a list if it doesn't already exists.
-template <class T>
-void add_elem(std::vector<T>& , T) ;
+// //==============================================================
+// // Adds element to a list if it doesn't already exists.
+// template <class T>
+// void add_elem(std::vector<T>& , T) ;
 
-//==============================================================
-// Removes a list of int elements from a T type list
-template <class T> 
-void rm_elem(std::vector<T>&, std::vector<int>) ;
+// //==============================================================
+// // Removes a list of int elements from a T type list
+// template <class T> 
+// void rm_elem(std::vector<T>&, std::vector<int>) ;
 
 //==============================================================
 // Counts the number of particles with id's in id_list
@@ -61,26 +53,26 @@ int count(std::vector<ExParticle>&, std::vector<int> ) ;
 
 //==============================================================
 // Prints "ch" for "size" times.
-std::string pr(int size, char ch) ;
+// std::string pr(int size, char ch) ;
 
 //==============================================================
-// Parses the input based on the given delim
-std::vector<std::string> pars(std::string, std::string, int=1) ;
-// Parses the input based on the given delim list
-std::vector<std::string> pars(std::string, std::vector<std::string>) ;
-//==============================================================
-// converts a string list of numbers separated by delim (default = ",")
-// to a vector of numbers
-void stolst(std::vector<int>&, std::string, std::string=",") ;
-// Overloading for float numbers
-void stolst(std::vector<float>&, std::string, std::string=",") ;
-// overloading for string lists
-void stolst(std::vector<std::string>&, std::string, std::string=",") ;
+// // Parses the input based on the given delim
+// std::vector<std::string> pars(std::string, std::string, int=1) ;
+// // Parses the input based on the given delim list
+// std::vector<std::string> pars(std::string, std::vector<std::string>) ;
+// //==============================================================
+// // converts a string list of numbers separated by delim (default = ",")
+// // to a vector of numbers
+// void stolst(std::vector<int>&, std::string, std::string=",") ;
+// // Overloading for float numbers
+// void stolst(std::vector<float>&, std::string, std::string=",") ;
+// // overloading for string lists
+// void stolst(std::vector<std::string>&, std::string, std::string=",") ;
 
-//==============================================================
-// Event range input parser for inputs like:
-//  (...=1-10,50-75,300,401)
-std::vector<int> ev_range_pars(std::string) ;
+// //==============================================================
+// // Event range input parser for inputs like:
+// //  (...=1-10,50-75,300,401)
+// std::vector<int> ev_range_pars(std::string) ;
 
 //==============================================================
 // Returns the invariant mass of two particles
@@ -109,11 +101,12 @@ T val ;
 
 //==============================================================
 // Saves any vector quantity to a file
-template <class T> 
-void saveVec(std::vector<T>, std::string) ;
+// template <class T> 
+// void saveVec(std::vector<T>, std::string) ;
 
 template <class T> 
-void saveVec(std::vector<rec_var<T> >) ;
+void SaveVec(std::vector<rec_var<T> >) ;
 //==============================================================
-
+} // Pheno namespace
+//=============================================================
 #endif /*Basics_H*/

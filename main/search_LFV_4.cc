@@ -26,8 +26,8 @@
 #include "../include/OffZCut.h"
 
 // LFV_4_1  (mu+ mu+ ta- ta-)
-std::vector<double> scaleTauE_LFV4(std::vector<ExParticle>&);
-std::vector<double> alpha(std::vector<ExParticle>&, std::vector<ExParticle>&) ;
+std::vector<double> scaleTauE_LFV4(std::vector<PHENO::ExParticle>&);
+std::vector<double> alpha(std::vector<PHENO::ExParticle>&, std::vector<PHENO::ExParticle>&) ;
 bool check(std::vector<double>) ;
 
 ///////////////////////////////////////////////////
@@ -35,7 +35,7 @@ bool check(std::vector<double>) ;
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  Instrumentor::Get().BeginSession("search_LFV_4", "Profile_search_LFV_4.json") ;        // Begin session  
+  Zaki::Util::Instrumentor::BeginSession("search_LFV_4", "Profile_search_LFV_4.json") ;        // Begin session  
 
   std::string filename           = "" ;
   std::string Tot_Num_Events_str = "" ;
@@ -54,6 +54,8 @@ int main(int argc,char *argv[])
 
   // Seeding the random function for ID_eff "rand01()"
   srand(time(NULL)) ;
+
+  using namespace PHENO ;
 
   Pheno phen;
 
@@ -131,25 +133,25 @@ int main(int argc,char *argv[])
   // in included header files can be used.
 
   // ID_Eff cut
-  phen.Input({new IdEffCut, "drop_low_eff=true"}) ;
+  phen.Input({new CUTS::IdEffCut, "drop_low_eff=true"}) ;
 
   // Cut on M_l+l-
-  phen.Input({new M2Cut, "M2_Cut_Value=12"}) ;
+  phen.Input({new CUTS::M2Cut, "M2_Cut_Value=12"}) ;
 
   /*  p_T Cut Conditions:
         e & mu: pt>= 7 GeV  (at least 1 > 20 GeV)
         t_h: pt>= 20 GeV
   */
-  phen.Input({new PtCut, "lead=20,sub_lead=7,extra=7,had_tau=20"}) ;
+  phen.Input({new CUTS::PtCut, "lead=20,sub_lead=7,extra=7,had_tau=20"}) ;
 
   /*  prap Cut Conditions:
         e & mu: |eta| < 2.4
         t_h: |eta| < 2.3
   */
-  phen.Input({new PrapCut, "e=2.4,mu=2.4,had_tau=2.3"}) ;
+  phen.Input({new CUTS::PrapCut, "e=2.4,mu=2.4,had_tau=2.3"}) ;
 
   // Isolation cut
-  phen.Input(new IsolationCut) ;
+  phen.Input(new CUTS::IsolationCut) ;
 
   //-------------------------
   // // Don't have to run fastjet in this case
@@ -163,10 +165,10 @@ int main(int argc,char *argv[])
   //-------------------------
 
   // Demanding  m(l+l-) <= 75 GeV or 105 GeV <= m(l+l-)
-  phen.Input({new OffZCut, "OffZ_Cut_Min=75,OffZ_Cut_Max=105"}) ;
+  phen.Input({new CUTS::OffZCut, "OffZ_Cut_Min=75,OffZ_Cut_Max=105"}) ;
 
   // Demanding 80 GeV <= m(ta-, e-, mu+, mu+) <= 120 GeV
-  phen.Input({new M4Cut, "M4_Cut_Min=80,M4_Cut_Max=120"}) ;  // LFV_4
+  phen.Input({new CUTS::M4Cut, "M4_Cut_Min=80,M4_Cut_Max=120"}) ;  // LFV_4
   // -------------------------------------------------------------------------
 
   //------------------------------------------------------
@@ -178,21 +180,21 @@ int main(int argc,char *argv[])
 
   phen.Run() ;
 
-  Instrumentor::Get().EndSession();  // End Session
+  Zaki::Util::Instrumentor::EndSession();  // End Session
   return 0 ;
 }
 
 //==============================================================
 // Electron & tau momentum scaling ( for LFV_4_1 )
-std::vector<double> scaleTauE_LFV4(std::vector<ExParticle>& parts)
+std::vector<double> scaleTauE_LFV4(std::vector<PHENO::ExParticle>& parts)
 {
   if (parts.size() != 4)  return {-1} ;
 
-  std::vector<ExParticle> comb_a_emu ;
-  std::vector<ExParticle> comb_b_emu ;
-  std::vector<ExParticle> comb_a_taumu ;
-  std::vector<ExParticle> comb_b_taumu ;
-  std::vector<ExParticle> mu_set ;
+  std::vector<PHENO::ExParticle> comb_a_emu ;
+  std::vector<PHENO::ExParticle> comb_b_emu ;
+  std::vector<PHENO::ExParticle> comb_a_taumu ;
+  std::vector<PHENO::ExParticle> comb_b_taumu ;
+  std::vector<PHENO::ExParticle> mu_set ;
 
   // Adding tau- and electron
   for (size_t i=0 ; i<parts.size() ; ++i)
@@ -243,8 +245,8 @@ std::vector<double> scaleTauE_LFV4(std::vector<ExParticle>& parts)
  Pythia8::Vec4 p_e = comb_a_emu[0].GetVisMom()   ; // same between a & b
 
   // assume combination 'a' is correct:
-  std::vector<ExParticle> sel_taumu  = comb_a_taumu ;
-  std::vector<ExParticle> sel_emu    = comb_a_emu ;
+  std::vector<PHENO::ExParticle> sel_taumu  = comb_a_taumu ;
+  std::vector<PHENO::ExParticle> sel_emu    = comb_a_emu ;
   double alpha_e  = alpha_a[0] ;
   double alpha_ta = alpha_a[1] ;
   double tauMuInv = alpha_a[2] ;
@@ -283,7 +285,7 @@ std::vector<double> scaleTauE_LFV4(std::vector<ExParticle>& parts)
 
 //==============================================================
 // Solves the scaling factors alpha
-std::vector<double> alpha(std::vector<ExParticle>& emu_set, std::vector<ExParticle>& taumu_set)
+std::vector<double> alpha(std::vector<PHENO::ExParticle>& emu_set, std::vector<PHENO::ExParticle>& taumu_set)
 {
   
   Pythia8::Vec4 p_ta = taumu_set[0].GetVisMom();

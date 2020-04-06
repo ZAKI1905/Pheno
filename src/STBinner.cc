@@ -11,15 +11,14 @@
 //==============================================================
 
 // Constructor
-STBinner::STBinner() 
+PHENO::STBinner::STBinner() 
 { 
-  logger.SetUnit("STBinner");
   SetName("STBinner") ; 
 }
 
 //--------------------------------------------------------------
 // Copy Constructor
-STBinner::STBinner(const STBinner& old_obj)
+PHENO::STBinner::STBinner(const STBinner& old_obj)
   : st_limit(old_obj.st_limit)
 {
   // Explicitly writing this to show 
@@ -31,7 +30,7 @@ STBinner::STBinner(const STBinner& old_obj)
 
 //--------------------------------------------------------------
 // Adding the event
-void STBinner::Input(ExEvent& evIn)
+void PHENO::STBinner::Input(ExEvent& evIn)
 {
   // Saving the event reference
   evp = &evIn ;
@@ -49,25 +48,27 @@ void STBinner::Input(ExEvent& evIn)
 
 //--------------------------------------------------------------
 // // Should be used after the genjet method
-// void STBinner::input(vector<fastjet::PseudoJet> in_jet_set)
+// void PHENO::STBinner::input(vector<fastjet::PseudoJet> in_jet_set)
 // {
 //   jet_set = in_jet_set ;
 // }
 
 //--------------------------------------------------------------
 // Overloading the input method.
-void STBinner::Input(std::string input)
+void PHENO::STBinner::Input(std::string input)
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(input, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(input, "=") ;
 
-  if(inp[0] == "ST_Bins") { stolst( st_limit , inp[1], "-" )  ;}
+  if(inp[0] == "ST_Bins") { Zaki::String::Str2Lst( st_limit , inp[1], "-" )  ;}
 }
 
 //--------------------------------------------------------------
 // Virtual method from binner class:
-void STBinner::BinIt(bool cut_report, std::string cut_f_name)
+void PHENO::STBinner::BinIt(bool cut_report, std::string cut_f_name)
 {
+
+  using namespace Zaki::String ;
 
   // Finds the S_T of the event
   double st_val = S_T()  ;
@@ -138,14 +139,14 @@ void STBinner::BinIt(bool cut_report, std::string cut_f_name)
     "|    %-5s S_T = %-9.1f GeV,  Event Weight = %-4.2f%-18s|\n|%70s\n","==>",
      st_val,evp->Weight(),".","|") ;
 
-    fprintf(pCUT_REPORT_FILE," %s\n", pr(69,'-').c_str() ) ;
+    fprintf(pCUT_REPORT_FILE," %s\n", Multiply('-', 69).c_str() ) ;
     fclose(pCUT_REPORT_FILE) ;
   }
 
 }
 
 //--------------------------------------------------------------
-double STBinner::S_T()
+double PHENO::STBinner::S_T()
 {/*
  Calculates the value of S_T for an event.
  */
@@ -176,7 +177,7 @@ double STBinner::S_T()
 }
 
 //--------------------------------------------------------------
-void STBinner::OnOffZ()
+void PHENO::STBinner::OnOffZ()
 {
   /*
   ---------------------------------- On-Z or Off-Z ----------------------------
@@ -218,7 +219,7 @@ void STBinner::OnOffZ()
 }
 
 //--------------------------------------------------------------
-std::vector<int> STBinner::LepNumCheck()
+std::vector<int> PHENO::STBinner::LepNumCheck()
 /*           Lepton Number Cut Conditions
 Checking the number of charged leptons in an event:
 
@@ -289,105 +290,107 @@ Checking the number of charged leptons in an event:
 //--------------------------------------------------------------
 // Internal report for python, and an external report for the user
 // Should be implemented in a "bin" calss maybe.
-void STBinner::Report(std::string File_LHE) const
+void PHENO::STBinner::Report(std::string File_LHE) const
 {
-    std::FILE * INT_REPORT ;
-    char INT_Report_Char[100] ;
-    sprintf(INT_Report_Char, "_report_%s", File_LHE.c_str()) ;
-    INT_REPORT= fopen(INT_Report_Char, "w") ;
+  using namespace Zaki::String ;
 
-    // Writing the report text file:
-    std::FILE * FINAL_REPORT ;
-    char Final_Report_Char[100] ;
-    sprintf(Final_Report_Char, "Report_%s.txt", File_LHE.c_str()) ;
-    FINAL_REPORT= fopen(Final_Report_Char, "w") ;
+  std::FILE * INT_REPORT ;
+  char INT_Report_Char[100] ;
+  sprintf(INT_Report_Char, "_report_%s", File_LHE.c_str()) ;
+  INT_REPORT= fopen(INT_Report_Char, "w") ;
 
-    std::string content( "\n  Final Cut Report : \n\n" ) ; // Title
-    char tmp[200] ;
+  // Writing the report text file:
+  std::FILE * FINAL_REPORT ;
+  char Final_Report_Char[100] ;
+  sprintf(Final_Report_Char, "Report_%s.txt", File_LHE.c_str()) ;
+  FINAL_REPORT= fopen(Final_Report_Char, "w") ;
 
-    for (size_t j = 1 ; j < 10 ; ++j)
+  std::string content( "\n  Final Cut Report : \n\n" ) ; // Title
+  char tmp[200] ;
+
+  for (size_t j = 1 ; j < 10 ; ++j)
+  {
+    // NOTE: Dependent on the definition of bins!
+    int N_l        =  4 - j/6  ;
+    int N_tau_h    = 0         ;  if(j==4 || j==5 || j==7 || j==8) N_tau_h = 1 ;
+    int N_OSSF     = 1         ;  if(j==1 || j==4 || j==6 || j==7) N_OSSF = 0  ; if(j==3) N_OSSF = 2 ;
+    int dash_count = 0         ;
+
+    // label the columns
+    sprintf(tmp,"  %s\n |  N_l = %d  -  tau_h = %d -  OSSF = %d  |",Multiply('_', 37).c_str(),
+              N_l,N_tau_h, N_OSSF) ;
+    content += tmp ;
+
+    if(j!=8 && j!=9)
     {
-      // NOTE: Dependent on the definition of bins!
-      int N_l        =  4 - j/6  ;
-      int N_tau_h    = 0         ;  if(j==4 || j==5 || j==7 || j==8) N_tau_h = 1 ;
-      int N_OSSF     = 1         ;  if(j==1 || j==4 || j==6 || j==7) N_OSSF = 0  ; if(j==3) N_OSSF = 2 ;
-      int dash_count = 0         ;
 
-      // label the columns
-      sprintf(tmp,"  %s\n |  N_l = %d  -  tau_h = %d -  OSSF = %d  |",pr(37,'_').c_str(),
-               N_l,N_tau_h, N_OSSF) ;
+      sprintf(tmp,"\n |%-s|\n | %9s |%9s   |%9s   |\n", Multiply('=', 37).c_str(),"S_T bin #","off-Z", "on-Z") ;
+      content += tmp ;
+      sprintf(tmp," | %s |\n",Multiply('-', 35+dash_count).c_str()) ;
+      content += tmp ;
+      for (size_t i = 0 ; i < 5 ; ++i)
+      {
+        fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i],  bin_set[j-1][2][i]) ;
+
+        sprintf(tmp," | %6u    |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i]) ;
+        content += tmp ;
+      }
+      sprintf(tmp,"  %s \n\n",Multiply('-', 37).c_str()) ;
       content += tmp ;
 
-      if(j!=8 && j!=9)
-      {
-
-        sprintf(tmp,"\n |%-s|\n | %9s |%9s   |%9s   |\n", pr(37,'=').c_str(),"S_T bin #","off-Z", "on-Z") ;
-        content += tmp ;
-        sprintf(tmp," | %s |\n",pr(35+dash_count,'-').c_str()) ;
-        content += tmp ;
-        for (size_t i = 0 ; i < 5 ; ++i)
-        {
-          fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i],  bin_set[j-1][2][i]) ;
-
-          sprintf(tmp," | %6u    |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i]) ;
-          content += tmp ;
-        }
-        sprintf(tmp,"  %s \n\n",pr(37,'-').c_str()) ;
-        content += tmp ;
-
-      }
-      else
-      {
-        dash_count = 13 ;
-
-        sprintf(tmp,"\n |%-s\n | %9s |  %9s |%9s   | %9s |\n", pr(50,'=').c_str(),"S_T bin #","m_ll < 75", "on-Z", "m_ll > 105") ;
-        content += tmp ;
-        sprintf(tmp," | %s |\n",pr(35+dash_count,'-').c_str()) ;
-        content += tmp ;
-
-        for (size_t i = 0 ; i < 5 ; ++i)
-        {
-
-         fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
-
-          sprintf(tmp," | %6u    |%9.2f   |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
-          content += tmp ;
-        }
-        sprintf(tmp,"  %s \n\n",pr(50,'-').c_str()) ;
-        content += tmp ;
-
-      }
-
-      // fprintf(FINAL_REPORT," | %s |\n",pr(35+dash_count,'-').c_str()) ;
-
-
-      // print out the details for each bin
-      // if(j!=8 && j!=9)
-      // {
-      //   for (size_t i = 0 ; i < 5 ; ++i) {
-      //     fprintf(FINAL_REPORT," | %6u    |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i]) ;
-      //     fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i],  bin_set[j-1][2][i]) ;
-      //   }
-      //   fprintf(FINAL_REPORT,"  %s \n\n",pr(37,'-').c_str()) ;
-      // }
-      // else
-      // {
-      //   for (size_t i = 0 ; i < 5 ; ++i) {
-      //     fprintf(FINAL_REPORT," | %6u    |%9.2f   |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
-      //     fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
-      //   }
-      //   fprintf(FINAL_REPORT,"  %s \n\n",pr(50,'-').c_str()) ;
-      // }
     }
-    fprintf(FINAL_REPORT, "%s", content.c_str()) ;
+    else
+    {
+      dash_count = 13 ;
 
-    fclose(INT_REPORT) ;
-    fclose(FINAL_REPORT) ;
+      sprintf(tmp,"\n |%-s\n | %9s |  %9s |%9s   | %9s |\n", Multiply('=', 50).c_str(),"S_T bin #","m_ll < 75", "on-Z", "m_ll > 105") ;
+      content += tmp ;
+      sprintf(tmp," | %s |\n",Multiply('-', 35+dash_count).c_str()) ;
+      content += tmp ;
+
+      for (size_t i = 0 ; i < 5 ; ++i)
+      {
+
+        fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
+
+        sprintf(tmp," | %6u    |%9.2f   |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
+        content += tmp ;
+      }
+      sprintf(tmp,"  %s \n\n",Multiply('-', 50).c_str()) ;
+      content += tmp ;
+
+    }
+
+    // fprintf(FINAL_REPORT," | %s |\n",Multiply('-', 35+dash_count).c_str()) ;
+
+
+    // print out the details for each bin
+    // if(j!=8 && j!=9)
+    // {
+    //   for (size_t i = 0 ; i < 5 ; ++i) {
+    //     fprintf(FINAL_REPORT," | %6u    |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i]) ;
+    //     fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i],  bin_set[j-1][2][i]) ;
+    //   }
+    //   fprintf(FINAL_REPORT,"  %s \n\n",Multiply('-', 37).c_str()) ;
+    // }
+    // else
+    // {
+    //   for (size_t i = 0 ; i < 5 ; ++i) {
+    //     fprintf(FINAL_REPORT," | %6u    |%9.2f   |%9.2f   |%9.2f   |\n",(int)i+1, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
+    //     fprintf(INT_REPORT," %2u , %9.2f , %9.2f , %9.2f  \n",(int)j, bin_set[j-1][0][i], bin_set[j-1][1][i], bin_set[j-1][2][i]) ;
+    //   }
+    //   fprintf(FINAL_REPORT,"  %s \n\n",Multiply('-', 50).c_str()) ;
+    // }
+  }
+  fprintf(FINAL_REPORT, "%s", content.c_str()) ;
+
+  fclose(INT_REPORT) ;
+  fclose(FINAL_REPORT) ;
 }
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<Binner> STBinner::Clone() 
+std::shared_ptr<PHENO::Binner> PHENO::STBinner::Clone() 
 {
   return std::shared_ptr<STBinner>(new STBinner(*this)) ;
 }

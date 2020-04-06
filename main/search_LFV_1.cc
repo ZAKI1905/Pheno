@@ -25,14 +25,14 @@
 #include "../include/PrapCut.h"
 #include "../include/OffZCut.h"
 
-std::vector<double> InvMeMu(std::vector<ExParticle>& parts);
+std::vector<double> InvMeMu(std::vector<PHENO::ExParticle>& parts);
 
 ///////////////////////////////////////////////////
 ///////////////      main()     ///////////////////
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  Instrumentor::Get().BeginSession("search_LFV_1", "Profile_search_LFV_1.json") ;        // Begin session 
+  Zaki::Util::Instrumentor::BeginSession("search_LFV_1", "Profile_search_LFV_1.json") ;        // Begin session 
 
   std::string filename           = "" ;
   std::string Tot_Num_Events_str = "" ;
@@ -51,6 +51,8 @@ int main(int argc,char *argv[])
 
   // Seeding the random function for ID_eff "rand01()"
   srand(time(NULL)) ;
+
+  using namespace PHENO ;
 
   Pheno phen;
 
@@ -132,25 +134,25 @@ int main(int argc,char *argv[])
   // in included header files can be used.
 
   // ID_Eff cut
-  phen.Input({new IdEffCut,"drop_low_eff=true"}) ;
+  phen.Input({new CUTS::IdEffCut,"drop_low_eff=true"}) ;
 
   // Cut on M_l+l-
-  phen.Input({new M2Cut,"M2_Cut_Value=12"}) ;
+  phen.Input({new CUTS::M2Cut,"M2_Cut_Value=12"}) ;
 
   /*  p_T Cut Conditions:
         e & mu: pt>= 7 GeV  (at least 1 > 20 GeV)
         t_h: pt>= 20 GeV
   */
-  phen.Input({new PtCut, "lead=20,sub_lead=7,extra=7,had_tau=20"}) ;
+  phen.Input({new CUTS::PtCut, "lead=20,sub_lead=7,extra=7,had_tau=20"}) ;
 
   /*  prap Cut Conditions:
         e & mu: |eta| < 2.4
         t_h: |eta| < 2.3
   */
-  phen.Input({new PrapCut, "e=2.4,mu=2.4,had_tau=2.3"}) ;
+  phen.Input({new CUTS::PrapCut, "e=2.4,mu=2.4,had_tau=2.3"}) ;
 
   // Isolation cut
-  phen.Input(new IsolationCut) ;
+  phen.Input(new CUTS::IsolationCut) ;
 
   //-------------------------
   // Don't have to run fastjet in this case
@@ -164,10 +166,10 @@ int main(int argc,char *argv[])
   //-------------------------
 
   // Demanding  m(l+l-) <= 75 GeV or 105 GeV <= m(l+l-)
-  phen.Input({new OffZCut, "OffZ_Cut_Min=75,OffZ_Cut_Max=105"}) ;
+  phen.Input({new CUTS::OffZCut, "OffZ_Cut_Min=75,OffZ_Cut_Max=105"}) ;
 
   // Demanding 120 GeV <= m(e+, mu-, e-, mu+) <= 130 GeV
-  phen.Input({new M4Cut, "M4_Cut_Min=120,M4_Cut_Max=130"}) ;  // LFV_1
+  phen.Input({new CUTS::M4Cut, "M4_Cut_Min=120,M4_Cut_Max=130"}) ;  // LFV_1
   
   // -------------------------------------------------------------------------
 
@@ -181,18 +183,18 @@ int main(int argc,char *argv[])
 
   phen.Run() ;
 
-  Instrumentor::Get().EndSession();  // End Session
+  Zaki::Util::Instrumentor::EndSession();  // End Session
   return 0 ;
 }
 
 //==============================================================
 // Invariant mass for (mu, e) pair (for LFV_1 )
-std::vector<double> InvMeMu(std::vector<ExParticle>& parts)
+std::vector<double> InvMeMu(std::vector<PHENO::ExParticle>& parts)
 {
   if (parts.size() != 4 )  return {-100, -100, -100};
 
-  std::vector<ExParticle> sel_EpMum ;
-  std::vector<ExParticle> sel_EmMup ;
+  std::vector<PHENO::ExParticle> sel_EpMum ;
+  std::vector<PHENO::ExParticle> sel_EmMup ;
 
   for (size_t i=0 ; i<parts.size() ; ++i)
   {

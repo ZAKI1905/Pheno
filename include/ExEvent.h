@@ -2,14 +2,18 @@
 #define ExEvent_H
 
 #include "Basics.h"
+
 #include "ExParticle.h"
 
+//--------------------------------------------------------------
+namespace PHENO
+{
 //==============================================================
 // Forward declaration
-class Cut ;
+namespace CUTS { class Cut; };
 class GenJet ;
 
-class ExEvent
+class ExEvent : public Prog
 {
   // Grants access to input, etc.
   friend class Pheno ;
@@ -18,7 +22,7 @@ class ExEvent
   friend class ExParticle ;
 
   // Grants access to setCutPtr:
-  friend class Cut ;
+  friend class CUTS::Cut ;
 
   // Grants access to setGenJetPtr:
   friend class GenJet ;
@@ -127,7 +131,7 @@ class ExEvent
     void SetEventWeight() ;
 
     // Saves the Cut pointer
-    void AddCutPtr(std::shared_ptr<Cut>) ;
+    void AddCutPtr(std::shared_ptr<CUTS::Cut>) ;
 
     // Adds GenJet pointer for STBinner
     void AddGenJetPtr(GenJet*) ;
@@ -166,7 +170,7 @@ class ExEvent
     ParticleLST  full_event ; 
 
     // A list of Cut pointers that have been applied to the event
-    std::vector<std::shared_ptr<Cut>> cut_ptr ;
+    std::vector<std::shared_ptr<CUTS::Cut>> cut_ptr ;
     
     // Leptons that passed all the cuts 
     ParticleLST  isolated_leptons ;   
@@ -184,4 +188,6 @@ class ExEvent
 };
 
 //==============================================================
+} // PHENO namespace
+//=============================================================
 #endif /*ExEvent_H*/

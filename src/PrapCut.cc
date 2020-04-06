@@ -11,22 +11,22 @@
 
 //--------------------------------------------------------------
 // Default Constructor
-PrapCut::PrapCut()
+PHENO::CUTS::PrapCut::PrapCut()
 {
-  logger.SetUnit("PrapCut");
+  // logger.SetUnit("PrapCut");
   SetName("PrapCut") ;
 }
 
 // Constructor
-PrapCut::PrapCut(ExEvent* ev) : Cut(ev) 
+PHENO::CUTS::PrapCut::PrapCut(ExEvent* ev) : Cut(ev) 
 {
-  logger.SetUnit("PrapCut");
+  // logger.SetUnit("PrapCut");
   SetName("PrapCut") ;
 }
 
 //--------------------------------------------------------------
 // Copy Constructor
-PrapCut::PrapCut(const PrapCut& old_obj)
+PHENO::CUTS::PrapCut::PrapCut(const PrapCut& old_obj)
   : e_prap_cut(old_obj.e_prap_cut), 
     mu_prap_cut(old_obj.mu_prap_cut),
     tau_prap_cut(old_obj.tau_prap_cut)
@@ -36,10 +36,10 @@ PrapCut::PrapCut(const PrapCut& old_obj)
 
 //--------------------------------------------------------------
 // Overriding the input method from base class "cut".
-void PrapCut::Input(std::string property)
+void PHENO::CUTS::PrapCut::Input(std::string property)
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(property, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(property, "=") ;
   
   if(inp[0] == "e")
   {
@@ -56,16 +56,16 @@ void PrapCut::Input(std::string property)
 
   else
   {
-    LOG_ERROR((inp[0] + " is invalid option for PRap cut!").c_str()) ;
+    Z_LOG_ERROR((inp[0] + " is invalid option for PRap cut!").c_str()) ;
   } 
 
 }
 
 //--------------------------------------------------------------
 // Virtual method from cut class:
-void PrapCut::CutCond(ParticleLST& in_parlst)
+void PHENO::CUTS::PrapCut::CutCond(ParticleLST& in_parlst)
 {
-  PROFILE_SCOPE("PrapCut::CutCond") ;
+  PROFILE_SCOPE("PHENO::CUTS::PrapCut::CutCond") ;
 
     for(size_t i=0 ; i< in_parlst.size() ; ++i)
     {   
@@ -74,7 +74,7 @@ void PrapCut::CutCond(ParticleLST& in_parlst)
         if( in_parlst[i].idAbs()==ID_ELECTRON )
         {  
           if(  abs( in_parlst[i].GetVisMom().eta() ) > e_prap_cut  )
-            add_elem(rm_list, (int) i) ;            
+            Zaki::Vector::Add(rm_list, (int) i) ;            
         }
 
         //-----------------------------------------------
@@ -82,7 +82,7 @@ void PrapCut::CutCond(ParticleLST& in_parlst)
         if( in_parlst[i].idAbs()==ID_MUON )
         {  
           if(  abs( in_parlst[i].GetVisMom().eta() ) > mu_prap_cut  )
-            add_elem(rm_list, (int) i) ;           
+            Zaki::Vector::Add(rm_list, (int) i) ;           
         }
 
         //-----------------------------------------------
@@ -90,7 +90,7 @@ void PrapCut::CutCond(ParticleLST& in_parlst)
         if( in_parlst[i].idAbs()==ID_TAU && in_parlst[i].IsHadDec() )
         {  
           if(  abs( in_parlst[i].GetVisMom().eta() ) > tau_prap_cut  )
-            add_elem(rm_list, (int) i) ;           
+            Zaki::Vector::Add(rm_list, (int) i) ;           
         }
         //-----------------------------------------------
     }
@@ -98,7 +98,7 @@ void PrapCut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<Cut> PrapCut::Clone() 
+std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::PrapCut::Clone() 
 {
   return std::shared_ptr<PrapCut>(new PrapCut(*this)) ;
 }

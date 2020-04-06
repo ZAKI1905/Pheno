@@ -5,19 +5,25 @@
 #include "ExEvent.h"
 #include "ExParticle.h"
 
+//--------------------------------------------------------------
+namespace PHENO
+{
+  class Pheno;
+//--------------------------------------------------------------
+namespace CUTS
+{
 //=============================================================
 /*
   Cut class takes an event, and a removal list and outputs
   another removal list, reports the Cut if asked by the user.
 */
-class Cut
+class Cut : public Prog
 {
   // Gives access to input, etc.
-  friend class Pheno ;   
+  friend class PHENO::Pheno ;   
   friend struct CutOptions ;
   //--------------------------------------------------------------
   protected:
-    Logger logger ;
     
     // // Protected Constructor for use in derived
     // // copy constructors
@@ -116,6 +122,82 @@ class Cut
     ParticleLST out_parts_cpy ;   
 };
 
+//==============================================================
+//                  Cut Options struct
 //=============================================================
 
+// Cut options includes a cut and its options
+struct CutOptions : public Prog
+{
+  std::shared_ptr<Cut> cutPtr ;
+  // Cut* cut ;
+  std::vector<std::string> options ;
+
+  //--------------------------------------------------------------
+  // Constructor
+  CutOptions(Cut* in_cut, std::string command="")
+  {
+    cutPtr.reset(in_cut) ;
+
+    // stripping spaces from command
+    command = Zaki::String::Strip(command, ' ') ;
+
+    Zaki::String::Str2Lst( options, command )  ;
+
+    InputOptions() ;
+  }
+
+  //--------------------------------------------------------------
+  // Copy Constructor
+  CutOptions(const CutOptions& old_obj)
+  {
+    cutPtr = old_obj.cutPtr->Clone() ;
+
+    options = old_obj.options ;
+  }
+
+  ~CutOptions() {}
+  //--------------------------------------------------------------
+  // Getting the string form
+  std::string GetStrForm()
+  {
+    std::string out_str = "Cut Name: '" + cutPtr->GetName() + "'";
+
+    // if (options.size() == 0 )
+    if (options[0] == "" )
+      return out_str ;
+
+    out_str += "\n - Options: " ;
+
+    for(size_t i=0 ; i< options.size(); i++)
+    {
+      out_str += options[i] ;
+
+      // if its the last element 
+      // no need for an extra comma
+      if ( i == options.size()-1)
+        break;
+      
+      out_str += ", " ; 
+    }
+    return out_str ;
+  }
+
+  //--------------------------------------------------------------
+  // Set the input for each cut
+  void InputOptions()
+  {
+    for( size_t i=0 ; i<options.size() ; ++i)
+    {
+      cutPtr->Input(options[i]) ;
+    }
+  }
+  //--------------------------------------------------------------
+
+};
+//=============================================================
+} // CUTS namespace
+//=============================================================
+} // PHENO namespace
+//=============================================================
 #endif

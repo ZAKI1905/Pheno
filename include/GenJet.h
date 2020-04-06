@@ -2,13 +2,17 @@
 #define  GenJet_H
 
 #include "ExEvent.h"
+#include "Prog.h"
 
+//--------------------------------------------------------------
+namespace PHENO
+{
 //=============================================================
 class STBinner ;
 /*
   Generates the jets and makes reports.
 */
-class GenJet
+class GenJet : public Prog
 {
 
   // Gives access to input, etc.
@@ -19,7 +23,6 @@ class GenJet
 
   //--------------------------------------------------------------
   protected:
-    Logger logger ;
 
   //--------------------------------------------------------------
   public:
@@ -112,7 +115,7 @@ class GenJet
     // Finds the distance between the pseudo jet and a particle
     double Distance(fastjet::PseudoJet&, ExParticle&) ; 
 
-    // Removes jets close to isoalted leptons
+    // Removes jets close to isolated leptons
     void  Isolate() ;    
 
     // Isolation condition assuming jets are faking taus
@@ -134,5 +137,6 @@ class GenJet
 };
 
 //=============================================================
-
+} // PHENO namespace
+//=============================================================
 #endif

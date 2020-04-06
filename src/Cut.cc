@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <iostream>
 
+// #include <zaki/Vector/Vector_Basic.h>
+
 #include "../include/Cut.h"
 
 //==============================================================
@@ -16,51 +18,51 @@
 //--------------------------------------------------------------
 // Constructor
 // Default Constructor
-Cut::Cut() { }
+PHENO::CUTS::Cut::Cut() { }
 
 // Constructor takes a reference to an event.
-Cut::Cut(ExEvent* ev) : evPtr(ev) {
+PHENO::CUTS::Cut::Cut(PHENO::ExEvent* ev) : evPtr(ev) {
   // // Adding the pointer to this cut to the event
   //   ev.addCutPtr(this);
 }
 
 //--------------------------------------------------------------
 // Setting pointer to an event
-void Cut::SetEventPtr(ExEvent* in_ev) 
+void PHENO::CUTS::Cut::SetEventPtr(PHENO::ExEvent* in_ev) 
 {
   evPtr = in_ev ;
 }
 
 //--------------------------------------------------------------
 // Setting the cut label
-void Cut::SetName(const char* in_name) 
+void PHENO::CUTS::Cut::SetName(const char* in_name) 
 {
   name = in_name ;
 }
 
 //--------------------------------------------------------------
 // Setting the cut label
-std::string Cut::GetName() const 
+std::string PHENO::CUTS::Cut::GetName() const 
 {
   return name;
 }
 
 //--------------------------------------------------------------
 // Getting pointer to an event
-ExEvent* Cut::GetEventPtr() const
+PHENO::ExEvent* PHENO::CUTS::Cut::GetEventPtr() const
 {
   return evPtr;
 }
 
 //--------------------------------------------------------------
 // Virtual destructor
-Cut::~Cut() { }
+PHENO::CUTS::Cut::~Cut() { }
 
 //--------------------------------------------------------------
 /*
   Reports the details of the cut into a text file.
 */
-void Cut::Report() const
+void PHENO::CUTS::Cut::Report() const
 {
 
   bool no_part_selected = false ;
@@ -79,23 +81,22 @@ void Cut::Report() const
     if( same_iEv != evPtr->i() )
     {
       same_iEv = evPtr->i() ;
-      fprintf(pCUT_REPORT_FILE,"\n %s Event %5d %s\n", pr(50,'*').c_str(),
-       same_iEv, pr(50,'*').c_str()) ;
+      fprintf(pCUT_REPORT_FILE,"\n %s Event %5d %s\n", Zaki::String::Multiply('*', 50).c_str(),
+       same_iEv, Zaki::String::Multiply('*', 50).c_str()) ;
 
     }
-
 
   // --------------------------------------
   // List of particles prior to the Cut
   // --------------------------------------
     fprintf(pCUT_REPORT_FILE,
     "\n %s\n| %19s  %-74s %-20s |\n| %19s  %-74s %-20s |\n|%s|\n",
-    pr(118,'_').c_str()," "," "," ","*",report_title.c_str(),
-    "*",pr(118,'_').c_str()) ;
+    Zaki::String::Multiply('_', 118).c_str()," "," "," ","*",report_title.c_str(),
+    "*",Zaki::String::Multiply('_', 118).c_str()) ;
 
     if(in_parts_cpy.size() > 0){fprintf(pCUT_REPORT_FILE,
     "  %s\n |  Particles selected for this cut   |",
-    pr(36,'_').c_str());}
+    Zaki::String::Multiply('_', 36).c_str());}
 
     else{no_part_selected = true; fprintf(pCUT_REPORT_FILE,
     "\n No particle was selected for this cut.");}
@@ -117,7 +118,7 @@ void Cut::Report() const
     if( out_parts_cpy.size() > 0 && in_parts_cpy.size() != out_parts_cpy.size() )
      {
       fprintf(pCUT_REPORT_FILE,
-      "  %s\n |  Particles passing this cut   |",pr(31,'_').c_str()) ;
+      "  %s\n |  Particles passing this cut   |", Zaki::String::Multiply('_', 31).c_str()) ;
       evPtr->PrintTable<ExParticle>(pCUT_REPORT_FILE, out_parts_cpy) ;
      }
   // If none passed
@@ -136,15 +137,15 @@ void Cut::Report() const
 }
 
 //--------------------------------------------------------------
-void Cut::Input(std::string property)
+void PHENO::CUTS::Cut::Input(std::string property)
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(property, ":") ;
+  std::vector<std::string> inp = Zaki::String::Pars(property, ":") ;
 
   if(inp[0] == "Report_Cut")
   {
-    report_title = pars(inp[1], ":" )[0]  ;
-    sprintf(cut_report_char, "%s", (pars(inp[1], ":" )[1]).c_str() ) ;
+    report_title = Zaki::String::Pars(inp[1], ":" )[0]  ;
+    sprintf(cut_report_char, "%s", (Zaki::String::Pars(inp[1], ":" )[1]).c_str() ) ;
     report_cut   = true ;
     return ;
   }
@@ -159,7 +160,7 @@ void Cut::Input(std::string property)
 
 //--------------------------------------------------------------
 // Applies the cut on in_parlst
-void Cut::Apply(ParticleLST& in_parlst)
+void PHENO::CUTS::Cut::Apply(ParticleLST& in_parlst)
 {
 
   // Copying in_parlst for report()
@@ -169,7 +170,7 @@ void Cut::Apply(ParticleLST& in_parlst)
     CutCond(in_parlst) ;
 
   // Removes the elements in in_parlst based on rm_list
-    rm_elem(in_parlst, rm_list) ;
+    Zaki::Vector::Remove(in_parlst, rm_list) ;
 
   // Adding the pointer to this cut to the event
     // evPtr->addCutPtr(this) ;

@@ -10,22 +10,22 @@
 //==============================================================
 //--------------------------------------------------------------
 // Constructor
-Binner::Binner() {}
+PHENO::Binner::Binner() {}
 
 //--------------------------------------------------------------
 // Virtual destructor
-Binner::~Binner() { }
+PHENO::Binner::~Binner() { }
 
 //--------------------------------------------------------------
 // Setting the binner label
-void Binner::SetName(const char* in_name) 
+void PHENO::Binner::SetName(const char* in_name) 
 {
   name = in_name ;
 }
 
 //--------------------------------------------------------------
 // Setting the binner label
-std::string Binner::GetName() const 
+std::string PHENO::Binner::GetName() const 
 {
   return name;
 }

@@ -27,7 +27,7 @@
 // Binner classes header files
 #include "../include/STBinner.h"
 
-double ftest(std::vector<ExParticle>&);
+double ftest(std::vector<PHENO::ExParticle>&);
 //==============================================================
 // .............................................................
 //                          CUTS
@@ -67,21 +67,20 @@ double ftest(std::vector<ExParticle>&);
 //    For reporting the binning results
 // (5) 'void Report(std::string) const'
 // .............................................................
-
-class MyCut : public Cut
+class MyCut : public PHENO::CUTS::Cut
 {
 
   public:
 
     // Default constructor
-    MyCut() {logger.SetUnit("MyCut"); SetName("my_cut");}
+    MyCut() {SetName("my_cut");}
 
     // Constructor
-    // MyCut(ExEvent* ev) : Cut(ev) {logger.SetUnit("MyCut");}
+    // MyCut(ExEvent* ev) : Cut(ev) {}
 
   private:
     // Virtual method from cut class
-    void CutCond(std::vector<ExParticle>& in_set) override
+    void CutCond(std::vector<PHENO::ExParticle>& in_set) override
     {
 
     } 
@@ -92,6 +91,7 @@ class MyCut : public Cut
     }
 
 };
+
 //==============================================================
 
 ///////////////////////////////////////////////////
@@ -101,7 +101,7 @@ int main(int argc,char *argv[])
 {
 #if PROFILING
   // Begin session 
-  Instrumentor::Get().BeginSession("user_def_cuts", "user_def_cuts.json");       
+  Zaki::Util::Instrumentor::BeginSession("user_def_cuts", "user_def_cuts.json");       
 #endif
 
   // PROFILE_FUNCTION() ;
@@ -125,6 +125,8 @@ int main(int argc,char *argv[])
 
   // Seeding the random function for ID_eff "rand01()"
   srand(time(NULL)) ;
+
+  using namespace PHENO ;
 
   Pheno phen;
 
@@ -209,25 +211,25 @@ int main(int argc,char *argv[])
 
   // ID_Eff cut
   // IdEffCut* id_eff = new IdEffCut  ;
-  phen.Input({new IdEffCut, "drop_low_eff=true"}) ;
+  phen.Input({new CUTS::IdEffCut, "drop_low_eff=true"}) ;
 
   // Cut on M_l+l- 
   // M2Cut* m2_cut = new M2Cut ;
-  phen.Input({new M2Cut ,"M2_Cut_Value=12"}) ;
+  phen.Input({new CUTS::M2Cut ,"M2_Cut_Value=12"}) ;
 
   // /*  p_T Cut Conditions:
   //       e & mu: pt>= 10 GeV  (at least 1 > 20 GeV)
   //       t_h: pt>= 20 GeV
   // */
   // PtCut* pt_cut = new PtCut ;
-  phen.Input({new PtCut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
+  phen.Input({new CUTS::PtCut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
 
   // /*  prap Cut Conditions:
   //       e & mu: |eta| < 2.4
   //       t_h: |eta| < 2.3
   // */
   // PrapCut* prap_cut = new PrapCut;
-  phen.Input({new PrapCut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
+  phen.Input({new CUTS::PrapCut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
 
   // phen.Input("record=test_after_Prap", ftest);
   
@@ -236,7 +238,7 @@ int main(int argc,char *argv[])
 
   // Isolation cut
   // IsolationCut* iso_cut = new  IsolationCut; 
-  phen.Input(new  IsolationCut) ;
+  phen.Input(new  CUTS::IsolationCut) ;
 
   //-------------------------
   // fastjet options
@@ -257,7 +259,7 @@ int main(int argc,char *argv[])
 }
 
 #if PROFILING
-  Instrumentor::Get().EndSession();  // End Session
+  Zaki::Util::Instrumentor::EndSession();  // End Session
 #endif
 
   return 0 ;
@@ -266,7 +268,7 @@ int main(int argc,char *argv[])
 //==============================================================
 // You can change the body of this function
 // and use it for recording variables, and vectors
-double ftest(std::vector<ExParticle>& parts)
+double ftest(std::vector<PHENO::ExParticle>& parts)
 {
   double test_out = 0 ;
 

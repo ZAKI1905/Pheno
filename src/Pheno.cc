@@ -10,6 +10,8 @@
 #include <chrono>
 #include <thread>
 
+#include <zaki/File/SaveVec.h>
+
 #include "../include/Pheno.h"
 // #include "../include/IdEff.h"
 // #include "../include/Isolation.h"
@@ -24,10 +26,10 @@
 
 //--------------------------------------------------------------
 // Constructor
-Pheno::Pheno()
+PHENO::Pheno::Pheno()
 {
   start_time = omp_get_wtime() ; 
-  logger.SetUnit("Pheno"); 
+  // logger.SetUnit("Pheno"); 
   
   auto t_1 = std::chrono::system_clock::now();
   std::time_t start_t = std::chrono::system_clock::to_time_t(t_1);
@@ -42,17 +44,17 @@ Pheno::Pheno()
 
 //--------------------------------------------------------------
 // Destructor
-Pheno::~Pheno()
+PHENO::Pheno::~Pheno()
 {
   char tmp[100];
   sprintf(tmp, "Number of threads used: %2d,  Processing Time:  %.2f s.",
           threads, omp_get_wtime()-start_time) ;
-  LOG_INFO(tmp) ;
+  Z_LOG_INFO(tmp) ;
 
 }
 
 //--------------------------------------------------------------
-void Pheno::Input(std::string command, bool strip_space)
+void PHENO::Pheno::Input(std::string command, bool strip_space)
 /*
   Input method that initializes the Pheno class:
 */
@@ -64,11 +66,11 @@ void Pheno::Input(std::string command, bool strip_space)
 
   // Stripping the command from any spaces:
   if ( strip_space )
-    command = strip(command, ' ');
+    command = Zaki::String::Strip(command, ' ');
   
 
   // Parsing the command
-  std::vector<std::string> inp = pars(command, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(command, "=") ;
 
   std::string prop  = inp[0] ;
   bool value                 ;
@@ -77,7 +79,7 @@ void Pheno::Input(std::string command, bool strip_space)
   if(inp[1] == "false") {value = false ; }
 
   // Cases with report options:
-  std::vector<std::string> parsed_prop = pars(prop, ":") ;
+  std::vector<std::string> parsed_prop = Zaki::String::Pars(prop, ":") ;
 
   if( parsed_prop[0] == "report" ) 
   {
@@ -93,11 +95,11 @@ void Pheno::Input(std::string command, bool strip_space)
     else 
     {
       if ( parsed_prop[1] == "cuts" )
-        report_cuts_set  = ev_range_pars(inp[1])  ;
+        report_cuts_set  = Zaki::String::RangeParser(inp[1])  ;
       if ( parsed_prop[1] == "jets" )
-        report_jets_set  = ev_range_pars(inp[1])  ;
+        report_jets_set  = Zaki::String::RangeParser(inp[1])  ;
       if ( parsed_prop[1] == "taus" )
-        report_taus_set  = ev_range_pars(inp[1])  ;
+        report_taus_set  = Zaki::String::RangeParser(inp[1])  ;
     }
   
   }
@@ -109,21 +111,21 @@ void Pheno::Input(std::string command, bool strip_space)
   if(prop == "print_events") 
   {
     // Parsing the input event numbers
-    print_ev_set = ev_range_pars(inp[1]) ;
+    print_ev_set = Zaki::String::RangeParser(inp[1]) ;
   }
 
   if( prop == "required_set" )
   {
     std::vector<std::string> tmp_req_lst ;
-    stolst( tmp_req_lst, inp[1] )  ;
+    Zaki::String::Str2Lst( tmp_req_lst, inp[1] )  ;
 
     StateDict(tmp_req_lst) ;
   }
 
   // if(prop == "cuts")
   // {
-  //   std::vector<std::string> tmp_cut_lst = {pars(inp[1], ":")[0]} ;
-  //   stolst( tmp_cut_lst, pars(inp[1], ":")[1] )  ;
+  //   std::vector<std::string> tmp_cut_lst = {Zaki::String::Pars(inp[1], ":")[0]} ;
+  //   Zaki::String::Str2Lst( tmp_cut_lst, Zaki::String::Pars(inp[1], ":")[1] )  ;
   //   cut_list.push_back(tmp_cut_lst) ;
 
   //   //................Recording funcs & vars................
@@ -143,13 +145,13 @@ void Pheno::Input(std::string command, bool strip_space)
     if ( inp[1] == "run" )
     {
       gen_jet_idx = cut_list.size() - 1 ;
-      // LOG_INFO((" gen_jet_idx is = " + std::to_string(gen_jet_idx) ).c_str() );
+      // Z_LOG_INFO((" gen_jet_idx is = " + std::to_string(gen_jet_idx) ).c_str() );
     }
     else
     {
       // fastjet options
-      std::vector<std::string> tmp_fj_commands = {pars(inp[1], ":")[0]} ;
-      stolst( tmp_fj_commands, pars(inp[1], ":")[1] )  ;
+      std::vector<std::string> tmp_fj_commands = {Zaki::String::Pars(inp[1], ":")[0]} ;
+      Zaki::String::Str2Lst( tmp_fj_commands, Zaki::String::Pars(inp[1], ":")[1] )  ;
 
       fastjet_commands.push_back(tmp_fj_commands) ;
     }
@@ -160,8 +162,8 @@ void Pheno::Input(std::string command, bool strip_space)
 
   // if(prop == "Bin")
   // {
-  //   std::vector<std::string> tmp_bin_lst = {pars(inp[1], ":")[0]} ;
-  //   stolst( tmp_bin_lst, pars(inp[1], ":")[1] ) ;
+  //   std::vector<std::string> tmp_bin_lst = {Zaki::String::Pars(inp[1], ":")[0]} ;
+  //   Zaki::String::Str2Lst( tmp_bin_lst, Zaki::String::Pars(inp[1], ":")[1] ) ;
   //   bin_list.push_back(tmp_bin_lst) ;
   // }
 
@@ -173,13 +175,13 @@ void Pheno::Input(std::string command, bool strip_space)
     LHE_path = inp[1] ;
 
     // Parsing the lhe file path
-    std::vector<std::string> parsed_lhe_path = pars(LHE_path, "/", -1) ;
+    std::vector<std::string> parsed_lhe_path = Zaki::String::Pars(LHE_path, "/", -1) ;
 
     // Extracting the lhe file name
     inp[1] = parsed_lhe_path [ parsed_lhe_path.size() - 1] ;
 
     // Removing the ".lhe" extenstion from the LHE file:
-    std::vector<std::string> lhe_file_string = pars(inp[1], ".") ;
+    std::vector<std::string> lhe_file_string = Zaki::String::Pars(inp[1], ".") ;
 
     file_LHE     = lhe_file_string[0] ;
 
@@ -202,10 +204,10 @@ void Pheno::Input(std::string command, bool strip_space)
 
 //--------------------------------------------------------------
 template<class T>
-void Pheno::Input(std::string input, T (*func)(ParticleLST& parts) )
+void PHENO::Pheno::Input(std::string input, T (*func)(ParticleLST& parts) )
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(input, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(input, "=") ;
 
   if( inp[0] == "record")
   {
@@ -220,10 +222,10 @@ void Pheno::Input(std::string input, T (*func)(ParticleLST& parts) )
 //--------------------------------------------------------------
 // Specialization for int instances
 template<>
-void Pheno::Input<int>(std::string input, int (*func)(ParticleLST& parts) )
+void PHENO::Pheno::Input<int>(std::string input, int (*func)(ParticleLST& parts) )
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(input, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(input, "=") ;
 
   if( inp[0] == "record")
   {
@@ -238,10 +240,10 @@ void Pheno::Input<int>(std::string input, int (*func)(ParticleLST& parts) )
 //--------------------------------------------------------------
 // Specialization for double vectors instances
 template<>
-void Pheno::Input<std::vector<double> >(std::string input, std::vector<double> (*func)(ParticleLST& parts) )
+void PHENO::Pheno::Input<std::vector<double> >(std::string input, std::vector<double> (*func)(ParticleLST& parts) )
 {
   // Parsing the command
-  std::vector<std::string> inp = pars(input, "=") ;
+  std::vector<std::string> inp = Zaki::String::Pars(input, "=") ;
 
   if( inp[0] == "record")
   {
@@ -254,7 +256,7 @@ void Pheno::Input<std::vector<double> >(std::string input, std::vector<double> (
 }
 
 //--------------------------------------------------------------
-int Pheno::CompStr2Int(std::string input)
+int PHENO::Pheno::CompStr2Int(std::string input)
 {
   if (input == ">=")
     return 1 ;
@@ -273,7 +275,7 @@ int Pheno::CompStr2Int(std::string input)
 }
 
 //--------------------------------------------------------------
-void Pheno::StateDict( std::vector<std::string> lst_in)
+void PHENO::Pheno::StateDict( std::vector<std::string> lst_in)
 {
   // The binary comparisons: {">=", "<=", ">", "<", "=", "!="}
   // Note that ">=" should precede "=" and ">" for pars to
@@ -281,7 +283,7 @@ void Pheno::StateDict( std::vector<std::string> lst_in)
   std::vector<std::string> binary_comp = {">=", "<=", ">", "<", "=", "!="} ;
   for (size_t i=0 ; i<lst_in.size() ; ++i)
   {
-    std::vector<std::string> name_str = pars(lst_in[i], binary_comp) ;
+    std::vector<std::string> name_str = Zaki::String::Pars(lst_in[i], binary_comp) ;
     std::vector<std::vector<int> > tmp_lst = { { std::stoi(name_str[2]),
                                       CompStr2Int(name_str[1]) } } ;
 
@@ -320,7 +322,7 @@ void Pheno::StateDict( std::vector<std::string> lst_in)
       tmp_lst.push_back({ID_TAU}) ;
 
   else
-    LOG_ERROR(("No matching definition for '" + name_str[0] + "' !").c_str()) ;
+    Z_LOG_ERROR(("No matching definition for '" + name_str[0] + "' !").c_str()) ;
 
   req_states.push_back(tmp_lst) ;
   }
@@ -328,11 +330,11 @@ void Pheno::StateDict( std::vector<std::string> lst_in)
 }
 
 //--------------------------------------------------------------
-void Pheno::Run()
+void PHENO::Pheno::Run()
 {
   PROFILE_FUNCTION() ;
   omp_set_num_threads(req_threads) ;
-  LOG_INFO( ("Threads requested: " + std::to_string(req_threads)).c_str()) ;
+  Z_LOG_INFO( ("Threads requested: " + std::to_string(req_threads)).c_str()) ;
 
   num_cuts_passed.resize(tot_num_events) ;
   
@@ -353,7 +355,7 @@ void Pheno::Run()
 }
 
 //-----------------------------------
-void Pheno::RunPythia(int pr_id)
+void PHENO::Pheno::RunPythia(int pr_id)
 /*
   Runs pythia, input the events in EV's and apply cuts
   and make reports, along with binning.
@@ -429,7 +431,7 @@ void Pheno::RunPythia(int pr_id)
     ExEvent ev(iEvent_Glob, pythia.event) ;
 
     // Reporting events
-    if( contains(print_ev_set, iEvent_Glob) )
+    if( Zaki::Vector::Exists(iEvent_Glob, print_ev_set) )
     {
       std::string event_rep_str(shared_file_char) ;
       event_rep_str = "Event_Report_"+event_rep_str + "_" +
@@ -441,7 +443,7 @@ void Pheno::RunPythia(int pr_id)
     std::string tau_rep_str(shared_file_char) ;
     tau_rep_str = "Tau_Report_" + tau_rep_str + ".txt" ;
 
-    bool tau_report_bool = ( report_taus_flag || contains( report_taus_set, ev.i() ) ) ;
+    bool tau_report_bool = ( report_taus_flag || Zaki::Vector::Exists(ev.i(), report_taus_set) ) ;
     ev.Input("Report_Taus", tau_report_bool) ;
 
     // Find hadronic taus
@@ -494,7 +496,7 @@ void Pheno::RunPythia(int pr_id)
 // loop to the next iteration, i.e. cut is not passed.
 // So the conditions here are the logical negation of :
 //       {">=", "<=", ">", "<", "=", "!="}
-bool Pheno::break_ev_loop(ParticleLST& prt_lst)
+bool PHENO::Pheno::break_ev_loop(ParticleLST& prt_lst)
 {
 
   for ( size_t i=0 ; i < req_states.size() ; ++i)
@@ -529,8 +531,8 @@ bool Pheno::break_ev_loop(ParticleLST& prt_lst)
 
 //-------------------------------------------------------
 // Cuts
-int Pheno::RunCuts(ExEvent& ev, ParticleLST& part_lst,
- std::vector<CutOptions> cut_lst, char* shared_file_char)
+int PHENO::Pheno::RunCuts(ExEvent& ev, ParticleLST& part_lst,
+ std::vector<PHENO::CUTS::CutOptions> cut_lst, char* shared_file_char)
 {
   PROFILE_SCOPE("Run Cuts") ;
 
@@ -580,7 +582,7 @@ int Pheno::RunCuts(ExEvent& ev, ParticleLST& part_lst,
     // Saving the name of the cut in the cut instance
     // c1->Cut::Input("Name:"+cut_name) ;
 
-    bool cut_report_bool = ( report_cuts_flag || contains( report_cuts_set, ev.i() ) ) ;
+    bool cut_report_bool = ( report_cuts_flag || Zaki::Vector::Exists(ev.i(), report_cuts_set) ) ;
     if(cut_report_bool) cut_lst[i].cutPtr->Cut::Input(cut_rep_title+ ":" + cut_file_str) ;
 
     // // Read the input for each cut
@@ -613,7 +615,7 @@ int Pheno::RunCuts(ExEvent& ev, ParticleLST& part_lst,
 
 //-------------------------------------------------------
 // Cut dictionary
-// std::shared_ptr<Cut> Pheno::CutDict(ExEvent* ev, std::string input)
+// std::shared_ptr<Cut> PHENO::Pheno::CutDict(ExEvent* ev, std::string input)
 // {
 
 //   std::shared_ptr<Cut> pCut ;
@@ -632,12 +634,12 @@ int Pheno::RunCuts(ExEvent& ev, ParticleLST& part_lst,
 
 //-------------------------------------------------------
 // Runs fastjet and saves a list of jets, and reports if Report_Jets is true.
-void Pheno::RunGenJet(ExEvent& ev, char* shared_file_char)
+void PHENO::Pheno::RunGenJet(ExEvent& ev, char* shared_file_char)
 {   
   PROFILE_FUNCTION() ;
   std::string jet_file_str(shared_file_char) ;
 
-  bool jet_report_bool = ( report_jets_flag || contains( report_jets_set, ev.i() ) ) ;
+  bool jet_report_bool = ( report_jets_flag || Zaki::Vector::Exists(ev.i(), report_jets_set) ) ;
   if(jet_report_bool) { ev.GenJetPtr->Input( {"Report_Jets", jet_file_str} ) ; }
 
   for (size_t i=0 ; i<fastjet_commands.size() ; ++i)
@@ -648,7 +650,7 @@ void Pheno::RunGenJet(ExEvent& ev, char* shared_file_char)
   
 //-------------------------------------------------------
 // Recording Values
-void Pheno::Record(size_t cut_idx, ParticleLST& part_lst)
+void PHENO::Pheno::Record(size_t cut_idx, ParticleLST& part_lst)
 {
   PROFILE_FUNCTION() ;
   // #pragma omp single
@@ -693,7 +695,7 @@ void Pheno::Record(size_t cut_idx, ParticleLST& part_lst)
 
 //-------------------------------------------------------
 // Binner dictionary
-// std::shared_ptr<Binner> Pheno::bin_dict(std::string input)
+// std::shared_ptr<Binner> PHENO::Pheno::bin_dict(std::string input)
 // {
 //   std::shared_ptr<Binner> pBinner ;
 
@@ -705,7 +707,7 @@ void Pheno::Record(size_t cut_idx, ParticleLST& part_lst)
 
 //-------------------------------------------------------
 // Initializing the binner classes
-// void Pheno::InitBinner()
+// void PHENO::Pheno::InitBinner()
 // {
 
 //   for( size_t i=0 ; i<bin_list.size() ; ++i)
@@ -728,14 +730,14 @@ void Pheno::Record(size_t cut_idx, ParticleLST& part_lst)
 //-------------------------------------------------------
 // Binning the event
 // Has to be within critical statement in parallel region!
-void Pheno::BinEvents(ExEvent& ev, char* shared_file_char)
+void PHENO::Pheno::BinEvents(ExEvent& ev, char* shared_file_char)
 {
   PROFILE_FUNCTION() ;
 
   std::string cut_file_str(shared_file_char) ;
   cut_file_str = "Pythia_Cut_Report_" + cut_file_str + ".txt" ;
 
-  bool cut_report_bool = ( report_cuts_flag || contains( report_cuts_set, ev.i() ) ) ;
+  bool cut_report_bool = ( report_cuts_flag || Zaki::Vector::Exists(ev.i(), report_cuts_set) ) ;
 
  // Read the input for each binner
   for( size_t i=0 ; i<bin_list.size() ; ++i)
@@ -749,11 +751,12 @@ void Pheno::BinEvents(ExEvent& ev, char* shared_file_char)
 
 //-------------------------------------------------------
 // Reporting
-void Pheno::FinalReport()
+void PHENO::Pheno::FinalReport()
 {
+
   char tmp[100] ;
   sprintf(tmp, "Total number of events passing the cuts: %f.", num_ev_passed) ;
-  LOG_INFO(tmp) ;
+  Z_LOG_INFO(tmp) ;
 
 
   // .....................................
@@ -764,7 +767,7 @@ void Pheno::FinalReport()
     {
       for (size_t j=0 ; j<rec_double.vars[i].size() ; ++j)
       {
-        saveVec(rec_double.vars[i][j]) ;
+        SaveVec(rec_double.vars[i][j]) ;
       }
     }
   // Double vector values
@@ -772,7 +775,7 @@ void Pheno::FinalReport()
     {
       for (size_t j=0 ; j<rec_vec_double.vars[i].size() ; ++j)
       {
-        saveVec(rec_vec_double.vars[i][j]) ;
+        SaveVec(rec_vec_double.vars[i][j]) ;
       }
     }
   // int values
@@ -780,18 +783,18 @@ void Pheno::FinalReport()
   {
     for (size_t j=0 ; j<rec_int.vars[i].size() ; ++j)
     {
-      saveVec(rec_int.vars[i][j]) ;
+      SaveVec(rec_int.vars[i][j]) ;
     }
   }
   // .....................................
 
   if(rep_num_cut_flag)
-    saveVec(num_cuts_passed, "_rec_Num_Cuts_" + file_LHE);
+    Zaki::File::SaveVec(num_cuts_passed, "_rec_Num_Cuts_" + file_LHE);
 
 
   input_list.push_back("#------------------------------------------------------------------");
   if(rep_input_commands_flag)
-    saveVec(input_list,  "_main_inputs_" + file_LHE);
+    Zaki::File::SaveVec(input_list,  "_main_inputs_" + file_LHE);
 
   // Output for each binner
   for( size_t i=0 ; i<bin_list.size() ; ++i)
@@ -800,7 +803,7 @@ void Pheno::FinalReport()
 
 //-------------------------------------------------------
 // Adding user defined cuts
-void Pheno::Input(CutOptions in_options) 
+void PHENO::Pheno::Input(CUTS::CutOptions in_options) 
 {
   // Saving the command in a list
   input_list.push_back(in_options.GetStrForm()) ;
@@ -820,7 +823,7 @@ void Pheno::Input(CutOptions in_options)
 
 //-------------------------------------------------------
 // Adding user defined binners
-void Pheno::Input(BinnerOptions in_options) 
+void PHENO::Pheno::Input(BinnerOptions in_options) 
 {
   // Saving the command in a list
   input_list.push_back(in_options.GetStrForm()) ;
@@ -833,6 +836,6 @@ void Pheno::Input(BinnerOptions in_options)
 //==============================================================
 //                    explicit instantiations
 //==============================================================
-template void Pheno::Input<double>(std::string, double (*func)(ParticleLST&) ) ;
+template void PHENO::Pheno::Input<double>(std::string, double (*func)(ParticleLST&) ) ;
 
 //==============================================================

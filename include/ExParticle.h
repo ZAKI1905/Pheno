@@ -5,11 +5,18 @@
 #include <fastjet/ClusterSequence.hh>
 #include <fastjet/Selector.hh>
 
+#include <zaki/Vector/Vector_Basic.h>
+
+#include "Prog.h"
+
+//--------------------------------------------------------------
+namespace PHENO
+{
 //==============================================================
 // Forward declaration
 class ExEvent ;
 
-class ExParticle : public Pythia8::Particle
+class ExParticle : public Pythia8::Particle, public Prog
 {
 
   friend class ExEvent ;
@@ -43,7 +50,7 @@ class ExParticle : public Pythia8::Particle
 
       return *this; }
 
-    bool operator==(const ExParticle& right) ;
+    bool operator==(const ExParticle& right) const ;
 
     // Returns the IdEff of particle
     double GetIdEff() ;
@@ -110,4 +117,6 @@ class ExParticle : public Pythia8::Particle
 };
 
 //==============================================================
+} // PHENO namespace
+//=============================================================
 #endif /*ExParticle_H*/

@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+// #include <zaki/Vector/Vector_Basic.h>
+
 #include "../include/Basics.h"
 #include "../include/ExEvent.h"
 #include "../include/GenJet.h"
@@ -26,26 +28,26 @@
 
 //--------------------------------------------------------------
 // Basic  Constructor
-GenJet::GenJet(ExEvent& ev) : ev_ref(ev){ ev.AddGenJetPtr(this); logger.SetUnit("GenJet"); }
+PHENO::GenJet::GenJet(PHENO::ExEvent& ev) : ev_ref(ev){ ev.AddGenJetPtr(this); }
 
 //--------------------------------------------------------------
 // Copy  Constructor
 // Careful about the ev_ref !
-GenJet& GenJet::operator=(const GenJet &other)
+PHENO::GenJet& PHENO::GenJet::operator=(const PHENO::GenJet &other)
 {
   return *this ;
 }
 
 //--------------------------------------------------------------
 // Set Event reference
-void GenJet::SetEventRef(ExEvent& in_event) 
+void PHENO::GenJet::SetEventRef(PHENO::ExEvent& in_event) 
 {
   ev_ref = in_event ;
 }
 
 //--------------------------------------------------------------
 // Takes a pointer to pseudo jets in the event
-void GenJet::GenerateJets()
+void PHENO::GenJet::GenerateJets()
 {
   PROFILE_FUNCTION() ;
   //-----1-Jet Definition-----
@@ -101,7 +103,7 @@ void GenJet::GenerateJets()
 
 //--------------------------------------------------------------
 // input method that takes jet options
-void GenJet::Input(std::vector<std::string> option)
+void PHENO::GenJet::Input(std::vector<std::string> option)
 {
 
   std::string main_option = option[0] ;
@@ -128,21 +130,21 @@ void GenJet::Input(std::vector<std::string> option)
 }
 //--------------------------------------------------------------
 // Sets jet definition options
-void GenJet::SetSelector(std::vector<std::string> selector_set)
+void PHENO::GenJet::SetSelector(std::vector<std::string> selector_set)
 {
 
   // Start i from "1", since the first element is "Selector".
   for (size_t i =1 ; i< selector_set.size(); ++i)
   {
-    std::vector<std::string> tmp_sel = pars(selector_set[i],"=");
+    std::vector<std::string> tmp_sel = Zaki::String::Pars(selector_set[i],"=");
 
     // ......Cases with 4 inputs..........
     if (tmp_sel[0] == "RapPhiRange")
     {
-      std::vector<std::string> tmp_sel_range = pars(tmp_sel[1],"-", -1) ;
+      std::vector<std::string> tmp_sel_range = Zaki::String::Pars(tmp_sel[1],"-", -1) ;
 
       if ( tmp_sel_range.size() !=4 ) 
-      { LOG_ERROR("The range must be four numbers --> ignoring this selector.") ; continue; }
+      { Z_LOG_ERROR("The range must be four numbers --> ignoring this selector.") ; continue; }
       
       double rap_min =  std::stod(tmp_sel_range[0]);
       double rap_max =  std::stod(tmp_sel_range[1]);
@@ -155,13 +157,13 @@ void GenJet::SetSelector(std::vector<std::string> selector_set)
     // ...................................
 
     // ......Cases with 2 inputs..........
-    else if ( endswith(tmp_sel[0], "Range") )
+    else if ( Zaki::String::EndsWith(tmp_sel[0], "Range") )
     {
 
-      std::vector<std::string> tmp_sel_range = pars(tmp_sel[1],"-", -1) ;
+      std::vector<std::string> tmp_sel_range = Zaki::String::Pars(tmp_sel[1],"-", -1) ;
 
       if ( tmp_sel_range.size() !=2 ) 
-      { LOG_ERROR("The range must be two numbers --> ignoring this selector."); continue; }
+      { Z_LOG_ERROR("The range must be two numbers --> ignoring this selector."); continue; }
 
       double min = std::stod(tmp_sel_range[0]);
       double max =  std::stod(tmp_sel_range[1]);
@@ -238,12 +240,12 @@ void GenJet::SetSelector(std::vector<std::string> selector_set)
 
 //--------------------------------------------------------------
 // Sets jet definition options
-void GenJet::SetJetDef(std::vector<std::string> jet_def_set)
+void PHENO::GenJet::SetJetDef(std::vector<std::string> jet_def_set)
 {
   // Start i from "1", since the first element is "Def".
   for (size_t i =1 ; i< jet_def_set.size(); ++i)
     {
-      std::vector<std::string> tmp_def = pars(jet_def_set[i],"=");
+      std::vector<std::string> tmp_def = Zaki::String::Pars(jet_def_set[i],"=");
 
       if (tmp_def[0] == "Algorithm")
         SetJetAlg(tmp_def[1]) ;
@@ -262,7 +264,7 @@ void GenJet::SetJetDef(std::vector<std::string> jet_def_set)
 
 //--------------------------------------------------------------
 // Sets jet algorithm
-void GenJet::SetJetAlg(std::string jet_alg_str)
+void PHENO::GenJet::SetJetAlg(std::string jet_alg_str)
 {
 
   if (jet_alg_str == "antikt_algorithm")
@@ -285,14 +287,14 @@ void GenJet::SetJetAlg(std::string jet_alg_str)
 
   else
   {
-    LOG_WARNING("The algorithm is not found, please add it to GenJet::setJetAlg options."); 
+    Z_LOG_WARNING("The algorithm is not found, please add it to PHENO::GenJet::setJetAlg options."); 
   }
   
 }
 
 //--------------------------------------------------------------
 // Sets recombination scheme
-void GenJet::SetRecScheme(std::string rec_scheme)
+void PHENO::GenJet::SetRecScheme(std::string rec_scheme)
 {
   if (rec_scheme == "E_scheme")
     recomb_scheme = fastjet::E_scheme ;
@@ -310,14 +312,14 @@ void GenJet::SetRecScheme(std::string rec_scheme)
     recomb_scheme = fastjet::BIpt2_scheme ;
   else
   {
-    LOG_WARNING("The recombination scheme is not found, add it to GenJet::SetRecScheme options."); 
+    Z_LOG_WARNING("The recombination scheme is not found, add it to PHENO::GenJet::SetRecScheme options."); 
   }
 
 }
 
 //--------------------------------------------------------------
 // Sets the Strategy
-void GenJet::SetStrategy(std::string strat)
+void PHENO::GenJet::SetStrategy(std::string strat)
 {
   if (strat == "Best")
     strategy = fastjet::Best ;
@@ -333,13 +335,13 @@ void GenJet::SetStrategy(std::string strat)
     strategy = fastjet::NlnNCam ;
   else
   {
-    std::cout<<"==> WARNING: The strategy is not found, please add it to GenJet::setStrategy options.\n"<<std::flush; 
+    std::cout<<"==> WARNING: The strategy is not found, please add it to PHENO::GenJet::setStrategy options.\n"<<std::flush; 
   }
 }
 
 //--------------------------------------------------------------
 // Isolation condition assuming jets are faking taus
-void GenJet::FakeTauIsolate()
+void PHENO::GenJet::FakeTauIsolate()
 {
   PROFILE_FUNCTION();
   std::vector<int> remove_jet ;
@@ -375,7 +377,7 @@ void GenJet::FakeTauIsolate()
 
     if(sum_ET  > 2)
     {
-      add_elem(remove_jet, (int) i) ;
+      Zaki::Vector::Add(remove_jet, (int) i) ;
       
       if (report_jet_flag) 
       {
@@ -389,12 +391,12 @@ void GenJet::FakeTauIsolate()
     }
   }
   
-  rm_elem(inc_jets_after, remove_jet) ;
+  Zaki::Vector::Remove(inc_jets_after, remove_jet) ;
 
 }
 
 //--------------------------------------------------------------
-void GenJet::Isolate()
+void PHENO::GenJet::Isolate()
 {
   PROFILE_FUNCTION();
   std::vector<int> remove_jet ;
@@ -429,13 +431,13 @@ void GenJet::Isolate()
     }
   }
 
-  rm_elem(inc_jets_after, remove_jet) ;
+  Zaki::Vector::Remove(inc_jets_after, remove_jet) ;
 
 }
 
 //--------------------------------------------------------------
 // Returns the distance between the pseudo jet and a particle
-double GenJet::Distance(fastjet::PseudoJet& psjet, ExParticle& p) 
+double PHENO::GenJet::Distance(fastjet::PseudoJet& psjet, ExParticle& p) 
 {
   return pow((pow((psjet.pseudorapidity() - p.GetVisMom().eta() ), 2)
   + pow( ( psjet.phi() - p.GetVisMom().phi() ), 2) ), 0.5) ;
@@ -445,7 +447,7 @@ double GenJet::Distance(fastjet::PseudoJet& psjet, ExParticle& p)
 /*
   Reports the details of the jet production into a text file.
 */
-void GenJet::Report()
+void PHENO::GenJet::Report()
 {
   std::FILE * jet_rep_file  ;
 
@@ -482,9 +484,11 @@ void GenJet::Report()
 /*
   Printing the jet report
 */
-template <class T> void GenJet::PrintJetTable(std::FILE * file,
+template <class T> void PHENO::GenJet::PrintJetTable(std::FILE * file,
  std::vector<T> list, char* File_Description,  const char* Table_Title, int iEv)
 {
+
+  using namespace Zaki::String ;
 
   thread_local static int Table_Num   = 0  ;
   thread_local static int Same_iEvent = -1 ;
@@ -493,12 +497,12 @@ template <class T> void GenJet::PrintJetTable(std::FILE * file,
   {
     // Title of the file
     if(Table_Num==0){fprintf(file," %s FastJet Report %s\n",
-     pr(28,'=').c_str(), pr(36,'=').c_str() ) ;
+     Multiply('=', 28).c_str(), Multiply('=', 36).c_str() ) ;
 
     fprintf(file,"\n FastJet Ran %s. \n", File_Description) ;}
 
     if(Same_iEvent != iEv){  fprintf(file,"\n %s Event %5d begins %s\n",
-     pr(29,'-').c_str() , iEv, pr(29,'-').c_str() ) ;
+     Multiply('-', 29).c_str() , iEv, Multiply('-', 29).c_str() ) ;
                                 Same_iEvent = iEv ;  }
 
     std::string Title_Dash((int) strlen(Table_Title)+8 ,'_') ;
@@ -507,8 +511,8 @@ template <class T> void GenJet::PrintJetTable(std::FILE * file,
 
     // label the columns
     fprintf(file,"\n |%-40s \n | %5s %10s %7s %8s %11s %17s %7s |\n",
-    pr(73,'=').c_str() ,"Jet #", "P.Rap.", "Rap.", "Phi", "p_T", "Constituents", "Charge") ;
-    fprintf(file, " | %s |\n", pr(71,'-').c_str() ) ;
+    Multiply('=', 73).c_str() ,"Jet #", "P.Rap.", "Rap.", "Phi", "p_T", "Constituents", "Charge") ;
+    fprintf(file, " | %s |\n", Multiply('-', 71).c_str() ) ;
 
     // print out the details for each jet
     for (unsigned int i = 0 ; i < list.size() ; ++i) {
@@ -524,7 +528,7 @@ template <class T> void GenJet::PrintJetTable(std::FILE * file,
        list[i].pt(),(unsigned int) constituents.size(), charge,"|") ;
     }
 
-      fprintf(file,"  %s\n", pr(73,'=').c_str() ) ;
+      fprintf(file,"  %s\n", Multiply('=', 73).c_str() ) ;
       Table_Num++ ;
       
   } else   if(iEv == Same_iEvent) {fprintf(file,
@@ -533,7 +537,7 @@ template <class T> void GenJet::PrintJetTable(std::FILE * file,
 
 //--------------------------------------------------------------
 // Returns the inclusive jets after cuts
-std::vector<fastjet::PseudoJet> GenJet::InclusiveJetsAfter()
+std::vector<fastjet::PseudoJet> PHENO::GenJet::InclusiveJetsAfter()
 {
   return inc_jets_after;
 }

@@ -7,7 +7,7 @@
     states with 0-4 leptons,” Phys. Rev. D94 (2016)
     no. 11, 112009, arXiv:1606.08076 [hep-ex].'
 
-  - Last Updated by Zaki on Mar 31, 2020
+  - Last Updated by Zaki on Apr 6, 2020
 */
 
 #include <iostream>
@@ -32,14 +32,14 @@
 // Binner classes header files
 #include "../include/STBinner.h"
 
-double ftest(std::vector<ExParticle>&);
+double ftest(std::vector<PHENO::ExParticle>&);
 
 ///////////////////////////////////////////////////
 ///////////////      main()     ///////////////////
 ///////////////////////////////////////////////////
 int main(int argc,char *argv[])
 {
-  Instrumentor::Get().BeginSession("CMS_8TeV", "Profile_CMS_8TeV.json");        // Begin session 
+  Zaki::Util::Instrumentor::BeginSession("CMS_8TeV", "Profile_CMS_8TeV.json");        // Begin session 
 
   std::string filename           = "" ;
   std::string Tot_Num_Events_str = "" ;
@@ -58,6 +58,8 @@ int main(int argc,char *argv[])
 
   // Seeding the random function for ID_eff "rand01()"
   srand(time(NULL)) ;
+
+  using namespace PHENO ;
 
   Pheno phen;
 
@@ -141,27 +143,27 @@ int main(int argc,char *argv[])
   // phen.Input("record=invMass_0", ftest);
   
   // ID_Eff cut
-  phen.Input({new IdEffCut, "drop_low_eff=true"}) ;
+  phen.Input({new CUTS::IdEffCut, "drop_low_eff=true"}) ;
 
   // Cut on M_l+l- 
-  phen.Input({new M2Cut, "M2_Cut_Value=12"}) ;
+  phen.Input({new CUTS::M2Cut, "M2_Cut_Value=12"}) ;
 
   /*  p_T Cut Conditions:
         e & mu: pt>= 10 GeV  (at least 1 > 20 GeV)
         t_h: pt>= 20 GeV
   */
-  phen.Input({new PtCut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
+  phen.Input({new CUTS::PtCut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
 
   /*  prap Cut Conditions:
         e & mu: |eta| < 2.4
         t_h: |eta| < 2.3
   */
-  phen.Input({new PrapCut, "e=2.4, mu=2.4, had_tau=2.3"} ) ;
+  phen.Input({new CUTS::PrapCut, "e=2.4, mu=2.4, had_tau=2.3"} ) ;
 
   phen.Input("record=test_after_Prap", ftest);
   
   // Isolation cut
-  phen.Input(new IsolationCut) ;
+  phen.Input(new CUTS::IsolationCut) ;
 
   //-------------------------
   // fastjet options
@@ -178,14 +180,14 @@ int main(int argc,char *argv[])
 
   phen.Run() ;
 
-  Instrumentor::Get().EndSession();  // End Session
+  Zaki::Util::Instrumentor::EndSession();  // End Session
   return 0 ;
 }
 
 //==============================================================
 // You can change the body of this function
 // and use it for recording variables, and vectors
-double ftest(std::vector<ExParticle>& parts)
+double ftest(std::vector<PHENO::ExParticle>& parts)
 {
   double test_out = 0 ;
 

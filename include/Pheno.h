@@ -1,157 +1,19 @@
 #ifndef Pheno_H
 #define Pheno_H
 
+#include <zaki/String/String_Basic.h>
+
 #include "Cut.h"
 #include "GenJet.h"
 #include "Binner.h"
-
-//==============================================================
-// Binner options includes a binner and its options
-struct BinnerOptions
+//--------------------------------------------------------------
+namespace PHENO
 {
-  std::shared_ptr<Binner> binnerPtr ;
-  std::vector<std::string> options ;
-
-  //--------------------------------------------------------------
-  // Constructor
-  BinnerOptions(Binner* in_cut, std::string command="")
-  {
-    // binnerPtr = in_cut->Clone() ;
-    binnerPtr.reset(in_cut) ;
-
-    // stripping spaces from command
-    command = strip(command, ' ') ;
-
-    stolst( options, command )  ;
-
-    InputOptions() ;
-  }
-
-  //--------------------------------------------------------------
-  // Copy Constructor
-  BinnerOptions(const BinnerOptions& old_obj)
-  {
-    binnerPtr = old_obj.binnerPtr->Clone() ;
-
-    options = old_obj.options ;
-  }
-
-  ~BinnerOptions(){}
-  //--------------------------------------------------------------
-  // Getting the string form
-  std::string GetStrForm()
-  {
-    std::string out_str = "Binner Name: '" + binnerPtr->GetName() + "'";
-
-    if (options[0] == "" )
-      return out_str ;
-
-    out_str += "\n - Options: " ;
-
-    for(size_t i=0 ; i< options.size(); i++)
-    {
-      out_str += options[i] ;
-
-      // if its the last element 
-      // no need for an extra comma
-      if ( i == options.size()-1)
-        break;
-      
-      out_str += ", " ; 
-    }
-    return out_str ;
-  }
-
-  //--------------------------------------------------------------
-  // Set the input for each cut
-  void InputOptions()
-  {
-    for( size_t i=0 ; i<options.size() ; ++i)
-    {
-      binnerPtr->Input(options[i]) ;
-    }
-  }
-  //--------------------------------------------------------------
-
-};
-
+  
 //==============================================================
-// Cut options includes a cut and its options
-struct CutOptions
+class Pheno : public Prog
 {
-  std::shared_ptr<Cut> cutPtr ;
-  // Cut* cut ;
-  std::vector<std::string> options ;
 
-  //--------------------------------------------------------------
-  // Constructor
-  CutOptions(Cut* in_cut, std::string command="")
-  {
-    cutPtr.reset(in_cut) ;
-
-    // stripping spaces from command
-    command = strip(command, ' ') ;
-
-    stolst( options, command )  ;
-
-    InputOptions() ;
-  }
-
-  //--------------------------------------------------------------
-  // Copy Constructor
-  CutOptions(const CutOptions& old_obj)
-  {
-    cutPtr = old_obj.cutPtr->Clone() ;
-
-    options = old_obj.options ;
-  }
-
-  ~CutOptions() {}
-  //--------------------------------------------------------------
-  // Getting the string form
-  std::string GetStrForm()
-  {
-    std::string out_str = "Cut Name: '" + cutPtr->GetName() + "'";
-
-    // if (options.size() == 0 )
-    if (options[0] == "" )
-      return out_str ;
-
-    out_str += "\n - Options: " ;
-
-    for(size_t i=0 ; i< options.size(); i++)
-    {
-      out_str += options[i] ;
-
-      // if its the last element 
-      // no need for an extra comma
-      if ( i == options.size()-1)
-        break;
-      
-      out_str += ", " ; 
-    }
-    return out_str ;
-  }
-
-  //--------------------------------------------------------------
-  // Set the input for each cut
-  void InputOptions()
-  {
-    for( size_t i=0 ; i<options.size() ; ++i)
-    {
-      cutPtr->Input(options[i]) ;
-    }
-  }
-  //--------------------------------------------------------------
-
-};
-
-//==============================================================
-class Pheno
-{
-  //--------------------------------------------------------------
-  protected:
-    Logger logger ;
   //--------------------------------------------------------------
   public:
 
@@ -163,7 +25,7 @@ class Pheno
   ~Pheno() ;
 
   // Adding user defined cuts
-  void Input(CutOptions) ;
+  void Input(CUTS::CutOptions) ;
 
   // Adding binner classes & their options
   void Input(BinnerOptions) ;
@@ -258,16 +120,16 @@ class Pheno
 
     // Run cuts (returns the number of cuts passed)
     int RunCuts(ExEvent&, ParticleLST&,
-     std::vector<CutOptions>, char*)  ;
+     std::vector<CUTS::CutOptions>, char*)  ;
 
     // Cut dictionary
-    // std::shared_ptr<Cut>  CutDict(ExEvent*, std::string) ;
+    // std::shared_ptr<CUTS::Cut>  CutDict(ExEvent*, std::string) ;
 
     // List of cuts to be applied
-    std::vector<CutOptions> cut_list ;
+    std::vector<CUTS::CutOptions> cut_list ;
 
     // List of cut pointers
-    std::vector<std::shared_ptr<Cut> > cut_ptr_list ;
+    std::vector<std::shared_ptr<CUTS::Cut> > cut_ptr_list ;
 
     //---------------------------------------------
     // Report options:
@@ -333,6 +195,8 @@ class Pheno
     int tot_num_events = 0 ;
 };
 
+//=============================================================
+} // PHENO namespace
 //=============================================================
 
 #endif /*Pheno_H*/
