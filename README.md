@@ -10,9 +10,9 @@ This is the program used for the collider analysis in "[Exotic Lepton-Flavor Vio
 
 If you use this package please cite:
 ```
-  Mohammadreza Zakeri. (2019, October 11).  
-  ZAKI1905/Pheno: Beta-Release (Version v1.0.0-beta). Zenodo.
-  http://doi.org/10.5281/zenodo.3482349
+  Mohammadreza Zakeri. (2020, January 9).
+  ZAKI1905/Pheno v1.0.1 (Version v1.0.1). Zenodo.
+  http://doi.org/10.5281/zenodo.3603138
 ```
 
 For BibTeX style citation use:
@@ -50,6 +50,8 @@ You can then run the program by running "python  ~/python/pheno.py"
 To make the binary files:
   1. Choose the main c++ file (which is inside "~/main") to be compiled, by typing it in front of "MAIN" & "LINK_TARGET" in the make file. 
   2. Run "make"
+  
+  For makefile help run: "make help"
 
 ## Running the C++ binaries (stand-alone)
 You can also run the C++ binaries by themselves, if you already have lhe files and want to run pythia and fastjet.
