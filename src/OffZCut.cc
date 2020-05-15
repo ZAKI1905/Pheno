@@ -106,9 +106,9 @@ void PHENO::CUTS::OffZCut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::OffZCut::Clone() 
+PHENO::CUTS::OffZCut* PHENO::CUTS::OffZCut::IClone() const
 {
-  return std::shared_ptr<OffZCut>(new OffZCut(*this)) ;
+  return new OffZCut(*this) ;
 }
 
 //==============================================================

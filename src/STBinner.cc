@@ -390,9 +390,9 @@ void PHENO::STBinner::Report(std::string File_LHE) const
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<PHENO::Binner> PHENO::STBinner::Clone() 
+PHENO::STBinner* PHENO::STBinner::IClone() const
 {
-  return std::shared_ptr<STBinner>(new STBinner(*this)) ;
+  return new STBinner(*this) ;
 }
 
 //---------------------------------------------------------------

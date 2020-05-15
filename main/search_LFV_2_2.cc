@@ -35,6 +35,11 @@ int main(int argc,char *argv[])
 {
   Zaki::Util::Instrumentor::BeginSession("search_LFV_2_2", "Profile_search_LFV_2_2.json") ;        // Begin session  
 
+if(argc < 5) 
+  { Z_LOG_ERROR("Filename, total events, number of threads & report bool are missing!") ;
+   return 1;
+  }
+  
   std::string filename           = "" ;
   std::string Tot_Num_Events_str = "" ;
   std::string NUM_THREADS_str    = "" ;

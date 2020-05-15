@@ -28,7 +28,7 @@ class IsolationCut : public Cut
 
     // Virtual method from cut class
     void CutCond(ParticleLST&) override;  
-    std::shared_ptr<Cut> Clone() override; 
+    virtual IsolationCut* IClone() const override ;
 
     // These values have to be reset for each particle!
     

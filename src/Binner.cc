@@ -31,5 +31,8 @@ std::string PHENO::Binner::GetName() const
 }
 
 //--------------------------------------------------------------
-
+std::unique_ptr<PHENO::Binner> PHENO::Binner::Clone() const 
+{
+  return std::unique_ptr<Binner>(IClone());
+}
 //==============================================================

@@ -35,11 +35,7 @@ double ftest(std::vector<PHENO::ExParticle>&);
 //  Defining Cuts:
 // User defined cut sub-classes should contain two overriden
 // methods from the Cut class, namely:
-// 'CutCond' & 'Clone'
-// ..............................
-//       * IMPORTANT *
-//  The objects MUST be heap allocated (use 'new'), 
-//   & they SHOULD'NT be deleted by user (don't write 'delete')
+// 'CutCond' & 'IClone'
 // ..............................
 // Options: 
 // It can optionally have 'Input(std::string)' method
@@ -59,7 +55,7 @@ double ftest(std::vector<PHENO::ExParticle>&);
 // (2) 'void Input(std::string)'
 //
 //    For deep-copying the object
-// (3) 'std::shared_ptr<Binner> Clone()'
+// (3) 'Binner* IClone()'
 //
 //    For binning the event, & adding to cut report if "true"
 // (4) 'void BinIt(bool cut_report, std::string)'
@@ -85,9 +81,9 @@ class MyCut : public PHENO::CUTS::Cut
 
     } 
 
-    std::shared_ptr<Cut> Clone() override
+    virtual MyCut* IClone() const override
     {
-      return std::shared_ptr<MyCut>(new MyCut(*this));
+      return new MyCut(*this);
     }
 
 };
@@ -104,6 +100,11 @@ int main(int argc,char *argv[])
   Zaki::Util::Instrumentor::BeginSession("user_def_cuts", "user_def_cuts.json");       
 #endif
 
+if(argc < 5) 
+  { Z_LOG_ERROR("Filename, total events, number of threads & report bool are missing!") ;
+   return 1;
+  }
+  
   // PROFILE_FUNCTION() ;
 {  
   PROFILE_SCOPE("main") ;
@@ -210,35 +211,35 @@ int main(int argc,char *argv[])
   // phen.Input("record=invMass_0", ftest);
 
   // ID_Eff cut
-  // IdEffCut* id_eff = new IdEffCut  ;
-  phen.Input({new CUTS::IdEffCut, "drop_low_eff=true"}) ;
+  CUTS::IdEffCut id_eff;
+  phen.Input({&id_eff, "drop_low_eff=true"}) ;
 
   // Cut on M_l+l- 
-  // M2Cut* m2_cut = new M2Cut ;
-  phen.Input({new CUTS::M2Cut ,"M2_Cut_Value=12"}) ;
+  CUTS::M2Cut m2_cut;
+  phen.Input({&m2_cut,"M2_Cut_Value=12"}) ;
 
   // /*  p_T Cut Conditions:
   //       e & mu: pt>= 10 GeV  (at least 1 > 20 GeV)
   //       t_h: pt>= 20 GeV
   // */
-  // PtCut* pt_cut = new PtCut ;
-  phen.Input({new CUTS::PtCut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
+  CUTS::PtCut pt_cut ;
+  phen.Input({&pt_cut, "lead=20, sub_lead=10, extra=10, had_tau=20"}) ;
 
   // /*  prap Cut Conditions:
   //       e & mu: |eta| < 2.4
   //       t_h: |eta| < 2.3
   // */
-  // PrapCut* prap_cut = new PrapCut;
-  phen.Input({new CUTS::PrapCut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
+  CUTS::PrapCut prap_cut;
+  phen.Input({&prap_cut, "e=2.4, mu=2.4, had_tau=2.3"}) ;
 
   // phen.Input("record=test_after_Prap", ftest);
   
-  // MyCut* my_cut = new  MyCut;
-  phen.Input(new  MyCut) ;
+  MyCut my_cut;
+  phen.Input(&my_cut) ;
 
   // Isolation cut
-  // IsolationCut* iso_cut = new  IsolationCut; 
-  phen.Input(new  CUTS::IsolationCut) ;
+  CUTS::IsolationCut iso_cut; 
+  phen.Input(&iso_cut) ;
 
   //-------------------------
   // fastjet options
@@ -252,7 +253,8 @@ int main(int argc,char *argv[])
 
   // Binning  
   // phen.Input( "Bin=STBinner:ST_Bins=0-300-600-1000-1500" ) ;
-  phen.Input({new STBinner, "ST_Bins=0-300-600-1000-1500"}) ;
+  STBinner st_binner ;
+  phen.Input({&st_binner, "ST_Bins=0-300-600-1000-1500"}) ;
 
 
   phen.Run() ;

@@ -155,9 +155,9 @@ void PHENO::CUTS::M4Cut::pT_Sort(ParticleLST& in_list)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::M4Cut::Clone() 
+PHENO::CUTS::M4Cut* PHENO::CUTS::M4Cut::IClone() const
 {
-  return std::shared_ptr<M4Cut>(new M4Cut(*this)) ;
+  return new M4Cut(*this) ;
 }
 
 //==============================================================

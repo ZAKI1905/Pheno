@@ -3,7 +3,7 @@
   This file is for finding the limits from:
     '  CMS Collaboration,
     p V. Khachatryan et al., “Searches for R-parity-violating 
-    supersymmetry in ppcollisions at (s) = 8 TeV in final 
+    supersymmetry in pp collisions at (s) = 8 TeV in final 
     states with 0-4 leptons,” Phys. Rev. D94 (2016)
     no. 11, 112009, arXiv:1606.08076 [hep-ex].'
 
@@ -41,6 +41,11 @@ int main(int argc,char *argv[])
 {
   Zaki::Util::Instrumentor::BeginSession("CMS_8TeV", "Profile_CMS_8TeV.json");        // Begin session 
 
+if(argc < 5) 
+  { Z_LOG_ERROR("Filename, total events, number of threads & report bool are missing!") ;
+   return 1;
+  }
+  
   std::string filename           = "" ;
   std::string Tot_Num_Events_str = "" ;
   std::string NUM_THREADS_str    = "" ;
@@ -143,7 +148,8 @@ int main(int argc,char *argv[])
   // phen.Input("record=invMass_0", ftest);
   
   // ID_Eff cut
-  phen.Input({new CUTS::IdEffCut, "drop_low_eff=true"}) ;
+  CUTS::IdEffCut id_eff_cut_ptr ;
+  phen.Input({&id_eff_cut_ptr, "drop_low_eff=true"}) ;
 
   // Cut on M_l+l- 
   phen.Input({new CUTS::M2Cut, "M2_Cut_Value=12"}) ;

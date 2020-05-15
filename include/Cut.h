@@ -56,8 +56,10 @@ class Cut : public Prog
     // void apply(std::vector<Particle>&, std::vector<Particle>& )    ;  
     // //----------------------------------
 
-    // Getting the cut label
+    /// Getting the cut label
     std::string GetName() const ;
+  
+    std::unique_ptr<Cut> Clone() const ;
   
   //--------------------------------------------------------------
 
@@ -80,9 +82,7 @@ class Cut : public Prog
     //.......................
     // Getting pointer to an event
     ExEvent* GetEventPtr() const ;
-
-    virtual std::shared_ptr<Cut> Clone() = 0 ;
-
+    virtual Cut*  IClone() const = 0 ;
     //.......................
     // Saves cut details in a .txt file
     void Report() const ;    
@@ -98,7 +98,7 @@ class Cut : public Prog
     std::string name = "unnamed_cut" ;
 
     // Pointer to the event
-    ExEvent* evPtr = NULL ;  
+    ExEvent* evPtr = nullptr ;  
 
     // The removal list
     std::vector<int> rm_list ;  
@@ -137,7 +137,8 @@ struct CutOptions : public Prog
   // Constructor
   CutOptions(Cut* in_cut, std::string command="")
   {
-    cutPtr.reset(in_cut) ;
+    cutPtr = in_cut->Clone() ;
+    // cutPtr.reset(in_cut) ;
 
     // stripping spaces from command
     command = Zaki::String::Strip(command, ' ') ;

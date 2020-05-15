@@ -113,10 +113,10 @@ void PHENO::CUTS::IdEffCut::Input(std::string property)
 }
 
 //--------------------------------------------------------------
-// Overriding the clone method
-std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::IdEffCut::Clone() 
+// Overriding the IClone method
+PHENO::CUTS::IdEffCut* PHENO::CUTS::IdEffCut::IClone() const 
 {
-  return std::shared_ptr<IdEffCut>(new IdEffCut(*this)) ;
+  return new IdEffCut(*this) ;
 }
 
 //==============================================================

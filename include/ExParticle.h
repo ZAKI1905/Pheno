@@ -65,7 +65,7 @@ class ExParticle : public Pythia8::Particle, public Prog
     Pythia8::Vec4 GetVisMom() ;   
 
     // Pointer to the ExEvent to which the particle belongs 
-    ExEvent* event_ptr=NULL ;
+    ExEvent* event_ptr=nullptr ;
   //--------------------------------------------------------------
 
   private:

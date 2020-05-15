@@ -98,9 +98,9 @@ void PHENO::CUTS::PrapCut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::PrapCut::Clone() 
+PHENO::CUTS::PrapCut* PHENO::CUTS::PrapCut::IClone() const
 {
-  return std::shared_ptr<PrapCut>(new PrapCut(*this)) ;
+  return new PrapCut(*this) ;
 }
 
 //==============================================================

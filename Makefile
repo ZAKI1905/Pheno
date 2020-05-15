@@ -1,7 +1,7 @@
 # ----------------------------------
 # Targets
-# LINK_TARGET	:= cms_8TeV
-# MAIN 	:= cms_8TeV
+LINK_TARGET	:= cms_8TeV
+MAIN 	:= cms_8TeV
 
 # LINK_TARGET	:= faketaus
 # MAIN 	:= faketaus
@@ -21,8 +21,8 @@
 # LINK_TARGET	:= search_LFV_4
 # MAIN 	:= search_LFV_4
 
-LINK_TARGET	:= user_cuts
-MAIN 	:= user_cuts
+# LINK_TARGET	:= user_cuts
+# MAIN 	:= user_cuts
 
 
 # ----------------------------------

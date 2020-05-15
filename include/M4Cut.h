@@ -35,7 +35,7 @@ class M4Cut : public Cut
     // Virtual method from cut class
     void CutCond(ParticleLST&) override;   
     void Input(std::string) override; 
-    std::shared_ptr<Cut> Clone() override; 
+    virtual M4Cut* IClone() const override ;
 
     // The minimum of m4l
     float M4_cut_min = 0 ;   

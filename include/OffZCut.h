@@ -34,7 +34,7 @@ class OffZCut : public Cut
     // Virtual method from cut class
     void CutCond(ParticleLST&) override;   
     void Input(std::string) override; 
-    std::shared_ptr<Cut> Clone() override; 
+    virtual OffZCut* IClone() const override ;
 
     // The minimum of OffZ cut
     float OffZ_cut_min = 75 ;   

@@ -35,7 +35,7 @@ class PrapCut : public Cut
     // Virtual method from cut class
     void CutCond(ParticleLST&) override ;   
     void Input(std::string) override ;  
-    std::shared_ptr<Cut> Clone() override; 
+    virtual PrapCut* IClone() const override ; 
 
     // Pseudorapidity cut values
     double e_prap_cut   = 1000 ;

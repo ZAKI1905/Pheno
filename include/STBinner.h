@@ -25,7 +25,7 @@ class STBinner : public Binner
   //--------------------------------------------------------------
   private:
 
-    std::shared_ptr<Binner> Clone() override; 
+    virtual STBinner* IClone() const override ; 
 
     // Reporting the bin information (virtual method from Binner)
     void Report(std::string) const override ;

@@ -100,9 +100,9 @@ void PHENO::CUTS::IsolationCut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::IsolationCut::Clone() 
+PHENO::CUTS::IsolationCut* PHENO::CUTS::IsolationCut::IClone() const
 {
-  return std::shared_ptr<IsolationCut>(new IsolationCut(*this)) ;
+  return new IsolationCut(*this) ;
 }
 
 //==============================================================

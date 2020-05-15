@@ -37,7 +37,7 @@ class PtCut : public Cut
     // Virtual method from cut class
     void CutCond(ParticleLST&) override ;   
     void Input(std::string) override ; 
-    std::shared_ptr<Cut> Clone() override; 
+    virtual PtCut* IClone() const override ; 
 
     bool Comp_pT_Value(const ExParticle&, const ExParticle& ) ;
     ParticleLST pT_Sorter(ParticleLST& ) ;

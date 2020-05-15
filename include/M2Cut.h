@@ -35,7 +35,7 @@ class M2Cut : public Cut
     // Virtual method from cut class
     void CutCond(ParticleLST&) override ;   
     void Input(std::string) override ; 
-    std::shared_ptr<Cut> Clone() override; 
+    virtual M2Cut* IClone() const override ; 
     
     // The cut on m2
     float M2_Cut_Value = 0 ;   

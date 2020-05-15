@@ -47,7 +47,7 @@ private:
 
   // Virtual method from cut class
   void CutCond(ParticleLST&) override ;    
-  std::shared_ptr<Cut> Clone() override ;
+  virtual IdEffCut* IClone() const override ;
   // // Value of the ID_Eff
   // double ID_Eff_Val ;    
 

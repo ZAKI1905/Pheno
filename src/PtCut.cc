@@ -196,9 +196,9 @@ float PHENO::CUTS::PtCut::pT_CutVal(size_t rank, ExParticle& p)
 }
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::PtCut::Clone() 
+PHENO::CUTS::PtCut* PHENO::CUTS::PtCut::IClone() const
 {
-  return std::shared_ptr<PtCut>(new PtCut(*this)) ;
+  return new PtCut(*this) ;
 }
 
 //==============================================================

@@ -116,7 +116,7 @@ class ExEvent : public Prog
     bool drop_low_eff = true ;
 
     // GenJet pointer for STBinner
-    GenJet* GenJetPtr = NULL ;
+    GenJet* GenJetPtr = nullptr ;
 
 //--------------------------------------------------------------
   private:

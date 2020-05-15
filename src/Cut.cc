@@ -27,6 +27,12 @@ PHENO::CUTS::Cut::Cut(PHENO::ExEvent* ev) : evPtr(ev) {
 }
 
 //--------------------------------------------------------------
+std::unique_ptr<PHENO::CUTS::Cut> PHENO::CUTS::Cut::Clone() const 
+{
+  return std::unique_ptr<Cut>(IClone());
+}
+
+//--------------------------------------------------------------
 // Setting pointer to an event
 void PHENO::CUTS::Cut::SetEventPtr(PHENO::ExEvent* in_ev) 
 {

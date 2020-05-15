@@ -21,7 +21,7 @@ public:
   // Virtual destructor
     virtual ~Binner() ;
 
-    virtual std::shared_ptr<Binner> Clone() = 0 ;
+    std::unique_ptr<Binner> Clone() const ;
 
   // Setting the binner label
     void SetName(const char*) ;
@@ -48,7 +48,9 @@ protected:
     std::string name = "unnamed_binner" ;
 
   // Pointer to the event 
-    ExEvent* evp = NULL ;
+    ExEvent* evp = nullptr ;
+
+  virtual Binner* IClone() const = 0;
 };
 
 //==============================================================
@@ -65,8 +67,8 @@ struct BinnerOptions : public Prog
   // Constructor
   BinnerOptions(Binner* in_binner, std::string command="")
   {
-    // binnerPtr = in_cut->Clone() ;
-    binnerPtr.reset(in_binner) ;
+    binnerPtr = in_binner->Clone() ;
+    // binnerPtr.reset(in_binner) ;
 
     // stripping spaces from command
     command = Zaki::String::Strip(command, ' ') ;

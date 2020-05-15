@@ -104,9 +104,9 @@ void PHENO::CUTS::M2Cut::CutCond(ParticleLST& in_parlst)
 
 //--------------------------------------------------------------
 // Overriding the clone method
-std::shared_ptr<PHENO::CUTS::Cut> PHENO::CUTS::M2Cut::Clone() 
+PHENO::CUTS::M2Cut* PHENO::CUTS::M2Cut::IClone() const
 {
-  return std::shared_ptr<M2Cut>(new M2Cut(*this)) ;
+  return new M2Cut(*this) ;
 }
 
 //==============================================================
