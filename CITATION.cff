@@ -1,0 +1,10 @@
+cff-version: 1.0.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Zakeri
+    given-names: Mohammadreza
+    orcid: https://orcid.org/0000-0002-6510-5343
+title: "Pheno"
+version: 1.0.1
+doi: 10.5281/zenodo.3603138
+date-released: 2020-01-09
